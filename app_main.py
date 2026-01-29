@@ -25,7 +25,8 @@ from model_builder import (
     add_activity_allocation_constraints,
     add_worker_capacity_constraints,
     add_interval_worker_limit,
-    add_shift_constraints
+    add_shift_constraints,
+    add_istovar_kontrola_constraint
 )
 from results_display import (
     build_bij_matrix,
@@ -62,7 +63,7 @@ def main():
     (ind_within, ind_until, dep_within, within, until, 
      overlap_activities) = collect_variant_parameters(activities, activity_full_names)
 
-    demand = collect_demand_data(activities, activity_full_names, N_set)
+    demand, istovar_generic_id, kontrola_generic_id = collect_demand_data(activities, activity_full_names, N_set)
 
     # Run optimization button
     run_optimization_disabled = bool(overlap_activities)
@@ -111,6 +112,10 @@ def main():
 
         add_activity_until_constraints(
             model, ind_until, N_set, M_set, xaijk, bij, demand, until, activity_full_names
+        )
+
+        add_istovar_kontrola_constraint(
+            model, istovar_generic_id, kontrola_generic_id, N_set, M_set, xaijk, bij, ratio=0.5
         )
 
         add_activity_allocation_constraints(
