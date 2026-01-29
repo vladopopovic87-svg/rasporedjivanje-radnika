@@ -176,3 +176,37 @@ def add_shift_constraints(model, M_set, M1_set, M2_set, ytj, profil_types, yj,
 
     model += lpSum(yj[j] for j in M1_set) <= max_m1, "Constraint_M1_limit"
     model += lpSum(yj[j] for j in M2_set) <= max_m2, "Constraint_M2_limit"
+
+
+def add_istovar_kontrola_constraint(model, istovar_id, kontrola_id, N_set, M_set, 
+                                   xaijk, bij, ratio=0.5):
+    """
+    Add constraint for Istovar/Kontrola relationship (Constraint 2d).
+    
+    For each interval k, the number of Kontrola activities must be at least 
+    'ratio' times the number of Istovar activities in that interval.
+    
+    Constraint: Kontrola(k) >= ratio * Istovar(k)
+    """
+    if not istovar_id or not kontrola_id:
+        return
+    
+    for k in N_set:
+        # Sum of Istovar activities for all intervals up to k
+        istovar_sum = lpSum(
+            xaijk[(istovar_id, i, j, k)]
+            for i in N_set 
+            for j in M_set 
+            if (istovar_id, i, j, k) in xaijk
+        )
+        
+        # Sum of Kontrola activities at interval k (weighted by availability)
+        kontrola_sum = lpSum(
+            xaijk[(kontrola_id, k, j, k)] * bij.get((k, j), 0)
+            for j in M_set 
+            if (kontrola_id, k, j, k) in xaijk and (k, j) in bij
+        )
+        
+        # Constraint: kontrola >= ratio * istovar
+        model += kontrola_sum >= ratio * istovar_sum, \
+            f"Constraint_2d_istovar_kontrola_{k}"

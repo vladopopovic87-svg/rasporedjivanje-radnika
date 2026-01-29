@@ -347,4 +347,4 @@ def collect_demand_data(activities, activity_full_names, N_set):
         if generic_col_id:
             final_demand_for_model[generic_col_id] = [0] + edited_df_demand[full_col_name].tolist()
 
-    return final_demand_for_model
+    return final_demand_for_model, istovar_generic_id, kontrola_generic_id
