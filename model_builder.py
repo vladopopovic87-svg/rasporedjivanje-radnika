@@ -60,7 +60,7 @@ def build_delta_variables(P, profil_types, M_set, N_set, activities):
     return delta
 
 
-def setup_objective_function(model, P, profil_types, M_set, ytj, delta, ct):
+def setup_objective_function(model, P, profil_types, M_set, ytj, delta, ct, activities):
     """Setup the objective function."""
     obj_part_1 = lpSum(
         ct.get((p_type_id, j), 0) * ytj.get((p_type_id, j), 0)
