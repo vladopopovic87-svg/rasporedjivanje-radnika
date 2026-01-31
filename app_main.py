@@ -130,6 +130,10 @@ def main():
             model, N_set, profil_types, M_set, ytija, MAX_WORKERS_PER_INTERVAL
         )
 
+        add_demand_constraints(
+            model, activities, N_set, M_set, ytija, demand, profil_types
+        )
+
         # Additional constraints from original code
         # Constraint 6: Rest interval limits for M1 shifts
         for j in M1_set:
