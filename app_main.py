@@ -85,7 +85,7 @@ def main():
 
         # Setup objective function
         obj_part_1, obj_part_2 = setup_objective_function(
-            model, P, profil_types, M_set, ytj, delta, ct, activities
+            model, P, profil_types, M_set,N_set, ytj, delta, ct, activities
         )
 
         # Add delta constraints if P > 0

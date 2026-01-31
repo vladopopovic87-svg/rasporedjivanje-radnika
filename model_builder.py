@@ -60,7 +60,7 @@ def build_delta_variables(P, profil_types, M_set, N_set, activities):
     return delta
 
 
-def setup_objective_function(model, P, profil_types, M_set, ytj, delta, ct, activities):
+def setup_objective_function(model, P, profil_types, M_set,N_set, ytj, delta, ct, activities):
     """Setup the objective function."""
     obj_part_1 = lpSum(
         ct.get((p_type_id, j), 0) * ytj.get((p_type_id, j), 0)
@@ -75,8 +75,8 @@ def setup_objective_function(model, P, profil_types, M_set, ytj, delta, ct, acti
             for t in profil_types
             for j in M_set
             for a in activities
-            for i in range(1, max(activities) + 1)
-            if (t, j, a, i) in delta
+            for i in N_set
+            if i<max(N_set)
         )
         model += obj_part_1 + P * obj_part_2, "Total Cost"
     else:
