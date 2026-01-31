@@ -85,15 +85,15 @@ def setup_objective_function(model, P, profil_types, M_set, ytj, delta, ct, acti
     return obj_part_1, obj_part_2 if P > 0 else None
 
 
-def add_demand_constraints(model, activities, N_set, M_set, ytija, demand):
+def add_demand_constraints(model, activities, N_set, M_set, ytija, demand, profil_types):
     """Add constraint for total demand satisfaction."""
     for a in activities:
         model += lpSum(
             ytija[t, i, j, a]
-            for t in [k for k, v in ytija.items() if k[2] == j and k[3] == a]
+            for t in profil_types
             for i in N_set
             for j in M_set
-        ) == sum(demand.get(a, [0])), f"Demand_{a}"
+        ) == sum(demand[a]), f"Demand_{a}"
 
 
 def add_activity_within_constraints(model, ind_within, N_set, M_set, profil_types, 
