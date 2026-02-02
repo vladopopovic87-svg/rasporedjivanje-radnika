@@ -26,7 +26,12 @@ from model_builder import (
     add_worker_capacity_constraints,
     add_interval_worker_limit,
     add_shift_constraints,
-    add_istovar_kontrola_constraint
+    add_istovar_kontrola_constraint,
+    add_delta_constraints,
+    add_rest_interval_constraints,
+    add_m2_ratio_constraint,
+    add_non_primary_activities_constraint,
+    add_m1_m2_ratio_per_interval_constraint
 )
 from results_display import (
     build_bij_matrix,
@@ -89,100 +94,72 @@ def main():
         )
 
         # Add delta constraints if P > 0
-        if P > 0:
-            for t in profil_types:
-                for j in M_set:
-                    for a in activities:
-                        if a in able.get(t, []):
-                            for i in N_set:
-                                if i < max(N_set):
-                                    if (t, j, a, i) in delta and (t, i, j, a) in ytija and (t, i + 1, j, a) in ytija:
-                                        model += (
-                                            delta[t, j, a, i] >= ytija[t, i, j, a] - ytija[t, i + 1, j, a]
-                                        )
-                                        model += delta[t, j, a, i] >= 0
+        # Ograničenje za penalizovanje prelaska na drugu aktivnost nakon samo jednog intervala
+        add_delta_constraints(
+            model, P, profil_types, M_set, N_set, activities, ytija, delta, able
+        )
 
         # Add constraints
         st.write("--- Model setup complete. Adding constraints. ---")
 
+        # Constraint 2a
         add_activity_within_constraints(
             model, ind_within, N_set, M_set, profil_types, activities, 
             xaijk, bij, demand, within, able, activity_full_names
         )
 
+        # Constraint 2b
         add_activity_until_constraints(
             model, ind_until, N_set, M_set, xaijk, bij, demand, until, activity_full_names
         )
 
+        # Constraint 2d
         add_istovar_kontrola_constraint(
             model, istovar_generic_id, kontrola_generic_id, N_set, M_set, xaijk, bij, ratio=0.5
         )
 
+        # Constraint 3
         add_activity_allocation_constraints(
             model, activities, M_set, N_set, xaijk, ytija, bij, allowed
         )
 
+        # Constraint 4
         add_worker_capacity_constraints(
             model, profil_types, N_set, M_set, ytj, ytija, able
         )
 
+        # Constraint 5
         add_interval_worker_limit(
             model, N_set, profil_types, M_set, ytija, MAX_WORKERS_PER_INTERVAL
         )
 
+        # Ograničenje za ukupan broj radnika i potražnje
         add_demand_constraints(
             model, activities, N_set, M_set, ytija, demand, profil_types
         )
 
         # Additional constraints from original code
-        # Constraint 6: Rest interval limits for M1 shifts
-        for j in M1_set:
-            for p_type_id in profil_types:
-                if (p_type_id, j) in ytj:
-                    rest_sum = 0
-                    for i in Oj.get(j, []):
-                        for a_id in activities:
-                            if (p_type_id, i, j, a_id) in ytija and (i, j) in bij:
-                                rest_sum += ytija[(p_type_id, i, j, a_id)] * bij[(i, j)]
-                    model += rest_sum <= 2 * ytj[(p_type_id, j)], f"Constraint_6_{j}_{p_type_id}"
+        # Constraint 6
+        add_rest_interval_constraints(
+            model, M1_set, profil_types, ytj, ytija, activities, able, bij, Oj
+        )
 
-        # Constraint 7: M2 ratio limit
-        for p_type_id in profil_types:
-            if M2_set:
-                sum_m2 = sum(ytj[(p_type_id, j)] for j in M2_set if (p_type_id, j) in ytj)
-                sum_m_total = sum(ytj[(p_type_id, j)] for j in M_set if (p_type_id, j) in ytj)
-                model += sum_m2 <= M2_RATIO_LIMIT * sum_m_total, f"Constraint_7_{p_type_id}"
+        # Constraint 7
+        add_m2_ratio_constraint(
+            model, profil_types, M2_set, M_set, ytj, M2_RATIO_LIMIT
+        )
 
-        # Constraint 11: Non-primary activities ratio (M1 only)
-        for j in M1_set:
-            for p_type_id in profil_types:
-                primary_sum = sum(
-                    ytija[(p_type_id, i, j, a_id)] * bij.get((i, j), 0)
-                    for i in N_set for a_id in able.get(p_type_id, [])
-                    if (p_type_id, i, j, a_id) in ytija and (i, j) in bij
-                )
-                non_primary_sum = sum(
-                    ytija[(p_type_id, i, j, a_id)] * bij.get((i, j), 0)
-                    for i in N_set for a_id in able_ne.get(p_type_id, [])
-                    if (p_type_id, i, j, a_id) in ytija and (i, j) in bij
-                )
-                model += non_primary_sum <= NON_PRIMARY_ACTIVITIES_RATIO * primary_sum, \
-                    f"Constraint_11_{j}_{p_type_id}"
+        # Constraint 11
+        add_non_primary_activities_constraint(
+            model, M1_set, profil_types, N_set, ytija, able, able_ne, bij, NON_PRIMARY_ACTIVITIES_RATIO
+        )
 
-        # Constraint 12: M1 vs M2 ratio per interval
-        for i in N_set:
-            m1_shifts_sum = sum(
-                ytj[(p_type_id, j)] * bij.get((i, j), 0)
-                for j in M1_set for p_type_id in profil_types
-                if (p_type_id, j) in ytj and (i, j) in bij
-            )
-            m2_shifts_sum = sum(
-                ytj[(p_type_id, j)] * bij.get((i, j), 0)
-                for j in M2_set for p_type_id in profil_types
-                if (p_type_id, j) in ytj and (i, j) in bij
-            )
-            model += m1_shifts_sum >= 0.0000001 * m2_shifts_sum, f"Constraint_12_{i}"
+        # Constraint 12
+        add_m1_m2_ratio_per_interval_constraint(
+            model, N_set, M1_set, M2_set, ytj, bij, profil_types
+        )
 
+        # Constraint 8,9,10
         add_shift_constraints(
             model, M_set, M1_set, M2_set, ytj, profil_types,
             yj, MAX_M1_SHIFTS, MAX_M2_SHIFTS
