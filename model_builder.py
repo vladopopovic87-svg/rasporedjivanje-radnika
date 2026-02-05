@@ -217,7 +217,7 @@ def add_interval_worker_limit(model, activities, N_set, profil_types, M_set, yti
         model += lpSum(
             ytija[(p_type_id, i, j, a_id)]
             for p_type_id in profil_types for j in M_set for a_id in activities
-            if (p_type_id, i, j, a_id) in ytija
+            if ytija.get((p_type_id, i, j, a_id)) is not None
         ) <= max_workers, f"Constraint_max_workers_{i}"
 
 
