@@ -130,7 +130,7 @@ def main():
 
         # Constraint 5
         add_interval_worker_limit(
-            model, N_set, profil_types, M_set, ytija, MAX_WORKERS_PER_INTERVAL
+            model, activities, N_set, profil_types, M_set, ytija, MAX_WORKERS_PER_INTERVAL
         )
 
         # Ograničenje za ukupan broj radnika i potražnje

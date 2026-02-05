@@ -214,11 +214,12 @@ def add_worker_capacity_constraints(model, profil_types, N_set, M_set, ytj, ytij
 def add_interval_worker_limit(model, activities, N_set, profil_types, M_set, ytija, max_workers=40):
     """Add constraint limiting maximum workers per interval."""
     for i in N_set:
-        model += lpSum(
+        terms = [
             ytija[(p_type_id, i, j, a_id)]
             for p_type_id in profil_types for j in M_set for a_id in activities
-            if ytija.get((p_type_id, i, j, a_id)) is not None
-        ) <= max_workers, f"Constraint_max_workers_{i}"
+            if (p_type_id, i, j, a_id) in ytija
+        ]
+        model += lpSum(terms) <= max_workers, f"Constraint_max_workers_{i}"
 
 
 # Constraint 6
