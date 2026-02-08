@@ -185,7 +185,7 @@ def main():
 
             # Balance schedules
             st.write("--- Starting BALANCING ---")
-            balance_schedules(smjena_output, M1_set, profil_types, ytj)
+            smjena_output = balance_schedules(smjena_output, M1_set, profil_types, ytj)
 
             # Create tables
             st.write("--- Starting DataFrame generation ---")

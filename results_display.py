@@ -119,6 +119,8 @@ def balance_schedules(smjena_output, M1_set, profil_types, ytj):
                                     break
                 else:
                     balance_loop_active = False
+    
+    return smjena_output
 
 
 def create_shift_allocation_table(smjena_output, M_set, M1_set, M2_set, profil_types,
