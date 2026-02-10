@@ -218,7 +218,7 @@ def analyze_activity_sequences(df, M1_set, M_set):
 
 def display_results(model, obj_part_1, obj_part_2, P, profil_types, M_set, M1_set, M2_set,
                    N_set, ytj, ytija, activities, smjena_output, df, df_display,
-                   activity_per_interval, activity_full_names, demand):
+                   activity_per_interval, activity_full_names, demand,sp):
     """Display all optimization results."""
     st.header("Optimization Results")
     st.success(f"Optimal Objective Value: {value(model.objective):.2f}")
@@ -241,7 +241,7 @@ def display_results(model, obj_part_1, obj_part_2, P, profil_types, M_set, M1_se
             if (p_type_id, j) in ytj and value(ytj[(p_type_id, j)]) > 0:
                 ytj_data.append({
                     "Shift": j,
-                    "Profile": p_type_id,
+                    "Profile": sp[p_type_id],
                     "Count": value(ytj[(p_type_id, j)])
                 })
     if ytj_data:
