@@ -9,11 +9,14 @@ from utils import parse_list, generate_profile_types, generate_activities
 def collect_general_parameters():
     """Collect general model parameters from sidebar."""
     with st.sidebar.expander("General Parameters"):
+        # Check if AI has provided parameters
+        ai_params = st.session_state.get("ai_extracted_params", {})
+        
         P = st.number_input(
             "Short-Duration Assignment Penalty",
             min_value=0.00,
             max_value=1.00,
-            value=0.00,
+            value=ai_params.get("short_penalty", 0.00),
             step=0.01,
             help="Weight of the transition penalty term in the objective function."
         )
@@ -21,7 +24,7 @@ def collect_general_parameters():
         num_profiles = st.number_input(
             "Number of Worker Profiles",
             min_value=1,
-            value=DEFAULT_NUM_PROFILES,
+            value=ai_params.get("num_profiles", DEFAULT_NUM_PROFILES),
             step=1
         )
         profil_types = generate_profile_types(num_profiles)
@@ -29,7 +32,7 @@ def collect_general_parameters():
         num_activities = st.number_input(
             "Number of Activities",
             min_value=1,
-            value=DEFAULT_NUM_ACTIVITIES,
+            value=ai_params.get("num_activities", DEFAULT_NUM_ACTIVITIES),
             step=1
         )
         activities = generate_activities(num_activities)
@@ -38,8 +41,15 @@ def collect_general_parameters():
         st.subheader("Define Profile Names and Short Codes:")
         profile_full_names = {}
         sp = {}
-        for generic_profile_id in profil_types:
-            default_full = DEFAULT_FULL_PROFILE_NAMES.get(generic_profile_id, generic_profile_id.capitalize())
+        ai_profiles = ai_params.get("profiles", [])
+        
+        for idx, generic_profile_id in enumerate(profil_types):
+            # Use AI-extracted name if available, otherwise use defaults
+            if idx < len(ai_profiles):
+                default_full = ai_profiles[idx] if isinstance(ai_profiles[idx], str) else ai_profiles[idx].get("name", generic_profile_id.capitalize())
+            else:
+                default_full = DEFAULT_FULL_PROFILE_NAMES.get(generic_profile_id, generic_profile_id.capitalize())
+            
             profile_full_names[generic_profile_id] = st.text_input(
                 f"Full name for '{generic_profile_id}'",
                 value=default_full,
@@ -56,8 +66,15 @@ def collect_general_parameters():
         st.subheader("Define Activity Names and Short Codes:")
         s = {}
         activity_full_names = {}
-        for generic_activity_id in activities:
-            default_full = DEFAULT_FULL_ACTIVITY_NAMES.get(generic_activity_id, generic_activity_id.capitalize())
+        ai_activities = ai_params.get("activities", [])
+        
+        for idx, generic_activity_id in enumerate(activities):
+            # Use AI-extracted name if available, otherwise use defaults
+            if idx < len(ai_activities):
+                default_full = ai_activities[idx] if isinstance(ai_activities[idx], str) else ai_activities[idx].get("name", generic_activity_id.capitalize())
+            else:
+                default_full = DEFAULT_FULL_ACTIVITY_NAMES.get(generic_activity_id, generic_activity_id.capitalize())
+            
             activity_full_names[generic_activity_id] = st.text_input(
                 f"Full name for '{generic_activity_id}'",
                 value=default_full,
