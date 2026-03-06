@@ -47,7 +47,7 @@ Molim te da analiziraš i vrati JSON sa sledećim poljima (koristi brojeve gde j
 
 Budi precizna u analizi i vrati samo JSON bez dodatnog teksta."""
 
-        message = client.chat.completions.create(
+        message = client.messages.create(
             model="mixtral-8x7b-32768",
             messages=[
                 {"role": "user", "content": prompt}
@@ -56,7 +56,7 @@ Budi precizna u analizi i vrati samo JSON bez dodatnog teksta."""
             max_tokens=1024
         )
         
-        response_text = message.choices[0].message.content.strip()
+        response_text = message.content[0].text.strip()
         
         # Extract JSON from response
         start_idx = response_text.find('{')
@@ -91,7 +91,7 @@ def get_ai_suggestions(description: str, client: Groq) -> str:
 
 Daj 3-4 konkretne preporuke na srpskom jeziku."""
 
-        message = client.chat.completions.create(
+        message = client.messages.create(
             model="mixtral-8x7b-32768",
             messages=[
                 {"role": "user", "content": prompt}
@@ -100,7 +100,7 @@ Daj 3-4 konkretne preporuke na srpskom jeziku."""
             max_tokens=512
         )
         
-        return message.choices[0].message.content
+        return message.content[0].text
         
     except Exception as e:
         return f"Greška pri komunikaciji sa AI: {str(e)}"
