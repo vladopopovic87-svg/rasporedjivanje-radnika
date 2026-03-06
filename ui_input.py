@@ -152,7 +152,7 @@ def collect_cost_coefficients(profil_types, profile_full_names):
                 f"{profile_full_names.get(p_type, p_type)} (M1)",
                 value=default_rate,
                 key=f"ct_m1_{p_type}",
-                help=f"Cost rate per hour for {profile_full_names.get(p_type, p_type)} working full-time shifts (M1)."
+                help=f"Cost rate per full shift for {profile_full_names.get(p_type, p_type)} working full-time shifts (M1)."
             )
 
         st.write("Part-time shift (M2) cost rates:")
@@ -163,7 +163,7 @@ def collect_cost_coefficients(profil_types, profile_full_names):
                 f"{profile_full_names.get(p_type, p_type)} (M2)",
                 value=default_rate,
                 key=f"ct_m2_{p_type}",
-                help=f"Cost rate per hour for {profile_full_names.get(p_type, p_type)} working part-time shifts (M2)."
+                help=f"Cost rate per shift for {profile_full_names.get(p_type, p_type)} working part-time shifts (M2)."
             )
 
     return ct_m1_inputs, ct_m2_inputs
