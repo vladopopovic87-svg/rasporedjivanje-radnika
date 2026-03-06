@@ -22,7 +22,8 @@ def collect_general_parameters():
             "Number of Worker Profiles",
             min_value=1,
             value=DEFAULT_NUM_PROFILES,
-            step=1
+            step=1,
+            help="Number of different worker profile types (e.g., Komisioner, Kontrolor, Viljuskarista)."
         )
         profil_types = generate_profile_types(num_profiles)
 
@@ -30,7 +31,8 @@ def collect_general_parameters():
             "Number of Activities",
             min_value=1,
             value=DEFAULT_NUM_ACTIVITIES,
-            step=1
+            step=1,
+            help="Number of different activity types that workers can perform."
         )
         activities = generate_activities(num_activities)
 
@@ -43,13 +45,15 @@ def collect_general_parameters():
             profile_full_names[generic_profile_id] = st.text_input(
                 f"Full name for '{generic_profile_id}'",
                 value=default_full,
-                key=f"full_name_profile_{generic_profile_id}"
+                key=f"full_name_profile_{generic_profile_id}",
+                help="Full descriptive name for this worker profile type."
             )
             default_short = DEFAULT_SHORT_PROFILES.get(generic_profile_id, generic_profile_id[0:2])
             sp[generic_profile_id] = st.text_input(
                 f"Short code for '{generic_profile_id}'",
                 value=default_short,
-                key=f"short_code_profile_{generic_profile_id}"
+                key=f"short_code_profile_{generic_profile_id}",
+                help="Short abbreviation or code for this worker profile (used in tables and reports)."
             )
 
         # Activity names and codes
@@ -61,13 +65,15 @@ def collect_general_parameters():
             activity_full_names[generic_activity_id] = st.text_input(
                 f"Full name for '{generic_activity_id}'",
                 value=default_full,
-                key=f"full_name_activity_{generic_activity_id}"
+                key=f"full_name_activity_{generic_activity_id}",
+                help="Full descriptive name for this activity type."
             )
             default_short = DEFAULT_SHORT_ACTIVITIES.get(generic_activity_id, generic_activity_id[0:2])
             s[generic_activity_id] = st.text_input(
                 f"Short code for '{generic_activity_id}'",
                 value=default_short,
-                key=f"short_code_activity_{generic_activity_id}"
+                key=f"short_code_activity_{generic_activity_id}",
+                help="Short abbreviation or code for this activity (used in tables and reports)."
             )
 
     return P, profil_types, activities, profile_full_names, sp, activity_full_names, s
@@ -82,12 +88,14 @@ def collect_interval_and_shift_parameters():
             max_value=100,
             value=8,
             step=1,
-            key="display_start_interval"
+            key="display_start_interval",
+            help="Starting hour for displaying time intervals in the schedule (e.g., 8 means intervals start from 8:00)."
         )
 
         user_N_set_str = st.text_area(
             "N_set (Intervals, comma-separated integers)",
-            ', '.join(map(str, DEFAULT_N_SET))
+            ', '.join(map(str, DEFAULT_N_SET)),
+            help="List of time intervals for the workday. Each number represents a time slot (e.g., 1,2,3,4,5,6,7,8)."
         )
         N_set = parse_list(user_N_set_str, int)
         if not N_set:
@@ -96,7 +104,8 @@ def collect_interval_and_shift_parameters():
 
         user_M_set_str = st.text_area(
             "M_set (Shifts, comma-separated integers)",
-            ', '.join(map(str, DEFAULT_M_SET))
+            ', '.join(map(str, DEFAULT_M_SET)),
+            help="List of all available shifts. Each number represents a different shift type."
         )
         M_set = parse_list(user_M_set_str, int)
         if not M_set:
@@ -105,13 +114,15 @@ def collect_interval_and_shift_parameters():
 
         user_M1_set_str = st.text_area(
             "M1_set (Full-time shifts, comma-separated integers)",
-            ', '.join(map(str, DEFAULT_M1_SET))
+            ', '.join(map(str, DEFAULT_M1_SET)),
+            help="List of full-time shifts (longer working hours). Subset of M_set."
         )
         M1_set = parse_list(user_M1_set_str, int)
 
         user_M2_set_str = st.text_area(
             "M2_set (Part-time shifts, comma-separated integers)",
-            ', '.join(map(str, DEFAULT_M2_SET))
+            ', '.join(map(str, DEFAULT_M2_SET)),
+            help="List of part-time shifts (shorter working hours). Subset of M_set."
         )
         M2_set = parse_list(user_M2_set_str, int)
 
@@ -122,7 +133,8 @@ def collect_interval_and_shift_parameters():
             oj_intervals_str = st.text_area(
                 f"Intervals for shift {j_shift} (comma-separated integers)",
                 value=', '.join(map(str, default_oj_intervals)),
-                key=f"Oj_{j_shift}"
+                key=f"Oj_{j_shift}",
+                help=f"Time intervals available for rest during shift {j_shift}. Workers can take breaks in these intervals."
             )
             Oj[j_shift] = parse_list(oj_intervals_str, int)
 
@@ -139,7 +151,8 @@ def collect_cost_coefficients(profil_types, profile_full_names):
             ct_m1_inputs[p_type] = st.number_input(
                 f"{profile_full_names.get(p_type, p_type)} (M1)",
                 value=default_rate,
-                key=f"ct_m1_{p_type}"
+                key=f"ct_m1_{p_type}",
+                help=f"Cost rate per hour for {profile_full_names.get(p_type, p_type)} working full-time shifts (M1)."
             )
 
         st.write("Part-time shift (M2) cost rates:")
@@ -149,7 +162,8 @@ def collect_cost_coefficients(profil_types, profile_full_names):
             ct_m2_inputs[p_type] = st.number_input(
                 f"{profile_full_names.get(p_type, p_type)} (M2)",
                 value=default_rate,
-                key=f"ct_m2_{p_type}"
+                key=f"ct_m2_{p_type}",
+                help=f"Cost rate per hour for {profile_full_names.get(p_type, p_type)} working part-time shifts (M2)."
             )
 
     return ct_m1_inputs, ct_m2_inputs
@@ -173,7 +187,8 @@ def collect_role_activity_mappings(profil_types, activities, profile_full_names,
                 f"Profiles for '{activity_full_names.get(generic_activity_id, generic_activity_id)}'",
                 options=[profile_full_names.get(p, p) for p in profil_types],
                 default=default_selection_full_names,
-                key=f"allowed_{generic_activity_id}"
+                key=f"allowed_{generic_activity_id}",
+                help=f"Select which worker profiles are allowed to perform the '{activity_full_names.get(generic_activity_id, generic_activity_id)}' activity."
             )
             allowed[generic_activity_id] = [
                 pid for full_name in selected_full_names
@@ -196,7 +211,8 @@ def collect_role_activity_mappings(profil_types, activities, profile_full_names,
                 f"Activities for '{profile_full_names.get(generic_profile_id, generic_profile_id)}'",
                 options=[activity_full_names.get(a, a) for a in activities],
                 default=default_selection_full_names,
-                key=f"able_{generic_profile_id}"
+                key=f"able_{generic_profile_id}",
+                help=f"Select which activities {profile_full_names.get(generic_profile_id, generic_profile_id)} workers are able to perform."
             )
             able[generic_profile_id] = [
                 aid for full_name in selected_full_names
@@ -219,7 +235,8 @@ def collect_role_activity_mappings(profil_types, activities, profile_full_names,
                 f"Non-primary activities for '{profile_full_names.get(generic_profile_id, generic_profile_id)}'",
                 options=[activity_full_names.get(a, a) for a in activities],
                 default=default_selection_full_names,
-                key=f"able_ne_{generic_profile_id}"
+                key=f"able_ne_{generic_profile_id}",
+                help=f"Select which activities {profile_full_names.get(generic_profile_id, generic_profile_id)} can perform as non-primary work (limited by ratio constraints)."
             )
             able_ne[generic_profile_id] = [
                 aid for full_name in selected_full_names
@@ -235,13 +252,15 @@ def collect_variant_parameters(activities, activity_full_names):
     with st.sidebar.expander("Variant-Dependent Parameters"):
         user_ind_within_str = st.text_area(
             "ind_within (comma-separated generic activity IDs)",
-            ', '.join(DEFAULT_IND_WITHIN)
+            ', '.join(DEFAULT_IND_WITHIN),
+            help="Activities that have 'within' constraints - workers must complete these activities within a certain number of intervals."
         )
         ind_within = parse_list(user_ind_within_str)
 
         user_ind_until_str = st.text_area(
             "ind_until (comma-separated generic activity IDs)",
-            ', '.join(DEFAULT_IND_UNTIL)
+            ', '.join(DEFAULT_IND_UNTIL),
+            help="Activities that have 'until' constraints - workers must start these activities by a certain interval."
         )
         ind_until = parse_list(user_ind_until_str)
 
@@ -253,7 +272,8 @@ def collect_variant_parameters(activities, activity_full_names):
 
         user_dep_within_str = st.text_area(
             "dep_within (comma-separated generic activity IDs)",
-            ', '.join(DEFAULT_DEP_WITHIN)
+            ', '.join(DEFAULT_DEP_WITHIN),
+            help="Activities with dependent 'within' constraints - these depend on other activities being completed first."
         )
         dep_within = parse_list(user_dep_within_str)
 
@@ -265,7 +285,8 @@ def collect_variant_parameters(activities, activity_full_names):
                 f"'{activity_full_names.get(generic_activity_id, generic_activity_id)}' within value",
                 value=default_val,
                 key=f"within_{generic_activity_id}",
-                min_value=0
+                min_value=0,
+                help=f"Maximum number of intervals allowed to complete '{activity_full_names.get(generic_activity_id, generic_activity_id)}' activity."
             )
 
         st.subheader("until values (integer per activity):")
@@ -276,7 +297,8 @@ def collect_variant_parameters(activities, activity_full_names):
                 f"'{activity_full_names.get(generic_activity_id, generic_activity_id)}' until value",
                 value=default_val,
                 key=f"until_{generic_activity_id}",
-                min_value=0
+                min_value=0,
+                help=f"Latest interval by which '{activity_full_names.get(generic_activity_id, generic_activity_id)}' activity must be started."
             )
 
     return ind_within, ind_until, dep_within, within, until, overlap_activities
@@ -288,7 +310,8 @@ def collect_demand_data(activities, activity_full_names, N_set):
     selected_example = st.selectbox(
         "Odaberi defaultnu postavku potražnje:",
         ["Primjer 1", "Primjer 2"],
-        key="demand_example_selector"
+        key="demand_example_selector",
+        help="Choose a predefined demand pattern to start with. You can then edit the values in the table below."
     )
 
     if selected_example == "Primjer 1":
@@ -320,7 +343,8 @@ def collect_demand_data(activities, activity_full_names, N_set):
     df_demand_editable = pd.DataFrame(initial_df_data, index=N_set)
 
     st.subheader("Edit Demand per Interval")
-    edited_df_demand = st.data_editor(df_demand_editable, num_rows="fixed", use_container_width=True)
+    edited_df_demand = st.data_editor(df_demand_editable, num_rows="fixed", use_container_width=True, 
+                                      help="Edit the number of workers needed for each activity in each time interval. Rows are time intervals, columns are activities.")
 
     # Find activity IDs for Istovar and Kontrola
     istovar_generic_id = None
@@ -359,7 +383,7 @@ def collect_constraint_parameters():
             max_value=200,
             value=DEFAULT_MAX_WORKERS_PER_INTERVAL,
             step=1,
-            help="Maximum number of workers that can be assigned in a single interval."
+            help="Maximum number of workers that can be assigned to work in a single time interval. This constraint prevents overcrowding and ensures safety."
         )
         
         max_m1_shifts = st.number_input(
@@ -368,7 +392,7 @@ def collect_constraint_parameters():
             max_value=50,
             value=DEFAULT_MAX_M1_SHIFTS,
             step=1,
-            help="Maximum number of full-time shifts."
+            help="Maximum number of full-time shifts that can be scheduled. Full-time shifts typically have longer working hours."
         )
         
         max_m2_shifts = st.number_input(
@@ -377,7 +401,7 @@ def collect_constraint_parameters():
             max_value=50,
             value=DEFAULT_MAX_M2_SHIFTS,
             step=1,
-            help="Maximum number of part-time shifts."
+            help="Maximum number of part-time shifts that can be scheduled. Part-time shifts usually have shorter working hours."
         )
         
         m2_ratio_limit = st.slider(
@@ -386,7 +410,7 @@ def collect_constraint_parameters():
             max_value=1.0,
             value=DEFAULT_M2_RATIO_LIMIT,
             step=0.05,
-            help="Maximum ratio of part-time shifts relative to total shifts."
+            help="Maximum ratio of part-time shifts (M2) relative to total shifts (M1 + M2). For example, 0.3 means max 30% of shifts can be part-time."
         )
         
         non_primary_activities_ratio = st.slider(
@@ -395,7 +419,7 @@ def collect_constraint_parameters():
             max_value=1.0,
             value=DEFAULT_NON_PRIMARY_ACTIVITIES_RATIO,
             step=0.05,
-            help="Maximum ratio of non-primary activities for M1 shifts."
+            help="Maximum ratio of non-primary activities that full-time workers (M1) can perform. For example, 0.5 means max 50% of their work can be non-primary activities."
         )
     
     return max_workers_per_interval, max_m1_shifts, max_m2_shifts, m2_ratio_limit, non_primary_activities_ratio
