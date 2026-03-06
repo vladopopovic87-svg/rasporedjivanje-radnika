@@ -28,7 +28,7 @@ def extract_parameters_from_description(description: str) -> Dict[str, Any]:
         Dictionary with extracted parameters
     """
     try:
-        model = genai.GenerativeModel('gemini-2.0-flash')
+        model = genai.GenerativeModel('gemini-pro')
         
         prompt = f"""Kao ekspert za raspoređivanje radnika, analiziraj sledeći opis problema i ekstraktuj sve relevantne parametre za optimizaciju.
 
@@ -77,7 +77,7 @@ def get_ai_suggestions(description: str) -> str:
         Formatted suggestions string
     """
     try:
-        model = genai.GenerativeModel('gemini-2.0-flash')
+        model = genai.GenerativeModel('gemini-pro')
         
         prompt = f"""Kao ekspert za raspoređivanje radnika i optimizaciju, daj kratke i praktične preporuke za sledeći problem:
 
