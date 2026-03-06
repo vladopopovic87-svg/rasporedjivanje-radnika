@@ -343,8 +343,7 @@ def collect_demand_data(activities, activity_full_names, N_set):
     df_demand_editable = pd.DataFrame(initial_df_data, index=N_set)
 
     st.subheader("Edit Demand per Interval")
-    edited_df_demand = st.data_editor(df_demand_editable, num_rows="fixed", use_container_width=True, 
-                                      help="Edit the number of workers needed for each activity in each time interval. Rows are time intervals, columns are activities.")
+    edited_df_demand = st.data_editor(df_demand_editable, num_rows="fixed", use_container_width=True)
 
     # Find activity IDs for Istovar and Kontrola
     istovar_generic_id = None
