@@ -48,7 +48,7 @@ Molim te da analiziraš i vrati JSON sa sledećim poljima (koristi brojeve gde j
 Budi precizna u analizi i vrati samo JSON bez dodatnog teksta."""
 
         message = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="mixtral-8x7b-32768",
             messages=[
                 {"role": "user", "content": prompt}
             ],
@@ -92,7 +92,7 @@ def get_ai_suggestions(description: str, client: Groq) -> str:
 Daj 3-4 konkretne preporuke na srpskom jeziku."""
 
         message = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="mixtral-8x7b-32768",
             messages=[
                 {"role": "user", "content": prompt}
             ],
