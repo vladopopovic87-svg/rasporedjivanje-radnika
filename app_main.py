@@ -54,10 +54,6 @@ def main():
     st.set_page_config(layout="wide")
     st.title("Optimization Model with PuLP and Streamlit")
     
-    # Initialize session state for AI parameters
-    if "ai_extracted_params" not in st.session_state:
-        st.session_state.ai_extracted_params = {}
-    
     # Initialize Groq API
     api_key = os.getenv("GROQ_API_KEY") or st.secrets.get("GROQ_API_KEY")
     groq_client = None
@@ -66,8 +62,7 @@ def main():
         try:
             groq_client = init_groq(api_key)
             groq_available = True
-        except Exception as e:
-            st.sidebar.error(f"🔴 Groq API Error: {str(e)}")
+        except:
             groq_available = False
     else:
         groq_available = False
@@ -259,53 +254,47 @@ def main():
             if st.button("📤 Analitze sa AI", use_container_width=True):
                 if problem_description.strip():
                     with st.spinner("🤔 AI analizira problem..."):
-                        try:
-                            # Extract parameters
-                            params = extract_parameters_from_description(problem_description, groq_client)
+                        # Extract parameters
+                        params = extract_parameters_from_description(problem_description, groq_client)
                         
-                            # Display extracted parameters
-                            st.success("✅ Parametri ekstraktovani!")
-                            
-                            col_params1, col_params2 = st.columns(2)
-                            
-                            with col_params1:
-                                st.info(f"👥 Profili: {params.get('num_profiles', '?')}")
-                                if "profiles" in params:
-                                    for profile in params["profiles"]:
-                                        st.write(f"  • {profile}")
-                            
-                            with col_params2:
-                                st.info(f"📋 Aktivnosti: {params.get('num_activities', '?')}")
-                                if "activities" in params:
-                                    for activity in params["activities"]:
-                                        st.write(f"  • {activity}")
-                            
-                            # Display suggestions
-                            st.subheader("💡 AI Preporuke:")
-                            suggestions = get_ai_suggestions(problem_description, groq_client)
-                            st.info(suggestions)
-                            
-                            # Store parameters for later use
-                            st.session_state.ai_extracted_params = params
-                            
-                            if st.button("✨ Primeni Parametre", use_container_width=True):
-                                if validate_and_apply_parameters(params):
-                                    st.success("✅ Parametri su primenjeni! Osvezi stranicu da vidiš izmene.")
-                        except Exception as e:
-                            st.error(f"🔴 Greška pri obrade: {str(e)}")
+                        # Display extracted parameters
+                        st.success("✅ Parametri ekstraktovani!")
+                        
+                        col_params1, col_params2 = st.columns(2)
+                        
+                        with col_params1:
+                            st.info(f"👥 Profili: {params.get('num_profiles', '?')}")
+                            if "profiles" in params:
+                                for profile in params["profiles"]:
+                                    st.write(f"  • {profile}")
+                        
+                        with col_params2:
+                            st.info(f"📋 Aktivnosti: {params.get('num_activities', '?')}")
+                            if "activities" in params:
+                                for activity in params["activities"]:
+                                    st.write(f"  • {activity}")
+                        
+                        # Display suggestions
+                        st.subheader("💡 AI Preporuke:")
+                        suggestions = get_ai_suggestions(problem_description, groq_client)
+                        st.info(suggestions)
+                        
+                        # Store parameters for later use
+                        st.session_state.ai_extracted_params = params
+                        
+                        if st.button("✨ Primeni Parametre", use_container_width=True):
+                            if validate_and_apply_parameters(params):
+                                st.success("✅ Parametri su primenjeni! Osvezi stranicu da vidiš izmene.")
                 else:
                     st.warning("⚠️ Molim te da uneseš opis problema")
     else:
         st.sidebar.warning(
             "🔑 AI Agent nije dostupan.\n\n"
-            "Mogući razlozi:\n"
-            "- API ključ nije postavljen\n"
-            "- Greška pri inicijalizaciji Groq-a\n\n"
             "Za aktiviranje:\n"
             "1. Idi na [Groq Console](https://console.groq.com/keys)\n"
             "2. Kreiraj API ključ\n"
             "3. Dodaj u `.streamlit/secrets.toml`:\n"
-            "```\nGROQ_API_KEY = 'gsk_...'\n```"
+            "```\nGROQ_API_KEY = 'tvoj_kljuc'\n```"
         )
 
 
