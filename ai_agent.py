@@ -1,34 +1,35 @@
-# AI Agent for parameter extraction using Groq API
+# AI Agent for parameter extraction using Google Gemini API
 
-from groq import Groq
+import google.generativeai as genai
 import streamlit as st
 import json
 import os
 from typing import Dict, Any
 
-# Initialize Groq client
-def init_groq(api_key: str = None):
-    """Initialize Groq API with API key."""
+# Configure Gemini API
+def init_gemini(api_key: str = None):
+    """Initialize Gemini API with API key."""
     if api_key:
-        return Groq(api_key=api_key)
-    elif os.getenv("GROQ_API_KEY"):
-        return Groq(api_key=os.getenv("GROQ_API_KEY"))
+        genai.configure(api_key=api_key)
+    elif os.getenv("GEMINI_API_KEY"):
+        genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
     else:
-        raise ValueError("GROQ_API_KEY not found. Please provide an API key.")
+        raise ValueError("GEMINI_API_KEY not found. Please provide an API key.")
 
 
-def extract_parameters_from_description(description: str, client: Groq) -> Dict[str, Any]:
+def extract_parameters_from_description(description: str) -> Dict[str, Any]:
     """
-    Use Groq to extract scheduling parameters from a user description.
+    Use Gemini to extract scheduling parameters from a user description.
     
     Args:
         description: User's problem description in natural language
-        client: Groq client instance
         
     Returns:
         Dictionary with extracted parameters
     """
     try:
+        model = genai.GenerativeModel('gemini-2.0-flash')
+        
         prompt = f"""Kao ekspert za raspoređivanje radnika, analiziraj sledeći opis problema i ekstraktuj sve relevantne parametre za optimizaciju.
 
 Opis problema:
@@ -45,18 +46,10 @@ Molim te da analiziraš i vrati JSON sa sledećim poljima (koristi brojeve gde j
     "additional_notes": "<dodatne napomene ili zahtevi>"
 }}
 
-Budi precizna u analizi i vrati samo JSON bez dodatnog teksta."""
+Budi presiznana analizi i vrati samo JSON bez dodatnog teksta."""
 
-        message = client.messages.create(
-            model="mixtral-8x7b-32768",
-            messages=[
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.3,
-            max_tokens=1024
-        )
-        
-        response_text = message.content[0].text.strip()
+        response = model.generate_content(prompt)
+        response_text = response.text.strip()
         
         # Extract JSON from response
         start_idx = response_text.find('{')
@@ -73,34 +66,27 @@ Budi precizna u analizi i vrati samo JSON bez dodatnog teksta."""
         return {"error": f"API Error: {str(e)}"}
 
 
-def get_ai_suggestions(description: str, client: Groq) -> str:
+def get_ai_suggestions(description: str) -> str:
     """
     Get general AI suggestions for the problem.
     
     Args:
         description: User's problem description
-        client: Groq client instance
         
     Returns:
         Formatted suggestions string
     """
     try:
+        model = genai.GenerativeModel('gemini-2.0-flash')
+        
         prompt = f"""Kao ekspert za raspoređivanje radnika i optimizaciju, daj kratke i praktične preporuke za sledeći problem:
 
 {description}
 
 Daj 3-4 konkretne preporuke na srpskom jeziku."""
 
-        message = client.messages.create(
-            model="mixtral-8x7b-32768",
-            messages=[
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.7,
-            max_tokens=512
-        )
-        
-        return message.content[0].text
+        response = model.generate_content(prompt)
+        return response.text
         
     except Exception as e:
         return f"Greška pri komunikaciji sa AI: {str(e)}"

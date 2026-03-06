@@ -4,12 +4,11 @@ import streamlit as st
 from pulp import LpProblem, LpMinimize, PULP_CBC_CMD, LpStatus, LpStatusOptimal, value
 from collections import defaultdict
 import os
-from groq import Groq
 
 # Import modules
 from config import *
 from utils import parse_list
-from ai_agent import init_groq, extract_parameters_from_description, get_ai_suggestions, validate_and_apply_parameters
+from ai_agent import init_gemini, extract_parameters_from_description, get_ai_suggestions, validate_and_apply_parameters
 from ui_input import (
     collect_general_parameters,
     collect_interval_and_shift_parameters,
@@ -54,18 +53,16 @@ def main():
     st.set_page_config(layout="wide")
     st.title("Optimization Model with PuLP and Streamlit")
     
-    # Initialize Groq API
-    api_key = os.getenv("GROQ_API_KEY") or st.secrets.get("GROQ_API_KEY")
-    groq_client = None
-    
+    # Initialize Gemini API
+    api_key = os.getenv("GEMINI_API_KEY") or st.secrets.get("GEMINI_API_KEY")
     if api_key:
         try:
-            groq_client = init_groq(api_key)
-            groq_available = True
+            init_gemini(api_key)
+            gemini_available = True
         except:
-            groq_available = False
+            gemini_available = False
     else:
-        groq_available = False
+        gemini_available = False
     
     st.sidebar.header("Model Parameters")
 
@@ -236,7 +233,7 @@ def main():
             st.warning(f"Solver Status: {LpStatus[model.status]}")
     
     # AI Agent Chat Interface in bottom right corner
-    if groq_available:
+    if gemini_available:
         st.markdown("---")
         st.subheader("🤖 AI Agent - Automatski Popuni Parametre")
         
@@ -255,7 +252,7 @@ def main():
                 if problem_description.strip():
                     with st.spinner("🤔 AI analizira problem..."):
                         # Extract parameters
-                        params = extract_parameters_from_description(problem_description, groq_client)
+                        params = extract_parameters_from_description(problem_description)
                         
                         # Display extracted parameters
                         st.success("✅ Parametri ekstraktovani!")
@@ -276,7 +273,7 @@ def main():
                         
                         # Display suggestions
                         st.subheader("💡 AI Preporuke:")
-                        suggestions = get_ai_suggestions(problem_description, groq_client)
+                        suggestions = get_ai_suggestions(problem_description)
                         st.info(suggestions)
                         
                         # Store parameters for later use
@@ -291,10 +288,10 @@ def main():
         st.sidebar.warning(
             "🔑 AI Agent nije dostupan.\n\n"
             "Za aktiviranje:\n"
-            "1. Idi na [Groq Console](https://console.groq.com/keys)\n"
+            "1. Idi na [Google AI Studio](https://aistudio.google.com/app/apikeys)\n"
             "2. Kreiraj API ključ\n"
             "3. Dodaj u `.streamlit/secrets.toml`:\n"
-            "```\nGROQ_API_KEY = 'tvoj_kljuc'\n```"
+            "```\nGEMINI_API_KEY = 'tvoj_kljuc'\n```"
         )
 
 
