@@ -348,3 +348,54 @@ def collect_demand_data(activities, activity_full_names, N_set):
             final_demand_for_model[generic_col_id] = [0] + edited_df_demand[full_col_name].tolist()
 
     return final_demand_for_model, istovar_generic_id, kontrola_generic_id
+
+
+def collect_constraint_parameters():
+    """Collect constraint parameters from sidebar."""
+    with st.sidebar.expander("Constraint Parameters"):
+        max_workers_per_interval = st.number_input(
+            "Max Workers Per Interval",
+            min_value=1,
+            max_value=200,
+            value=DEFAULT_MAX_WORKERS_PER_INTERVAL,
+            step=1,
+            help="Maximum number of workers that can be assigned in a single interval."
+        )
+        
+        max_m1_shifts = st.number_input(
+            "Max M1 Shifts (Full-time)",
+            min_value=1,
+            max_value=50,
+            value=DEFAULT_MAX_M1_SHIFTS,
+            step=1,
+            help="Maximum number of full-time shifts."
+        )
+        
+        max_m2_shifts = st.number_input(
+            "Max M2 Shifts (Part-time)",
+            min_value=1,
+            max_value=50,
+            value=DEFAULT_MAX_M2_SHIFTS,
+            step=1,
+            help="Maximum number of part-time shifts."
+        )
+        
+        m2_ratio_limit = st.slider(
+            "M2 Ratio Limit",
+            min_value=0.0,
+            max_value=1.0,
+            value=DEFAULT_M2_RATIO_LIMIT,
+            step=0.05,
+            help="Maximum ratio of part-time shifts relative to total shifts."
+        )
+        
+        non_primary_activities_ratio = st.slider(
+            "Non-Primary Activities Ratio",
+            min_value=0.0,
+            max_value=1.0,
+            value=DEFAULT_NON_PRIMARY_ACTIVITIES_RATIO,
+            step=0.05,
+            help="Maximum ratio of non-primary activities for M1 shifts."
+        )
+    
+    return max_workers_per_interval, max_m1_shifts, max_m2_shifts, m2_ratio_limit, non_primary_activities_ratio

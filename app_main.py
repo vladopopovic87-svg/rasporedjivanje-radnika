@@ -13,7 +13,8 @@ from ui_input import (
     collect_cost_coefficients,
     collect_role_activity_mappings,
     collect_variant_parameters,
-    collect_demand_data
+    collect_demand_data,
+    collect_constraint_parameters
 )
 from model_builder import (
     build_model_variables,
@@ -69,6 +70,10 @@ def main():
      overlap_activities) = collect_variant_parameters(activities, activity_full_names)
 
     demand, istovar_generic_id, kontrola_generic_id = collect_demand_data(activities, activity_full_names, N_set)
+
+    # Collect constraint parameters
+    (max_workers_per_interval, max_m1_shifts, max_m2_shifts, 
+     m2_ratio_limit, non_primary_activities_ratio) = collect_constraint_parameters()
 
     # Run optimization button
     run_optimization_disabled = bool(overlap_activities)
@@ -130,7 +135,7 @@ def main():
 
         # Constraint 5
         add_interval_worker_limit(
-            model, activities, N_set, profil_types, M_set, ytija, MAX_WORKERS_PER_INTERVAL
+            model, activities, N_set, profil_types, M_set, ytija, max_workers_per_interval
         )
 
         # Ograničenje za ukupan broj radnika i potražnje
@@ -146,12 +151,12 @@ def main():
 
         # Constraint 7
         add_m2_ratio_constraint(
-            model, profil_types, M2_set, M_set, ytj, M2_RATIO_LIMIT
+            model, profil_types, M2_set, M_set, ytj, m2_ratio_limit
         )
 
         # Constraint 11
         add_non_primary_activities_constraint(
-            model, M1_set, profil_types, N_set, ytija, able, able_ne, bij, NON_PRIMARY_ACTIVITIES_RATIO
+            model, M1_set, profil_types, N_set, ytija, able, able_ne, bij, non_primary_activities_ratio
         )
 
         # Constraint 12
@@ -162,7 +167,7 @@ def main():
         # Constraint 8,9,10
         add_shift_constraints(
             model, M_set, M1_set, M2_set, ytj, profil_types,
-            yj, MAX_M1_SHIFTS, MAX_M2_SHIFTS
+            yj, max_m1_shifts, max_m2_shifts
         )
 
         st.write("--- All constraints added. Solving model... ---")
