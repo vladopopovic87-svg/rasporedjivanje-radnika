@@ -3,12 +3,10 @@
 import streamlit as st
 from pulp import LpProblem, LpMinimize, PULP_CBC_CMD, LpStatus, LpStatusOptimal, value
 from collections import defaultdict
-import os
 
 # Import modules
 from config import *
 from utils import parse_list
-from ai_agent import init_gemini, extract_parameters_from_description, get_ai_suggestions, validate_and_apply_parameters
 from ui_input import (
     collect_general_parameters,
     collect_interval_and_shift_parameters,
@@ -52,18 +50,6 @@ def main():
     """Main application logic."""
     st.set_page_config(layout="wide")
     st.title("Optimization Model with PuLP and Streamlit")
-    
-    # Initialize Gemini API
-    api_key = os.getenv("GEMINI_API_KEY") or st.secrets.get("GEMINI_API_KEY")
-    if api_key:
-        try:
-            init_gemini(api_key)
-            gemini_available = True
-        except:
-            gemini_available = False
-    else:
-        gemini_available = False
-    
     st.sidebar.header("Model Parameters")
 
     # Collect all input parameters
@@ -231,68 +217,6 @@ def main():
             st.error("Solver Status: Infeasible (No feasible solution found)")
         else:
             st.warning(f"Solver Status: {LpStatus[model.status]}")
-    
-    # AI Agent Chat Interface in bottom right corner
-    if gemini_available:
-        st.markdown("---")
-        st.subheader("🤖 AI Agent - Automatski Popuni Parametre")
-        
-        col1, col2 = st.columns([3, 1])
-        
-        with col1:
-            problem_description = st.text_area(
-                "Opiši svoj problem raspoređivanja:",
-                placeholder="Npr: Trebam raspored za 20 radnika - 5 komisionera, 8 kontrolora i 7 viljuskara. Trebam optimizovati za male troškove.",
-                height=100,
-                key="ai_problem_input"
-            )
-        
-        with col2:
-            if st.button("📤 Analitze sa AI", use_container_width=True):
-                if problem_description.strip():
-                    with st.spinner("🤔 AI analizira problem..."):
-                        # Extract parameters
-                        params = extract_parameters_from_description(problem_description)
-                        
-                        # Display extracted parameters
-                        st.success("✅ Parametri ekstraktovani!")
-                        
-                        col_params1, col_params2 = st.columns(2)
-                        
-                        with col_params1:
-                            st.info(f"👥 Profili: {params.get('num_profiles', '?')}")
-                            if "profiles" in params:
-                                for profile in params["profiles"]:
-                                    st.write(f"  • {profile}")
-                        
-                        with col_params2:
-                            st.info(f"📋 Aktivnosti: {params.get('num_activities', '?')}")
-                            if "activities" in params:
-                                for activity in params["activities"]:
-                                    st.write(f"  • {activity}")
-                        
-                        # Display suggestions
-                        st.subheader("💡 AI Preporuke:")
-                        suggestions = get_ai_suggestions(problem_description)
-                        st.info(suggestions)
-                        
-                        # Store parameters for later use
-                        st.session_state.ai_extracted_params = params
-                        
-                        if st.button("✨ Primeni Parametre", use_container_width=True):
-                            if validate_and_apply_parameters(params):
-                                st.success("✅ Parametri su primenjeni! Osvezi stranicu da vidiš izmene.")
-                else:
-                    st.warning("⚠️ Molim te da uneseš opis problema")
-    else:
-        st.sidebar.warning(
-            "🔑 AI Agent nije dostupan.\n\n"
-            "Za aktiviranje:\n"
-            "1. Idi na [Google AI Studio](https://aistudio.google.com/app/apikeys)\n"
-            "2. Kreiraj API ključ\n"
-            "3. Dodaj u `.streamlit/secrets.toml`:\n"
-            "```\nGEMINI_API_KEY = 'tvoj_kljuc'\n```"
-        )
 
 
 if __name__ == "__main__":
