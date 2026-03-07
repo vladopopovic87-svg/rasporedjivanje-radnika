@@ -412,6 +412,14 @@ def collect_constraint_parameters():
             help="Maximum ratio of part-time shifts (M2) relative to total shifts (M1 + M2). For example, 0.3 means max 30% of shifts can be part-time."
         )
         
+        istovar_kontrola_ratio = st.slider(
+            "Istovar-Kontrola Ratio",
+            min_value=0.0,
+            max_value=1.0,
+            value=DEFAULT_ISTOVAR_KONTROLA_RATIO,
+            step=0.05,
+            help="Udio radnika za kontrolu u odnosu na broja radnika kojio obavljaju istovar."
+       )
         non_primary_activities_ratio = st.slider(
             "Non-Primary Activities Ratio",
             min_value=0.0,
@@ -420,5 +428,6 @@ def collect_constraint_parameters():
             step=0.05,
             help="Maximum ratio of non-primary activities that full-time workers (M1) can perform. For example, 0.5 means max 50% of their work can be non-primary activities."
         )
+        
     
-    return max_workers_per_interval, max_m1_shifts, max_m2_shifts, m2_ratio_limit, non_primary_activities_ratio
+    return max_workers_per_interval, max_m1_shifts, max_m2_shifts, m2_ratio_limit, non_primary_activities_ratio, istovar_kontrola_ratio

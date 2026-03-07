@@ -73,7 +73,7 @@ def main():
 
     # Collect constraint parameters
     (max_workers_per_interval, max_m1_shifts, max_m2_shifts, 
-     m2_ratio_limit, non_primary_activities_ratio) = collect_constraint_parameters()
+     m2_ratio_limit, non_primary_activities_ratio, istovar_kontrola_ratio) = collect_constraint_parameters()
 
     # Run optimization button
     run_optimization_disabled = bool(overlap_activities)
@@ -120,7 +120,7 @@ def main():
 
         # Constraint 2d
         add_istovar_kontrola_constraint(
-            model, istovar_generic_id, kontrola_generic_id, N_set, M_set, xaijk, bij, ratio=0.5
+            model, istovar_generic_id, kontrola_generic_id, N_set, M_set, xaijk, bij, istovar_kontrola_ratio
         )
 
         # Constraint 3

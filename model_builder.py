@@ -147,7 +147,7 @@ def add_activity_until_constraints(model, ind_until, N_set, M_set, xaijk, bij,
 
 # Constraint 2d
 def add_istovar_kontrola_constraint(model, istovar_id, kontrola_id, N_set, M_set, 
-                                   xaijk, bij, ratio=0.5):
+                                   xaijk, bij, ratio):
     """
     Add constraint for Istovar/Kontrola relationship (Constraint 2d).
     
@@ -211,7 +211,7 @@ def add_worker_capacity_constraints(model, profil_types, N_set, M_set, ytj, ytij
 
 
 # Constraint 5
-def add_interval_worker_limit(model, activities, N_set, profil_types, M_set, ytija, max_workers=40):
+def add_interval_worker_limit(model, activities, N_set, profil_types, M_set, ytija, max_workers):
     """Add constraint limiting maximum workers per interval."""
     for i in N_set:
         terms = [
@@ -248,7 +248,7 @@ def add_m2_ratio_constraint(model, profil_types, M2_set, M_set, ytj, M2_RATIO_LI
 
 # Constraint 8,9,10
 def add_shift_constraints(model, M_set, M1_set, M2_set, ytj, profil_types, yj,
-                         max_m1=3, max_m2=1):
+                         max_m1, max_m2):
     """Add constraints for shift limits."""
     for j in M_set:
         model += lpSum(
