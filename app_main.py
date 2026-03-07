@@ -32,11 +32,11 @@ from model_builder import (
     add_rest_interval_constraints,
     add_m2_ratio_constraint,
     add_non_primary_activities_constraint,
-    add_m1_m2_ratio_per_interval_constraint
+    add_m1_m2_ratio_per_interval_constraint,
+    build_bij_matrix,
+    build_ct_matrix
 )
 from results_display import (
-    build_bij_matrix,
-    build_ct_matrix,
     generate_schedule_output,
     balance_schedules,
     create_shift_allocation_table,

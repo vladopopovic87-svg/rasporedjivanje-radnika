@@ -8,30 +8,8 @@ from pulp import LpStatusOptimal, value
 from config import *
 from utils import count_consecutive_sequences
 
-
-def build_bij_matrix(M_set, M1_set, M2_set, N_set):
-    """Build the bij matrix for shift interval coverage."""
-    bij = {}
-    for j in M_set:
-        for i in N_set:
-            if j in M1_set:
-                bij[(i, j)] = 1.00 if j <= i <= j + 8 else 0.00
-            elif j in M2_set:
-                bij[(i, j)] = 1.00 if j - 5 <= i <= j - 5 + 3 else 0.00
-    return bij
-
-
-def build_ct_matrix(M_set, M1_set, M2_set, profil_types, ct_m1_inputs, ct_m2_inputs):
-    """Build cost coefficient matrix from user inputs."""
-    ct = {}
-    for j in M_set:
-        for p_type_id in profil_types:
-            if j in M1_set:
-                ct[(p_type_id, j)] = ct_m1_inputs[p_type_id]
-            elif j in M2_set:
-                ct[(p_type_id, j)] = ct_m2_inputs[p_type_id]
-    return ct
-
+# Matrice za pokrivanje smena i troškove preseljene su u model_builder.py, pošto
+# logika izgradnje pripada komponenti modela. Oni su sada umodulirani tamo.
 
 def generate_schedule_output(model, profil_types, M_set, M1_set, M2_set, N_set, ytj,
                             ytija, activities, s, able):

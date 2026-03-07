@@ -4,6 +4,40 @@ from pulp import LpProblem, LpMinimize, LpVariable, lpSum, LpStatusOptimal
 from config import *
 
 
+def build_bij_matrix(M_set, M1_set, M2_set, N_set):
+    """Build the bij matrix for shift interval coverage.
+
+    ``bij[(i,j)]`` equals 1.0 when interval *i* falls inside the time
+    coverage of shift starting at *j*; otherwise 0.0.  M1 shifts span 9
+    intervals (j..j+8) while M2 spans 4 intervals (j-5..j-1).
+    """
+    bij = {}
+    for j in M_set:
+        for i in N_set:
+            if j in M1_set:
+                bij[(i, j)] = 1.00 if j <= i <= j + 8 else 0.00
+            elif j in M2_set:
+                bij[(i, j)] = 1.00 if j - 5 <= i <= j - 5 + 3 else 0.00
+    return bij
+
+
+def build_ct_matrix(M_set, M1_set, M2_set, profil_types, ct_m1_inputs, ct_m2_inputs):
+    """Build cost coefficient matrix from user inputs.
+
+    Costs differ depending on whether a shift in *M_set* is type M1 or M2.
+    The returned dictionary maps ``(profile, shift)`` to the appropriate
+    coefficient chosen by the user.
+    """
+    ct = {}
+    for j in M_set:
+        for p_type_id in profil_types:
+            if j in M1_set:
+                ct[(p_type_id, j)] = ct_m1_inputs[p_type_id]
+            elif j in M2_set:
+                ct[(p_type_id, j)] = ct_m2_inputs[p_type_id]
+    return ct
+
+
 def build_model_variables(profil_types, M_set, M1_set, M2_set, N_set, activities):
     """Build PuLP decision variables."""
     yjz = LpVariable.dicts(
