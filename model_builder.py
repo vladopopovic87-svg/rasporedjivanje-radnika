@@ -180,38 +180,32 @@ def add_activity_until_constraints(model, ind_until, N_set, M_set, xaijk, bij,
 
 
 # Constraint 2d
-def add_istovar_kontrola_constraint(model, istovar_id, kontrola_id, N_set, M_set, 
-                                   xaijk, bij, ratio):
+def add_activity_dependency_ratio_constraints(model, dependency_list, N_set, M_set, xaijk, bij):
     """
-    Add constraint for Istovar/Kontrola relationship (Constraint 2d).
-    
-    For each interval k, the number of Kontrola activities must be at least 
-    'ratio' times the number of Istovar activities in that interval.
-    
-    Constraint: Kontrola(k) >= ratio * Istovar(k)
+    Add generic 2d constraints for any activity dependency with ratio.
+    dependency_list: list of dicts { 'dependent': activity_id, 'depends_on': activity_id, 'ratio': float }
+    For each interval k, dependent(k) >= ratio * depends_on(k)
     """
-    if not istovar_id or not kontrola_id:
-        return
-    
-    for k in N_set:
-        # Sum of Istovar activities for all intervals up to k
-        istovar_sum = lpSum(
-            xaijk[(istovar_id, i, j, k)]
-            for i in N_set 
-            for j in M_set 
-            if (istovar_id, i, j, k) in xaijk
-        )
-        
-        # Sum of Kontrola activities at interval k (weighted by availability)
-        kontrola_sum = lpSum(
-            xaijk[(kontrola_id, k, j, k)] * bij.get((k, j), 0)
-            for j in M_set 
-            if (kontrola_id, k, j, k) in xaijk and (k, j) in bij
-        )
-        
-        # Constraint: kontrola >= ratio * istovar
-        model += kontrola_sum >= ratio * istovar_sum, \
-            f"Constraint_2d_istovar_kontrola_{k}"
+    for dep in dependency_list:
+        dependent_id = dep['dependent']
+        depends_on_id = dep['depends_on']
+        ratio = dep['ratio']
+        if not dependent_id or not depends_on_id:
+            continue
+        for k in N_set:
+            depends_on_sum = lpSum(
+                xaijk[(depends_on_id, i, j, k)]
+                for i in N_set
+                for j in M_set
+                if (depends_on_id, i, j, k) in xaijk
+            )
+            dependent_sum = lpSum(
+                xaijk[(dependent_id, k, j, k)] * bij.get((k, j), 0)
+                for j in M_set
+                if (dependent_id, k, j, k) in xaijk and (k, j) in bij
+            )
+            model += dependent_sum >= ratio * depends_on_sum, \
+                f"Constraint_2d_{dependent_id}_{depends_on_id}_{k}"
 
 
 # Constraint 3

@@ -27,7 +27,6 @@ from model_builder import (
     add_worker_capacity_constraints,
     add_interval_worker_limit,
     add_shift_constraints,
-    add_istovar_kontrola_constraint,
     add_delta_constraints,
     add_rest_interval_constraints,
     add_m2_ratio_constraint,
@@ -67,7 +66,7 @@ def main():
     )
 
     (ind_within, ind_until, dep_within, within, until, 
-     overlap_activities) = collect_variant_parameters(activities, activity_full_names)
+     overlap_activities, dependency_list) = collect_variant_parameters(activities, activity_full_names)
 
     demand, istovar_generic_id, kontrola_generic_id = collect_demand_data(activities, activity_full_names, N_set)
 
@@ -118,9 +117,23 @@ def main():
             model, ind_until, N_set, M_set, xaijk, bij, demand, until, activity_full_names
         )
 
-        # Constraint 2d
-        add_istovar_kontrola_constraint(
-            model, istovar_generic_id, kontrola_generic_id, N_set, M_set, xaijk, bij, istovar_kontrola_ratio
+        # Constraint 2d (default istovar-kontrola + korisničke zavisnosti)
+        dependency_list_full = list(dependency_list)
+        # Dodaj default istovar-kontrola samo ako nije već u korisničkoj listi
+        if istovar_generic_id and kontrola_generic_id:
+            already_exists = any(
+                dep['dependent'] == kontrola_generic_id and dep['depends_on'] == istovar_generic_id
+                for dep in dependency_list_full
+            )
+            if not already_exists:
+                dependency_list_full.append({
+                    'dependent': kontrola_generic_id,
+                    'depends_on': istovar_generic_id,
+                    'ratio': istovar_kontrola_ratio
+                })
+        from model_builder import add_activity_dependency_ratio_constraints
+        add_activity_dependency_ratio_constraints(
+            model, dependency_list_full, N_set, M_set, xaijk, bij
         )
 
         # Constraint 3

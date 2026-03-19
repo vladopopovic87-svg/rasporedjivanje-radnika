@@ -277,6 +277,31 @@ def collect_variant_parameters(activities, activity_full_names):
         )
         dep_within = parse_list(user_dep_within_str)
 
+        st.subheader("Zavisnosti za dependent aktivnosti:")
+        dependent_activity_relations = {}
+        for dep_activity_id in dep_within:
+            available_ids = [aid for aid in activity_full_names.keys() if aid != dep_activity_id]
+            available_names = [activity_full_names.get(aid, aid) for aid in available_ids]
+            default_dep_on = DEFAULT_DEP_ON.get(dep_activity_id)
+            default_dep_idx = available_ids.index(default_dep_on) if default_dep_on in available_ids else 0
+            selected_idx = st.selectbox(
+                f"Odaberi aktivnost od koje zavisi '{activity_full_names.get(dep_activity_id, dep_activity_id)}'",
+                options=range(len(available_ids)),
+                index=default_dep_idx,
+                format_func=lambda idx: available_names[idx],
+                key=f"dep_relation_{dep_activity_id}"
+            )
+            depends_on_id = available_ids[selected_idx]
+            ratio_val = st.slider(
+                f"Unesi ratio za '{activity_full_names.get(dep_activity_id, dep_activity_id)}' (od {activity_full_names.get(depends_on_id, depends_on_id)})",
+                min_value=0.0,
+                max_value=1.0,
+                value=0.5,
+                step=0.05,
+                key=f"dep_ratio_{dep_activity_id}"
+            )
+            dependent_activity_relations[dep_activity_id] = {"depends_on": depends_on_id, "ratio": ratio_val}
+
         st.subheader("within values (integer per activity):")
         within = {}
         for generic_activity_id in ind_within:
@@ -301,7 +326,15 @@ def collect_variant_parameters(activities, activity_full_names):
                 help=f"Latest interval by which '{activity_full_names.get(generic_activity_id, generic_activity_id)}' activity must be started."
             )
 
-    return ind_within, ind_until, dep_within, within, until, overlap_activities
+    # Priprema liste zavisnosti za model
+    dependency_list = []
+    for dep_id, rel in dependent_activity_relations.items():
+        dependency_list.append({
+            'dependent': dep_id,
+            'depends_on': rel['depends_on'],
+            'ratio': rel['ratio']
+        })
+    return ind_within, ind_until, dep_within, within, until, overlap_activities, dependency_list
 
 
 def collect_demand_data(activities, activity_full_names, N_set):
