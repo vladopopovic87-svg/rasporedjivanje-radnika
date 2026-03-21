@@ -249,7 +249,7 @@ def collect_role_activity_mappings(profil_types, activities, profile_full_names,
 
 def collect_variant_parameters(activities, activity_full_names):
     """Collect variant-dependent parameters."""
-    with st.sidebar.expander("Variant-Dependent Parameters"):
+    with st.sidebar.expander("Variant-Dependent Parameters", expanded=True):
         user_ind_within_str = st.text_area(
             "ind_within (comma-separated generic activity IDs)",
             ', '.join(DEFAULT_IND_WITHIN),
@@ -302,29 +302,53 @@ def collect_variant_parameters(activities, activity_full_names):
             )
             dependent_activity_relations[dep_activity_id] = {"depends_on": depends_on_id, "ratio": ratio_val}
 
-        st.subheader("within values (integer per activity):")
-        within = {}
-        for generic_activity_id in ind_within:
-            default_val = DEFAULT_WITHIN.get(generic_activity_id, 1)
-            within[generic_activity_id] = st.number_input(
-                f"'{activity_full_names.get(generic_activity_id, generic_activity_id)}' within value",
-                value=default_val,
-                key=f"within_{generic_activity_id}",
-                min_value=0,
-                help=f"Maximum number of intervals allowed to complete '{activity_full_names.get(generic_activity_id, generic_activity_id)}' activity."
-            )
+        dep_within_values = {}
+        if not dep_within:
+            st.info("No dependent activities selected in dep_within. Add activity IDs above to set dep within values.")
+        else:
+            st.subheader("dependent within values (integer per dependent activity):")
+            for generic_activity_id in dep_within:
+                default_val = DEFAULT_WITHIN.get(generic_activity_id, 1)
+                dep_within_values[generic_activity_id] = st.number_input(
+                    f"'{activity_full_names.get(generic_activity_id, generic_activity_id)}' dep within value",
+                    value=default_val,
+                    key=f"dep_within_{generic_activity_id}",
+                    min_value=0,
+                    help=f"Maximum number of intervals allowed to complete dependent activity '{activity_full_names.get(generic_activity_id, generic_activity_id)}'."
+                )
 
-        st.subheader("until values (integer per activity):")
+        within = {}
+        if not ind_within:
+            st.info("No activities selected in ind_within. Add activity IDs above to set within values.")
+        else:
+            st.subheader("within values (integer per activity):")
+            for generic_activity_id in ind_within:
+                default_val = DEFAULT_WITHIN.get(generic_activity_id, 1)
+                within[generic_activity_id] = st.number_input(
+                    f"'{activity_full_names.get(generic_activity_id, generic_activity_id)}' within value",
+                    value=default_val,
+                    key=f"within_{generic_activity_id}",
+                    min_value=0,
+                    help=f"Maximum number of intervals allowed to complete '{activity_full_names.get(generic_activity_id, generic_activity_id)}' activity."
+                )
+
+        if dep_within_values:
+            within.update(dep_within_values)
+
         until = {}
-        for generic_activity_id in ind_until:
-            default_val = DEFAULT_UNTIL.get(generic_activity_id, 1)
-            until[generic_activity_id] = st.number_input(
-                f"'{activity_full_names.get(generic_activity_id, generic_activity_id)}' until value",
-                value=default_val,
-                key=f"until_{generic_activity_id}",
-                min_value=0,
-                help=f"Latest interval by which '{activity_full_names.get(generic_activity_id, generic_activity_id)}' activity must be started."
-            )
+        if not ind_until:
+            st.info("No activities selected in ind_until. Add activity IDs above to set until values.")
+        else:
+            st.subheader("until values (integer per activity):")
+            for generic_activity_id in ind_until:
+                default_val = DEFAULT_UNTIL.get(generic_activity_id, 1)
+                until[generic_activity_id] = st.number_input(
+                    f"'{activity_full_names.get(generic_activity_id, generic_activity_id)}' until value",
+                    value=default_val,
+                    key=f"until_{generic_activity_id}",
+                    min_value=0,
+                    help=f"Latest interval by which '{activity_full_names.get(generic_activity_id, generic_activity_id)}' activity must be started."
+                )
 
     # Priprema liste zavisnosti za model
     dependency_list = []

@@ -180,7 +180,7 @@ def add_activity_until_constraints(model, ind_until, N_set, M_set, xaijk, bij,
 
 
 # Constraint 2d
-def add_activity_dependency_ratio_constraints(model, dependency_list, N_set, M_set, xaijk, bij):
+def add_activity_dependency_ratio_constraints(model, dependency_list, N_set, M_set, xaijk, bij,within):
     """
     Add generic 2d constraints for any activity dependency with ratio.
     dependency_list: list of dicts { 'dependent': activity_id, 'depends_on': activity_id, 'ratio': float }
@@ -195,15 +195,22 @@ def add_activity_dependency_ratio_constraints(model, dependency_list, N_set, M_s
         for k in N_set:
             depends_on_sum = lpSum(
                 xaijk[(depends_on_id, i, j, k)]
-                for i in N_set
+                    for i in N_set
+                        for j in M_set
+                            if (depends_on_id, i, j, k) in xaijk)
+            
+            terms = [
+                xaijk[(dependent_id, k, j, l)] * bij.get((l, j), 0)
+                for l in range(k, min(k + 1, 12))
                 for j in M_set
-                if (depends_on_id, i, j, k) in xaijk
-            )
-            dependent_sum = lpSum(
-                xaijk[(dependent_id, k, j, k)] * bij.get((k, j), 0)
-                for j in M_set
-                if (dependent_id, k, j, k) in xaijk and (k, j) in bij
-            )
+                #if (dependent_id, k, j, l) in xaijk and (l, j) in bij
+            ]
+
+            print("k=", k, "broj članova:", len(terms))
+
+            dependent_sum = lpSum(terms)
+            
+                                  
             model += dependent_sum >= ratio * depends_on_sum, \
                 f"Constraint_2d_{dependent_id}_{depends_on_id}_{k}"
 

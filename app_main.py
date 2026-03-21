@@ -133,7 +133,7 @@ def main():
                 })
         from model_builder import add_activity_dependency_ratio_constraints
         add_activity_dependency_ratio_constraints(
-            model, dependency_list_full, N_set, M_set, xaijk, bij
+            model, dependency_list_full, N_set, M_set, xaijk, bij,within
         )
 
         # Constraint 3
