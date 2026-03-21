@@ -131,9 +131,25 @@ def main():
                     'depends_on': istovar_generic_id,
                     'ratio': istovar_kontrola_ratio
                 })
+
+        # Ako korisnik promijeni zavisnost za kontrolu, prilagodi demand za kontrolu prema toj zavisnosti
+        if kontrola_generic_id and kontrola_generic_id in demand:
+            kontrola_dep = next(
+                (dep for dep in dependency_list_full if dep['dependent'] == kontrola_generic_id),
+                None
+            )
+            if kontrola_dep is not None and kontrola_dep['depends_on'] in demand:
+                dep_id = kontrola_dep['depends_on']
+                ratio = kontrola_dep.get('ratio', istovar_kontrola_ratio)
+                # model doda 0 pri indeksu 0 da je 1-based lista u configu
+                demand[kontrola_generic_id] = [0] + [
+                    round(ratio * v)
+                    for v in demand.get(dep_id, [0] * (len(N_set) + 1))[1:len(N_set) + 1]
+                ]
+
         from model_builder import add_activity_dependency_ratio_constraints
         add_activity_dependency_ratio_constraints(
-            model, dependency_list_full, N_set, M_set, xaijk, bij,within
+            model, dependency_list_full, N_set, M_set, xaijk, bij, within
         )
 
         # Constraint 3
