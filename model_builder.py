@@ -192,6 +192,7 @@ def add_activity_dependency_ratio_constraints(model, dependency_list, N_set, M_s
         ratio = dep['ratio']
         if not dependent_id or not depends_on_id:
             continue
+        print ("within:", within)
         for k in N_set:
             depends_on_sum = lpSum(
                 xaijk[(depends_on_id, i, j, k)]
@@ -201,7 +202,7 @@ def add_activity_dependency_ratio_constraints(model, dependency_list, N_set, M_s
             
             terms = [
                 xaijk[(dependent_id, k, j, l)] * bij.get((l, j), 0)
-                for l in range(k, min(k + 1, 12))
+                for l in range(k, min(k + within.get(dependent_id, 11), 12))
                 for j in M_set
                 #if (dependent_id, k, j, l) in xaijk and (l, j) in bij
             ]
