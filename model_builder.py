@@ -180,41 +180,49 @@ def add_activity_until_constraints(model, ind_until, N_set, M_set, xaijk, bij,
 
 
 # Constraint 2d
-def add_activity_dependency_ratio_constraints(model, dependency_list, N_set, M_set, xaijk, bij,within):
+def add_activity_dependency_ratio_constraints(
+    model, dependency_list, N_set, M_set, xaijk, bij, within
+):
     """
-    Add generic 2d constraints for any activity dependency with ratio.
-    dependency_list: list of dicts { 'dependent': activity_id, 'depends_on': activity_id, 'ratio': float }
-    For each interval k, dependent(k) >= ratio * depends_on(k)
+    Generic 2d constraints:
+    dependent(k) >= ratio * depends_on(k)
     """
+
     for dep in dependency_list:
-        dependent_id = dep['dependent']
-        depends_on_id = dep['depends_on']
-        ratio = dep['ratio']
+        dependent_id = dep.get('dependent')
+        depends_on_id = dep.get('depends_on')
+        ratio = dep.get('ratio', 1)
+
+        # preskoči nevalidne
         if not dependent_id or not depends_on_id:
             continue
-        print ("within:", within)
+
         for k in N_set:
+
+            # suma aktivnosti od koje zavisi
             depends_on_sum = lpSum(
                 xaijk[(depends_on_id, i, j, k)]
-                    for i in N_set
-                        for j in M_set
-                            if (depends_on_id, i, j, k) in xaijk)
-            
-            terms = [
-                xaijk[(dependent_id, k, j, l)] * bij.get((l, j), 0)
-                for l in range(k, min(k + within.get(dependent_id, 11), 12))
+                for i in N_set
                 for j in M_set
-                #if (dependent_id, k, j, l) in xaijk and (l, j) in bij
-            ]
+                if (depends_on_id, i, j, k) in xaijk
+            )
 
-            print("k=", k, "broj članova:", len(terms))
+            # koliko "unaprijed" gledamo (fallback = 11)
+            window = within.get(dependent_id, 11)
+
+            # suma dependent aktivnosti
+            dependent_sum = lpSum(
+                xaijk[(dependent_id, k, j, l)] * bij.get((l, j), 0)
+                for l in range(k, min(k + window, max(N_set) + 1))
+                for j in M_set
+                if (dependent_id, k, j, l) in xaijk
+            )
             print(dependency_list)
-                  
-            dependent_sum = lpSum(terms)
-            
-                                  
-            model += dependent_sum >= ratio * depends_on_sum, \
+
+            model += (
+                dependent_sum >= ratio * depends_on_sum,
                 f"Constraint_2d_{dependent_id}_{depends_on_id}_{k}"
+            )
 
 
 # Constraint 3

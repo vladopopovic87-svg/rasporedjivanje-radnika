@@ -118,33 +118,27 @@ def main():
         )
 
         # Constraint 2d (default istovar-kontrola + korisničke zavisnosti)
+        # Constraint 2d (default + korisničke zavisnosti)
         dependency_list_full = list(dependency_list)
-        # Dodaj default istovar-kontrola samo ako korisnik nije postavio nikakvu zavisnost za kontrolu
-        if istovar_generic_id and kontrola_generic_id:
-            user_set_dependency_for_kontrola = any(
-                dep['dependent'] == kontrola_generic_id
-                for dep in dependency_list
-            )
-            if not user_set_dependency_for_kontrola:
-                dependency_list_full.append({
-                    'dependent': kontrola_generic_id,
-                    'depends_on': istovar_generic_id,
-                    'ratio': istovar_kontrola_ratio
-                })
 
-        # Ako korisnik promijeni zavisnost za kontrolu, prilagodi demand za kontrolu prema toj zavisnosti
-        if kontrola_generic_id and kontrola_generic_id in demand:
-            kontrola_dep = next(
-                (dep for dep in dependency_list_full if dep['dependent'] == kontrola_generic_id),
-                None
-            )
-            if kontrola_dep is not None and kontrola_dep['depends_on'] in demand:
-                dep_id = kontrola_dep['depends_on']
-                ratio = kontrola_dep.get('ratio', istovar_kontrola_ratio)
-                # model doda 0 pri indeksu 0 da je 1-based lista u configu
-                demand[kontrola_generic_id] = [0] + [
+        # default samo ako nema ništa
+        if not dependency_list_full and istovar_generic_id and kontrola_generic_id:
+            dependency_list_full.append({
+                'dependent': kontrola_generic_id,
+                'depends_on': istovar_generic_id,
+                'ratio': istovar_kontrola_ratio
+            })
+
+        # GENERIČKI update demand-a za sve dependency-je
+        for dep in dependency_list_full:
+            dependent = dep['dependent']
+            depends_on = dep['depends_on']
+            ratio = dep.get('ratio', istovar_kontrola_ratio)
+
+            if dependent in demand and depends_on in demand:
+                demand[dependent] = [0] + [
                     round(ratio * v)
-                    for v in demand.get(dep_id, [0] * (len(N_set) + 1))[1:len(N_set) + 1]
+                    for v in demand.get(depends_on, [0] * (len(N_set) + 1))[1:len(N_set) + 1]
                 ]
 
         from model_builder import add_activity_dependency_ratio_constraints
