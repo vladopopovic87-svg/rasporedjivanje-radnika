@@ -119,13 +119,13 @@ def main():
 
         # Constraint 2d (default istovar-kontrola + korisničke zavisnosti)
         dependency_list_full = list(dependency_list)
-        # Dodaj default istovar-kontrola samo ako nije već u korisničkoj listi
+        # Dodaj default istovar-kontrola samo ako korisnik nije postavio nikakvu zavisnost za kontrolu
         if istovar_generic_id and kontrola_generic_id:
-            already_exists = any(
-                dep['dependent'] == kontrola_generic_id and dep['depends_on'] == istovar_generic_id
-                for dep in dependency_list_full
+            user_set_dependency_for_kontrola = any(
+                dep['dependent'] == kontrola_generic_id
+                for dep in dependency_list
             )
-            if not already_exists:
+            if not user_set_dependency_for_kontrola:
                 dependency_list_full.append({
                     'dependent': kontrola_generic_id,
                     'depends_on': istovar_generic_id,

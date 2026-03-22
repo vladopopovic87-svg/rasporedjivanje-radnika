@@ -208,7 +208,8 @@ def add_activity_dependency_ratio_constraints(model, dependency_list, N_set, M_s
             ]
 
             print("k=", k, "broj članova:", len(terms))
-
+            print(dependency_list)
+                  
             dependent_sum = lpSum(terms)
             
                                   
