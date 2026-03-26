@@ -253,6 +253,10 @@ def display_results(model, obj_part_1, obj_part_2, P, profil_types, M_set, M1_se
     )
     st.dataframe(df_activities)
 
+    for key, var in ytija.items():
+        if var.varValue and var.varValue > 0:
+            print(key, var.varValue)
+
     # Non-zero variables
     if st.checkbox("Show all PuLP variables with non-zero values"):
         st.subheader("All Non-Zero PuLP Variables")

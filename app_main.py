@@ -17,6 +17,7 @@ from ui_input import (
     collect_constraint_parameters
 )
 from model_builder import (
+    add_worker_ableno_constraints,
     build_model_variables,
     build_delta_variables,
     setup_objective_function,
@@ -25,6 +26,7 @@ from model_builder import (
     add_activity_until_constraints,
     add_activity_allocation_constraints,
     add_worker_capacity_constraints,
+    add_worker_ableno_constraints,
     add_interval_worker_limit,
     add_shift_constraints,
     add_delta_constraints,
@@ -155,6 +157,10 @@ def main():
         add_worker_capacity_constraints(
             model, profil_types, N_set, M_set, ytj, ytija, able
         )
+        
+        # Constraint 4a - Ograničenje da radnik koji nije sposoban ne može biti raspoređen na aktivnost
+        add_worker_ableno_constraints(model, profil_types, N_set, M_set, ytj, ytija, 
+                                    able, activities)
 
         # Constraint 5
         add_interval_worker_limit(
