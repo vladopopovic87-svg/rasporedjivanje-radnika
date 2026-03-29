@@ -130,6 +130,7 @@ def main():
                 'depends_on': istovar_generic_id,
                 'ratio': istovar_kontrola_ratio
             })
+        print (f"dependency_list_full: {dependency_list_full}")
 
         # GENERIČKI update demand-a za sve dependency-je
         for dep in dependency_list_full:
@@ -142,6 +143,8 @@ def main():
                     round(ratio * v)
                     for v in demand.get(depends_on, [0] * (len(N_set) + 1))[1:len(N_set) + 1]
                 ]
+                
+        print (f"Updated demand for {dependent} based on {depends_on} with ratio {ratio}: {demand[dependent]}")
 
         from model_builder import add_activity_dependency_ratio_constraints
         add_activity_dependency_ratio_constraints(
@@ -168,9 +171,7 @@ def main():
         )
 
         # Ograničenje za ukupan broj radnika i potražnje
-        add_demand_constraints(
-            model, activities, N_set, M_set, ytija, demand, profil_types
-        )
+
 
         # Additional constraints from original code
         # Constraint 6
@@ -203,7 +204,7 @@ def main():
 
         # Solve
         with st.spinner('Solving optimization problem...'):
-            model.solve(PULP_CBC_CMD(msg=0))
+            model.solve(PULP_CBC_CMD(msg=0, timeLimit=10))
 
         st.write(f"--- Solver Status: {LpStatus[model.status]} ---")
 

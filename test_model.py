@@ -36,7 +36,7 @@ dep_within = ['activity4']
 within = {'activity5': 1, 'activity6': 2, 'activity4': 1}
 until = {'activity1': 5, 'activity2': 9, 'activity3': 12}
 overlap_activities = []
-dependency_list = [{'dependent': 'activity4', 'depends_on': 'activity6', 'ratio': 0.5}]  # Back to activity6
+dependency_list = [{'dependent': 'activity4', 'depends_on': 'activity6', 'ratio': 0.7}]  # Back to activity6
 
 # Build model
 model = LpProblem("Worker_Scheduling", LpMinimize)
@@ -49,7 +49,7 @@ delta = build_delta_variables(P, profil_types, M_set, N_set, activities)
 setup_objective_function(model, P, profil_types, M_set, N_set, ytj, delta, ct, activities)
 
 # Constraints
-add_demand_constraints(model, activities, N_set, M_set, ytija, demand, profil_types)
+"""add_demand_constraints(model, activities, N_set, M_set, ytija, demand, profil_types)"""
 add_activity_within_constraints(model, ind_within, N_set, M_set, profil_types, activities, xaijk, bij, demand, within, able, activity_full_names)
 add_activity_until_constraints(model, ind_until, N_set, M_set, xaijk, bij, demand, until, activity_full_names)
 add_activity_dependency_ratio_constraints(model, dependency_list, N_set, M_set, xaijk, bij, within)
@@ -62,9 +62,10 @@ add_shift_constraints(model, M_set, M1_set, M2_set, ytj, profil_types, yj, max_m
 add_non_primary_activities_constraint(model, M1_set, profil_types, N_set, ytija, able, able_ne, bij, NON_PRIMARY_ACTIVITIES_RATIO)
 add_m1_m2_ratio_per_interval_constraint(model, N_set, M1_set, M2_set, ytj, bij, profil_types)
 add_delta_constraints(model, P, profil_types, M_set, N_set, activities, ytija, delta, able)
+add_worker_ableno_constraints(model, profil_types, N_set, M_set, ytj, ytija, able, activities)
 
 # Solve
-model.solve(PULP_CBC_CMD(msg=1))
+model.solve(PULP_CBC_CMD(msg=1,timeLimit=10))
 
 print(f"Solver Status: {LpStatus[model.status]}")
 if model.status == 1:
@@ -72,3 +73,28 @@ if model.status == 1:
     print(f"Objective value: {model.objective.value()}")
 else:
     print("No feasible solution")
+
+for dep in dependency_list:
+    dependent_id = dep.get('dependent')
+    depends_on_id = dep.get('depends_on')
+    ratio = dep.get('ratio', 1)
+
+    for k in N_set:
+        depends_val = sum(
+            xaijk[(depends_on_id, i, j, k)].varValue or 0
+            for i in N_set
+            for j in M_set
+            if (depends_on_id, i, j, k) in xaijk
+        )
+
+        window = within.get(dependent_id, 11)
+
+        dependent_val = sum(
+            xaijk[(dependent_id, k, j, l)].varValue or 0
+            for l in range(k, min(k + window, max(N_set) + 1))
+            for j in M_set
+            if (dependent_id, k, j, l) in xaijk
+        )
+
+        print(f"k={k} | depends_on={depends_val} | dependent={dependent_val}")
+

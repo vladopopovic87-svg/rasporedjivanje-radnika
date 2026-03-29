@@ -144,6 +144,7 @@ def add_demand_constraints(model, activities, N_set, M_set, ytija, demand, profi
             for i in N_set
             for j in M_set
         ) == sum(demand[a]), f"Demand_{a}"
+    
 
 
 # Constraint 2a
