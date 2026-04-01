@@ -269,6 +269,38 @@ def collect_variant_parameters(activities, activity_full_names):
         if overlap_activities:
             overlap_full_names = [activity_full_names.get(a, a) for a in overlap_activities]
             st.error(f"Error: Activities in both 'ind_within' and 'ind_until': {', '.join(overlap_full_names)}")
+        
+        within = {}
+        if not ind_within:
+            st.info("No activities selected in ind_within. Add activity IDs above to set within values.")
+        else:
+            st.subheader("within values (integer per activity):")
+            for generic_activity_id in ind_within:
+                default_val = DEFAULT_WITHIN.get(generic_activity_id, 1)
+                within[generic_activity_id] = st.number_input(
+                    f"'{activity_full_names.get(generic_activity_id, generic_activity_id)}' within value",
+                    value=default_val,
+                    key=f"within_{generic_activity_id}",
+                    min_value=0,
+                    help=f"Maximum number of intervals allowed to complete '{activity_full_names.get(generic_activity_id, generic_activity_id)}' activity."
+                )
+
+        until = {}
+        if not ind_until:
+            st.info("No activities selected in ind_until. Add activity IDs above to set until values.")
+        else:
+            st.subheader("until values (integer per activity):")
+            for generic_activity_id in ind_until:
+                default_val = DEFAULT_UNTIL.get(generic_activity_id, 1)
+                until[generic_activity_id] = st.number_input(
+                    f"'{activity_full_names.get(generic_activity_id, generic_activity_id)}' until value",
+                    value=default_val,
+                    key=f"until_{generic_activity_id}",
+                    min_value=0,
+                    help=f"Latest interval by which '{activity_full_names.get(generic_activity_id, generic_activity_id)}' activity must be started."
+                )
+
+        st.subheader("Dependent aktivnosti:")
 
         user_dep_within_str = st.text_area(
             "dep_within (comma-separated generic activity IDs)",
@@ -276,10 +308,15 @@ def collect_variant_parameters(activities, activity_full_names):
             help="Activities with dependent 'within' constraints - these depend on other activities being completed first."
         )
         dep_within = parse_list(user_dep_within_str)
+        
+        user_dep_until_str = st.text_area(
+            "dep_until (comma-separated generic activity IDs)",    
+            help="Activities with dependent 'until' constraints - these depend on other activities being completed first."
+        )
+        dep_until = parse_list(user_dep_until_str)
 
-        st.subheader("Zavisnosti za dependent aktivnosti:")
         dependent_activity_relations = {}
-        for dep_activity_id in dep_within:
+        for dep_activity_id in dep_within + dep_until:
             available_ids = [aid for aid in activity_full_names.keys() if aid != dep_activity_id]
             available_names = [activity_full_names.get(aid, aid) for aid in available_ids]
             default_dep_on = DEFAULT_DEP_ON.get(dep_activity_id)
@@ -316,39 +353,28 @@ def collect_variant_parameters(activities, activity_full_names):
                     min_value=0,
                     help=f"Maximum number of intervals allowed to complete dependent activity '{activity_full_names.get(generic_activity_id, generic_activity_id)}'."
                 )
-
-        within = {}
-        if not ind_within:
-            st.info("No activities selected in ind_within. Add activity IDs above to set within values.")
+        
+        dep_until_values = {}
+        if not dep_until:
+            st.info("No dependent activities selected in dep_until. Add activity IDs above to set dep until values.")
         else:
-            st.subheader("within values (integer per activity):")
-            for generic_activity_id in ind_within:
-                default_val = DEFAULT_WITHIN.get(generic_activity_id, 1)
-                within[generic_activity_id] = st.number_input(
-                    f"'{activity_full_names.get(generic_activity_id, generic_activity_id)}' within value",
-                    value=default_val,
-                    key=f"within_{generic_activity_id}",
+            st.subheader("dependent until values (integer per dependent activity):")
+            for generic_activity_id in dep_until:
+                dep_until_values[generic_activity_id] = st.number_input(
+                    f"'{activity_full_names.get(generic_activity_id, generic_activity_id)}' dep until value",
+                    key=f"dep_until_{generic_activity_id}",
                     min_value=0,
-                    help=f"Maximum number of intervals allowed to complete '{activity_full_names.get(generic_activity_id, generic_activity_id)}' activity."
+                    help=f"Maximum number of intervals allowed to complete dependent activity '{activity_full_names.get(generic_activity_id, generic_activity_id)}'."
                 )
+        
+
 
         if dep_within_values:
             within.update(dep_within_values)
+        
+        if dep_until_values:
+            until.update(dep_until_values)
 
-        until = {}
-        if not ind_until:
-            st.info("No activities selected in ind_until. Add activity IDs above to set until values.")
-        else:
-            st.subheader("until values (integer per activity):")
-            for generic_activity_id in ind_until:
-                default_val = DEFAULT_UNTIL.get(generic_activity_id, 1)
-                until[generic_activity_id] = st.number_input(
-                    f"'{activity_full_names.get(generic_activity_id, generic_activity_id)}' until value",
-                    value=default_val,
-                    key=f"until_{generic_activity_id}",
-                    min_value=0,
-                    help=f"Latest interval by which '{activity_full_names.get(generic_activity_id, generic_activity_id)}' activity must be started."
-                )
 
     # Priprema liste zavisnosti za model
     dependency_list = []
