@@ -384,7 +384,7 @@ def collect_variant_parameters(activities, activity_full_names):
             'depends_on': rel['depends_on'],
             'ratio': rel['ratio']
         })
-    return ind_within, ind_until, dep_within, within, until, overlap_activities, dependency_list
+    return ind_within, ind_until, dep_within, dep_until, within, until, overlap_activities, dependency_list
 
 
 def collect_demand_data(activities, activity_full_names, N_set):

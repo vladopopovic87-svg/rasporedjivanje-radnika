@@ -67,7 +67,7 @@ def main():
         profil_types, activities, profile_full_names, activity_full_names
     )
 
-    (ind_within, ind_until, dep_within, within, until, 
+    (ind_within, ind_until, dep_within, dep_until, within, until, 
      overlap_activities, dependency_list) = collect_variant_parameters(activities, activity_full_names)
 
     demand, istovar_generic_id, kontrola_generic_id = collect_demand_data(activities, activity_full_names, N_set)
@@ -148,7 +148,7 @@ def main():
 
         from model_builder import add_activity_dependency_ratio_constraints
         add_activity_dependency_ratio_constraints(
-            model, dependency_list_full, N_set, M_set, xaijk, bij, within
+            model, dependency_list_full, N_set, M_set, xaijk, bij, within, until
         )
 
         # Constraint 3
