@@ -102,6 +102,16 @@ def collect_interval_and_shift_parameters():
             help="Duration of each time interval in hours (e.g., 0.5 for 30 minutes, 1.0 for 1 hour)."
         )
 
+        rest_duration = st.number_input(
+            "Trajanje odmora (u satima):",
+            min_value=0.25,
+            max_value=24.0,
+            value=1.0,
+            step=0.25,
+            key="rest_duration",
+            help="Duration of rest intervals in hours (e.g., 0.5 for 30 minutes, 1.0 for 1 hour)."
+        )
+
         user_N_set_str = st.text_area(
             "N_set (Intervals, comma-separated integers)",
             ', '.join(map(str, DEFAULT_N_SET)),
@@ -148,7 +158,7 @@ def collect_interval_and_shift_parameters():
             )
             Oj[j_shift] = parse_list(oj_intervals_str, int)
 
-    return display_start_interval, interval_duration, N_set, M_set, M1_set, M2_set, Oj
+    return display_start_interval, interval_duration, rest_duration, N_set, M_set, M1_set, M2_set, Oj
 
 
 def collect_cost_coefficients(profil_types, profile_full_names):

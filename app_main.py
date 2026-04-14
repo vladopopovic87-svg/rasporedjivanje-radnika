@@ -58,7 +58,7 @@ def main():
     (P, profil_types, activities, profile_full_names, sp, 
      activity_full_names, s) = collect_general_parameters()
 
-    (display_start_interval, interval_duration, N_set, M_set, M1_set, M2_set, 
+    (display_start_interval, interval_duration, rest_duration, N_set, M_set, M1_set, M2_set, 
      Oj) = collect_interval_and_shift_parameters()
 
     ct_m1_inputs, ct_m2_inputs = collect_cost_coefficients(profil_types, profile_full_names)
