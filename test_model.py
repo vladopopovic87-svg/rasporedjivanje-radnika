@@ -52,11 +52,11 @@ setup_objective_function(model, P, profil_types, M_set, N_set, ytj, delta, ct, a
 """add_demand_constraints(model, activities, N_set, M_set, ytija, demand, profil_types)"""
 add_activity_within_constraints(model, ind_within, N_set, M_set, profil_types, activities, xaijk, bij, demand, within, able, activity_full_names)
 add_activity_until_constraints(model, ind_until, N_set, M_set, xaijk, bij, demand, until, activity_full_names)
-add_activity_dependency_ratio_constraints(model, dependency_list, N_set, M_set, xaijk, bij, within)
+add_activity_dependency_ratio_constraints(model, dependency_list, N_set, M_set, xaijk, bij, within, until)
 add_activity_allocation_constraints(model, activities, M_set, N_set, xaijk, ytija, bij, allowed)
 add_worker_capacity_constraints(model, profil_types, N_set, M_set, ytj, ytija, able)
 add_interval_worker_limit(model, activities, N_set, profil_types, M_set, ytija, max_workers)
-add_rest_interval_constraints(model, M1_set, profil_types, ytj, ytija, activities, able, bij, Oj)
+add_rest_interval_constraints(model, M1_set, profil_types, ytj, ytija, activities, able, bij, Oj, 1.0, 0.5)
 add_m2_ratio_constraint(model, profil_types, M2_set, M_set, ytj, M2_RATIO_LIMIT)
 add_shift_constraints(model, M_set, M1_set, M2_set, ytj, profil_types, yj, max_m1, max_m2)
 add_non_primary_activities_constraint(model, M1_set, profil_types, N_set, ytija, able, able_ne, bij, NON_PRIMARY_ACTIVITIES_RATIO)

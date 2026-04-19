@@ -316,7 +316,7 @@ def add_interval_worker_limit(model, activities, N_set, profil_types, M_set, yti
 
 
 # Constraint 6
-def add_rest_interval_constraints(model, M1_set, profil_types, ytj, ytija, activities, able, bij, Oj):
+def add_rest_interval_constraints(model, M1_set, profil_types, ytj, ytija, activities, able, bij, Oj, interval_duration, rest_duration):
     """Add rest interval limits for M1 shifts (Constraint 6)."""
     for j in M1_set:
         for p_type_id in profil_types:
@@ -326,7 +326,7 @@ def add_rest_interval_constraints(model, M1_set, profil_types, ytj, ytija, activ
                     for a_id in activities:
                         if (p_type_id, i, j, a_id) in ytija and (i, j) in bij:
                             rest_sum += ytija[(p_type_id, i, j, a_id)] * bij[(i, j)]
-                model += rest_sum <= 2 * ytj[(p_type_id, j)], f"Constraint_6_{j}_{p_type_id}"
+                model += rest_sum <= ((len(Oj.get(j, []))-1)+(1-rest_duration/interval_duration)) * ytj[(p_type_id, j)], f"Constraint_6_{j}_{p_type_id}"
 
 
 # Constraint 7

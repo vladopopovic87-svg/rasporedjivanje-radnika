@@ -93,24 +93,26 @@ def collect_interval_and_shift_parameters():
         )
 
         interval_duration = st.number_input(
-            "Trajanje intervala (u satima):",
-            min_value=0.25,
-            max_value=24.0,
-            value=1.0,
-            step=0.25,
+            "Trajanje intervala (u minutama):",
+            min_value=15,
+            max_value=1440,
+            value=60,
+            step=15,
             key="interval_duration",
-            help="Duration of each time interval in hours (e.g., 0.5 for 30 minutes, 1.0 for 1 hour)."
+            help="Duration of each time interval in minutes (e.g., 30 for 30 minutes, 60 for 1 hour)."
         )
+       
 
         rest_duration = st.number_input(
-            "Trajanje odmora (u satima):",
-            min_value=0.25,
-            max_value=24.0,
-            value=1.0,
-            step=0.25,
+            "Trajanje odmora (u minutama):",
+            min_value=15,
+            max_value=1440,
+            value=60,
+            step=15,
             key="rest_duration",
-            help="Duration of rest intervals in hours (e.g., 0.5 for 30 minutes, 1.0 for 1 hour)."
+            help="Duration of rest intervals in minutes (e.g., 30 for 30 minutes, 60 for 1 hour)."
         )
+       
 
         user_N_set_str = st.text_area(
             "N_set (Intervals, comma-separated integers)",

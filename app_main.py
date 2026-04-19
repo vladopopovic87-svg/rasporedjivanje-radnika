@@ -176,7 +176,7 @@ def main():
         # Additional constraints from original code
         # Constraint 6
         add_rest_interval_constraints(
-            model, M1_set, profil_types, ytj, ytija, activities, able, bij, Oj
+            model, M1_set, profil_types, ytj, ytija, activities, able, bij, Oj, interval_duration, rest_duration
         )
 
         # Constraint 7
