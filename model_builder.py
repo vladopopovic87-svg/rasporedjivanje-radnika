@@ -100,7 +100,7 @@ def setup_objective_function(model, P, profil_types, M_set,N_set, ytj, delta, ct
         ct.get((p_type_id, j), 0) * ytj.get((p_type_id, j), 0)
         for j in M_set
         for p_type_id in profil_types
-        if (p_type_id, j) in ct and (p_type_id, j) in ytj
+        #if (p_type_id, j) in ct and (p_type_id, j) in ytj
     )
 
     if P > 0:
@@ -129,9 +129,9 @@ def add_delta_constraints(model, P, profil_types, M_set, N_set, activities, ytij
                     if a in able.get(t, []):
                         for i in N_set:
                             if i < max(N_set):
-                                if (t, j, a, i) in delta and (t, i, j, a) in ytija and (t, i + 1, j, a) in ytija:
-                                    model += delta[t, j, a, i] >= ytija[t, i, j, a] - ytija[t, i + 1, j, a]
-                                model += delta[t, j, a, i] >= 0
+                                #if (t, j, a, i) in delta and (t, i, j, a) in ytija and (t, i + 1, j, a) in ytija:
+                                model += delta[t, j, a, i] >= ytija[t, i, j, a] - ytija[t, i + 1, j, a]
+                                #model += delta[t, j, a, i] >= 0
 
 
 # Ograničenje za ukupan broj radnika i potražnje
@@ -153,17 +153,20 @@ def add_activity_within_constraints(model, ind_within, N_set, M_set, profil_type
     """Add constraints for activities with 'within' requirement."""
     for a_id in ind_within:
         for i in N_set:
-            if a_id in demand and i < len(demand[a_id]):
+            #if a_id in demand and i < len(demand[a_id]):
+            if i < len(demand[a_id]):
                 model += lpSum(
                     xaijk[(a_id, i, j, k)] * bij.get((k, j), 0)
                     for k in range(i, min(i + within.get(a_id, 11), 12))
-                    for j in M_set if (a_id, i, j, k) in xaijk and (k, j) in bij
+                    #for j in M_set if (a_id, i, j, k) in xaijk and (k, j) in bij
+                    for j in M_set 
                 ) == demand[a_id][i], f"Constraint_within_{activity_full_names.get(a_id, a_id)}_{i}"
 
                 model += lpSum(
                     xaijk[(a_id, i, j, k)]
                     for k in N_set
-                    for j in M_set if (a_id, i, j, k) in xaijk
+                    for j in M_set 
+                    #for j in M_set if (a_id, i, j, k) in xaijk
                 ) == demand[a_id][i], f"Constraint_within_sum_{activity_full_names.get(a_id, a_id)}_{i}"
 
 
@@ -172,11 +175,11 @@ def add_activity_until_constraints(model, ind_until, N_set, M_set, xaijk, bij,
     """Add constraints for activities with 'until' requirement."""
     for a_id in ind_until:
         for i in N_set:
-            if a_id in demand and i < len(demand[a_id]):
+            if i < len(demand[a_id]):
                 model += lpSum(
                     xaijk[(a_id, i, j, k)] * bij.get((k, j), 0)
                     for k in range(i, min(until.get(a_id, 11), 12))
-                    for j in M_set if (a_id, i, j, k) in xaijk and (k, j) in bij
+                    for j in M_set 
                 ) == demand[a_id][i], f"Constraint_until_{activity_full_names.get(a_id, a_id)}_{i}"
 
 
@@ -269,10 +272,10 @@ def add_activity_allocation_constraints(model, activities, M_set, N_set, xaijk, 
             for k in N_set:
                 model += lpSum(
                     xaijk[(a_id, i, j, k)]
-                    for i in range(1, k + 1) if (a_id, i, j, k) in xaijk
+                    for i in range(1, k + 1)
                 ) == lpSum(
                     ytija[(t_id, k, j, a_id)]
-                    for t_id in allowed.get(a_id, []) if (t_id, k, j, a_id) in ytija
+                    for t_id in allowed.get(a_id, []) 
                 ), f"Constraint_allocation_{a_id}_{j}_{k}"
 
 
@@ -286,7 +289,7 @@ def add_worker_capacity_constraints(model, profil_types, N_set, M_set, ytj, ytij
                 if (p_type_id, j) in ytj:
                     model += lpSum(
                         ytija[(p_type_id, i, j, a_id)]
-                        for a_id in able.get(p_type_id, []) if (p_type_id, i, j, a_id) in ytija
+                        for a_id in able.get(p_type_id, []) 
                     ) <= ytj[(p_type_id, j)], f"Constraint_capacity_{p_type_id}_{i}_{j}"
 
 # Constraint 4a
@@ -296,10 +299,9 @@ def add_worker_ableno_constraints(model, profil_types, N_set, M_set, ytj, ytija,
     for p_type_id in profil_types:
         for i in N_set:
             for j in M_set:
-                if (p_type_id, j) in ytj:
                     model += lpSum(
                         ytija[(p_type_id, i, j, a_id)]
-                        for a_id in activities if (p_type_id, i, j, a_id) in ytija and not a_id in able.get(p_type_id, [])
+                        for a_id in activities if not a_id in able.get(p_type_id, [])
                     ) ==0
 
 
@@ -310,7 +312,6 @@ def add_interval_worker_limit(model, activities, N_set, profil_types, M_set, yti
         terms = [
             ytija[(p_type_id, i, j, a_id)]
             for p_type_id in profil_types for j in M_set for a_id in activities
-            if (p_type_id, i, j, a_id) in ytija
         ]
         model += lpSum(terms) <= max_workers, f"Constraint_max_workers_{i}"
 
@@ -324,8 +325,7 @@ def add_rest_interval_constraints(model, M1_set, profil_types, ytj, ytija, activ
                 rest_sum = 0
                 for i in Oj.get(j, []):
                     for a_id in activities:
-                        if (p_type_id, i, j, a_id) in ytija and (i, j) in bij:
-                            rest_sum += ytija[(p_type_id, i, j, a_id)] * bij[(i, j)]
+                        rest_sum += ytija[(p_type_id, i, j, a_id)] * bij[(i, j)]
                 model += rest_sum <= ((len(Oj.get(j, []))-1)+(1-rest_duration/interval_duration)) * ytj[(p_type_id, j)], f"Constraint_6_{j}_{p_type_id}"
 
 
@@ -334,8 +334,8 @@ def add_m2_ratio_constraint(model, profil_types, M2_set, M_set, ytj, M2_RATIO_LI
     """Add M2 ratio limit (Constraint 7)."""
     for p_type_id in profil_types:
         if M2_set:
-            sum_m2 = sum(ytj[(p_type_id, j)] for j in M2_set if (p_type_id, j) in ytj)
-            sum_m_total = sum(ytj[(p_type_id, j)] for j in M_set if (p_type_id, j) in ytj)
+            sum_m2 = sum(ytj[(p_type_id, j)] for j in M2_set)
+            sum_m_total = sum(ytj[(p_type_id, j)] for j in M_set)
             model += sum_m2 <= M2_RATIO_LIMIT * sum_m_total, f"Constraint_7_{p_type_id}"
 
 
@@ -345,7 +345,7 @@ def add_shift_constraints(model, M_set, M1_set, M2_set, ytj, profil_types, yj,
     """Add constraints for shift limits."""
     for j in M_set:
         model += lpSum(
-            ytj[(p_type_id, j)] for p_type_id in profil_types if (p_type_id, j) in ytj
+            ytj[(p_type_id, j)] for p_type_id in profil_types 
         ) <= 1000 * yj[j], f"Constraint_shift_{j}"
 
     model += lpSum(yj[j] for j in M1_set) <= max_m1, "Constraint_M1_limit"
@@ -360,12 +360,12 @@ def add_non_primary_activities_constraint(model, M1_set, profil_types, N_set, yt
             primary_sum = sum(
                 ytija[(p_type_id, i, j, a_id)] * bij.get((i, j), 0)
                 for i in N_set for a_id in able.get(p_type_id, [])
-                if (p_type_id, i, j, a_id) in ytija and (i, j) in bij
+                
             )
             non_primary_sum = sum(
                 ytija[(p_type_id, i, j, a_id)] * bij.get((i, j), 0)
                 for i in N_set for a_id in able_ne.get(p_type_id, [])
-                if (p_type_id, i, j, a_id) in ytija and (i, j) in bij
+                
             )
             model += non_primary_sum <= NON_PRIMARY_ACTIVITIES_RATIO * primary_sum, \
                 f"Constraint_11_{j}_{p_type_id}"
@@ -378,11 +378,11 @@ def add_m1_m2_ratio_per_interval_constraint(model, N_set, M1_set, M2_set, ytj, b
         m1_shifts_sum = sum(
             ytj[(p_type_id, j)] * bij.get((i, j), 0)
             for j in M1_set for p_type_id in profil_types
-            if (p_type_id, j) in ytj and (i, j) in bij
+            
         )
         m2_shifts_sum = sum(
             ytj[(p_type_id, j)] * bij.get((i, j), 0)
             for j in M2_set for p_type_id in profil_types
-            if (p_type_id, j) in ytj and (i, j) in bij
+            
         )
         model += m1_shifts_sum >= 0.0000001 * m2_shifts_sum, f"Constraint_12_{i}"
