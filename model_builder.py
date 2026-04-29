@@ -100,7 +100,6 @@ def setup_objective_function(model, P, profil_types, M_set,N_set, ytj, delta, ct
         ct.get((p_type_id, j), 0) * ytj.get((p_type_id, j), 0)
         for j in M_set
         for p_type_id in profil_types
-        #if (p_type_id, j) in ct and (p_type_id, j) in ytj
     )
 
     if P > 0:
