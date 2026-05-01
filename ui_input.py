@@ -92,6 +92,51 @@ def collect_interval_and_shift_parameters():
             help="Starting hour for displaying time intervals in the schedule (e.g., 8 means intervals start from 8:00)."
         )
 
+        full_time_shift_length = st.number_input(
+            "Dužina smjene za puno radno vrijeme (u intervalima):",
+            min_value=1,
+            max_value=100,
+            value=DEFAULT_FULL_TIME_SHIFT_LENGTH,
+            step=1,
+            key="full_time_shift_length",
+            help="Length of full-time shifts in number of intervals."
+        )
+
+        half_time_shift_length = st.number_input(
+            "Dužina smjene za pola radnog vremena (u intervalima):",
+            min_value=1,
+            max_value=100,
+            value=DEFAULT_HALF_TIME_SHIFT_LENGTH,
+            step=1,
+            key="half_time_shift_length",
+            help="Length of half-time shifts in number of intervals."
+        )
+
+        m1_shift_count = st.number_input(
+            "Broj punih smjena (M1):",
+            min_value=0,
+            max_value=20,
+            value=len(DEFAULT_M1_SET),
+            step=1,
+            key="m1_shift_count",
+            help="Broj punih smjena koji će automatski popuniti M1_set."
+        )
+
+        m2_shift_count = st.number_input(
+            "Broj pola radnog vremena smjena (M2):",
+            min_value=0,
+            max_value=20,
+            value=len(DEFAULT_M2_SET),
+            step=1,
+            key="m2_shift_count",
+            help="Broj pola radnog vremena smjena koji će automatski popuniti M2_set."
+        )
+
+        generated_M1_set = list(range(1, m1_shift_count + 1))
+        generated_M2_set = list(range(DEFAULT_M2_SHIFT_START, DEFAULT_M2_SHIFT_START + m2_shift_count))
+        generated_M1_set_str = ', '.join(map(str, generated_M1_set))
+        generated_M2_set_str = ', '.join(map(str, generated_M2_set))
+
         interval_duration = st.number_input(
             "Trajanje intervala (u minutama):",
             min_value=15,
@@ -124,29 +169,41 @@ def collect_interval_and_shift_parameters():
             st.warning("N_set cannot be empty. Defaulting to default values.")
             N_set = DEFAULT_N_SET
 
+        generated_M_set = generated_M1_set + generated_M2_set
+        default_M_set_str = ', '.join(map(str, generated_M_set or DEFAULT_M_SET))
+
         user_M_set_str = st.text_area(
             "M_set (Shifts, comma-separated integers)",
-            ', '.join(map(str, DEFAULT_M_SET)),
+            default_M_set_str,
             help="List of all available shifts. Each number represents a different shift type."
         )
         M_set = parse_list(user_M_set_str, int)
         if not M_set:
-            st.warning("M_set cannot be empty. Defaulting to default values.")
-            M_set = DEFAULT_M_SET
+            st.warning("M_set cannot be empty. Defaulting to generated shift values.")
+            M_set = generated_M_set or DEFAULT_M_SET
+
+        st.caption(
+            "Ako unesete broj M1 i M2 smjena, polja za M1_set i M2_set se automatski popunjavaju. "
+            f"M1 počinje od 1, a M2 počinje od {DEFAULT_M2_SHIFT_START}."
+        )
 
         user_M1_set_str = st.text_area(
             "M1_set (Full-time shifts, comma-separated integers)",
-            ', '.join(map(str, DEFAULT_M1_SET)),
+            generated_M1_set_str or ', '.join(map(str, DEFAULT_M1_SET)),
             help="List of full-time shifts (longer working hours). Subset of M_set."
         )
         M1_set = parse_list(user_M1_set_str, int)
+        if not M1_set:
+            M1_set = generated_M1_set
 
         user_M2_set_str = st.text_area(
             "M2_set (Part-time shifts, comma-separated integers)",
-            ', '.join(map(str, DEFAULT_M2_SET)),
+            generated_M2_set_str or ', '.join(map(str, DEFAULT_M2_SET)),
             help="List of part-time shifts (shorter working hours). Subset of M_set."
         )
         M2_set = parse_list(user_M2_set_str, int)
+        if not M2_set:
+            M2_set = generated_M2_set
 
         st.subheader("Oj (Intervals available for rest shift j, only for M1 shifts):")
         Oj = {}
@@ -160,7 +217,7 @@ def collect_interval_and_shift_parameters():
             )
             Oj[j_shift] = parse_list(oj_intervals_str, int)
 
-    return display_start_interval, interval_duration, rest_duration, N_set, M_set, M1_set, M2_set, Oj
+    return display_start_interval, full_time_shift_length, half_time_shift_length, interval_duration, rest_duration, N_set, M_set, M1_set, M2_set, Oj
 
 
 def collect_cost_coefficients(profil_types, profile_full_names):

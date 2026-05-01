@@ -58,7 +58,7 @@ def main():
     (P, profil_types, activities, profile_full_names, sp, 
      activity_full_names, s) = collect_general_parameters()
 
-    (display_start_interval, interval_duration, rest_duration, N_set, M_set, M1_set, M2_set, 
+    (display_start_interval, full_time_shift_length, half_time_shift_length, interval_duration, rest_duration, N_set, M_set, M1_set, M2_set, 
      Oj) = collect_interval_and_shift_parameters()
 
     ct_m1_inputs, ct_m2_inputs = collect_cost_coefficients(profil_types, profile_full_names)
@@ -85,8 +85,9 @@ def main():
         model = LpProblem("Cost minimising problem", LpMinimize)
 
         # Build matrices
-        bij = build_bij_matrix(M_set, M1_set, M2_set, N_set)
+        bij = build_bij_matrix(M_set, M1_set, M2_set, N_set, full_time_shift_length, half_time_shift_length)
         ct = build_ct_matrix(M_set, M1_set, M2_set, profil_types, ct_m1_inputs, ct_m2_inputs)
+        print(bij)
 
         # Build variables
         yjz, yj, ytj, ytija, xaijk = build_model_variables(
@@ -190,9 +191,9 @@ def main():
         )
 
         # Constraint 12
-        add_m1_m2_ratio_per_interval_constraint(
-            model, N_set, M1_set, M2_set, ytj, bij, profil_types
-        )
+        #add_m1_m2_ratio_per_interval_constraint(
+            #model, N_set, M1_set, M2_set, ytj, bij, profil_types
+        #)
 
         # Constraint 8,9,10
         add_shift_constraints(

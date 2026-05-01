@@ -4,22 +4,24 @@ from pulp import LpProblem, LpMinimize, LpVariable, lpSum, LpStatusOptimal
 from config import *
 
 
-def build_bij_matrix(M_set, M1_set, M2_set, N_set):
+def build_bij_matrix(M_set, M1_set, M2_set, N_set, full_time_shift_length, half_time_shift_length):
     """Build the bij matrix for shift interval coverage.
 
     ``bij[(i,j)]`` equals 1.0 when interval *i* falls inside the time
-    coverage of shift starting at *j*; otherwise 0.0.  M1 shifts span 9
-    intervals (j..j+8) while M2 spans 4 intervals (j-5..j-1).
+    coverage of shift starting at *j*; otherwise 0.0.  M1 shifts span 
+    full_time_shift_length intervals (j..j+full_time_shift_length-1) while 
+    M2 spans half_time_shift_length intervals (j-half_time_shift_length+1..j).
     """
     bij = {}
     for j in M_set:
         for i in N_set:
             if j in M1_set:
-                bij[(i, j)] = 1.00 if j <= i <= j + 8 else 0.00
+                bij[(i, j)] = 1.00 if j <= i <= j + full_time_shift_length - 1 else 0.00
             elif j in M2_set:
-                bij[(i, j)] = 1.00 if j - 5 <= i <= j - 5 + 3 else 0.00
-    return bij
+                bij[(i, j)] = 1.00 if j - (half_time_shift_length + 1) <= i <= j-2 else 0.00
 
+    return bij
+    
 
 def build_ct_matrix(M_set, M1_set, M2_set, profil_types, ct_m1_inputs, ct_m2_inputs):
     """Build cost coefficient matrix from user inputs.
@@ -174,7 +176,7 @@ def add_activity_until_constraints(model, ind_until, N_set, M_set, xaijk, bij,
     """Add constraints for activities with 'until' requirement."""
     for a_id in ind_until:
         for i in N_set:
-            if i < len(demand[a_id]):
+            #if i < len(demand[a_id]):
                 model += lpSum(
                     xaijk[(a_id, i, j, k)] * bij.get((k, j), 0)
                     for k in range(i, min(until.get(a_id, 11), 12))

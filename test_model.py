@@ -21,7 +21,7 @@ allowed = DEFAULT_ALLOWED
 able = DEFAULT_ABLE
 able_ne = DEFAULT_ABLE_NE
 demand = DEMAND_EXAMPLE_1
-max_workers = 20
+max_workers = 50
 max_m1 = 10
 max_m2 = 10
 P = 0
@@ -40,7 +40,7 @@ dependency_list = [{'dependent': 'activity4', 'depends_on': 'activity6', 'ratio'
 
 # Build model
 model = LpProblem("Worker_Scheduling", LpMinimize)
-bij = build_bij_matrix(M_set, M1_set, M2_set, N_set)
+bij = build_bij_matrix(M_set, M1_set, M2_set, N_set, DEFAULT_FULL_TIME_SHIFT_LENGTH, DEFAULT_HALF_TIME_SHIFT_LENGTH)
 ct = build_ct_matrix(M_set, M1_set, M2_set, profil_types, ct_m1_inputs, ct_m2_inputs)
 yjz, yj, ytj, ytija, xaijk = build_model_variables(profil_types, M_set, M1_set, M2_set, N_set, activities)
 delta = build_delta_variables(P, profil_types, M_set, N_set, activities)
@@ -60,7 +60,7 @@ add_rest_interval_constraints(model, M1_set, profil_types, ytj, ytija, activitie
 add_m2_ratio_constraint(model, profil_types, M2_set, M_set, ytj, M2_RATIO_LIMIT)
 add_shift_constraints(model, M_set, M1_set, M2_set, ytj, profil_types, yj, max_m1, max_m2)
 add_non_primary_activities_constraint(model, M1_set, profil_types, N_set, ytija, able, able_ne, bij, NON_PRIMARY_ACTIVITIES_RATIO)
-add_m1_m2_ratio_per_interval_constraint(model, N_set, M1_set, M2_set, ytj, bij, profil_types)
+#add_m1_m2_ratio_per_interval_constraint(model, N_set, M1_set, M2_set, ytj, bij, profil_types)
 add_delta_constraints(model, P, profil_types, M_set, N_set, activities, ytija, delta, able)
 add_worker_ableno_constraints(model, profil_types, N_set, M_set, ytj, ytija, able, activities)
 
