@@ -227,7 +227,7 @@ def main():
             st.write("--- Starting DataFrame generation ---")
             df, df_display = create_shift_allocation_table(
                 smjena_output, M_set, M1_set, M2_set, profil_types,
-                ytj, sp, display_start_interval
+                ytj, sp, display_start_interval, N_set
             )
 
             # Calculate activity per interval

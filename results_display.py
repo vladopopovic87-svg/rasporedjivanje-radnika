@@ -102,9 +102,10 @@ def balance_schedules(smjena_output, M1_set, profil_types, ytj):
 
 
 def create_shift_allocation_table(smjena_output, M_set, M1_set, M2_set, profil_types,
-                                  ytj, sp, display_start_interval=0):
+                                  ytj, sp, display_start_interval=0, N_set=None):
     """Create DataFrame for shift allocation timetable."""
-    df = pd.DataFrame(index=range(1, 15), dtype=object)
+    max_interval = max(N_set) if N_set else 0
+    df = pd.DataFrame(index=range(1, max_interval + 1), dtype=object)
 
     for j in M_set:
         for t in profil_types:
@@ -119,7 +120,7 @@ def create_shift_allocation_table(smjena_output, M_set, M1_set, M2_set, profil_t
                 if j in M1_set:
                     for i_offset in range(9):
                         row = j + i_offset
-                        if row <= 14 and (j, t, k) in smjena_output:
+                        if 1 <= row <= max_interval and (j, t, k) in smjena_output:
                             if i_offset < len(smjena_output[j, t, k]):
                                 df.loc[row, col_name] = smjena_output[j, t, k][i_offset]
                             else:
@@ -127,15 +128,17 @@ def create_shift_allocation_table(smjena_output, M_set, M1_set, M2_set, profil_t
                 else:
                     for i_offset in range(4):
                         row = j - 5 + i_offset
-                        if row <= 14 and (j, t, k) in smjena_output:
+                        if 1 <= row <= max_interval and (j, t, k) in smjena_output:
                             if i_offset < len(smjena_output[j, t, k]):
                                 df.loc[row, col_name] = smjena_output[j, t, k][i_offset]
                             else:
                                 df.loc[row, col_name] = ""
 
-    # Adjust display offset
+    # Adjust display offset and show interval number with corresponding hour
     df_display = df.copy()
-    df_display.index = df_display.index + display_start_interval - 1
+    display_hours = df_display.index + display_start_interval - 1
+    df_display.index = [f"{interval}({hour})" for interval, hour in zip(df_display.index, display_hours)]
+    df_display.index.name = "Interval (Hour)"
 
     return df, df_display
 

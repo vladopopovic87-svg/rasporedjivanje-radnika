@@ -159,15 +159,16 @@ def collect_interval_and_shift_parameters():
         )
        
 
-        user_N_set_str = st.text_area(
-            "N_set (Intervals, comma-separated integers)",
-            ', '.join(map(str, DEFAULT_N_SET)),
-            help="List of time intervals for the workday. Each number represents a time slot (e.g., 1,2,3,4,5,6,7,8)."
+        num_intervals = st.number_input(
+            "Broj intervala u 24h:",
+            min_value=1,
+            max_value=100,
+            value=len(DEFAULT_N_SET),
+            step=1,
+            key="num_intervals",
+            help="Koliko intervala se radi u 24h. U pozadini se kreira N_set kao lista [1..N]."
         )
-        N_set = parse_list(user_N_set_str, int)
-        if not N_set:
-            st.warning("N_set cannot be empty. Defaulting to default values.")
-            N_set = DEFAULT_N_SET
+        N_set = list(range(1, num_intervals + 1))
 
         generated_M_set = generated_M1_set + generated_M2_set
         default_M_set_str = ', '.join(map(str, generated_M_set or DEFAULT_M_SET))
