@@ -150,19 +150,6 @@ def collect_interval_and_shift_parameters():
         generated_M1_set_str = ', '.join(map(str, generated_M1_set))
         generated_M2_set_str = ', '.join(map(str, generated_M2_set))
 
-        generated_M_set = generated_M1_set + generated_M2_set
-        default_M_set_str = ', '.join(map(str, generated_M_set or DEFAULT_M_SET))
-
-        user_M_set_str = st.text_area(
-            "M_set (Shifts, comma-separated integers)",
-            default_M_set_str,
-            help="List of all available shifts. Each number represents a different shift type."
-        )
-        M_set = parse_list(user_M_set_str, int)
-        if not M_set:
-            st.warning("M_set cannot be empty. Defaulting to generated shift values.")
-            M_set = generated_M_set or DEFAULT_M_SET
-
         st.caption(
             "M1_set se automatski popunjava prema dužini pune smjene i raspoloživim intervalima. "
             f"M1 počinje od 1, a M2 po defaultu od {DEFAULT_M2_SHIFT_START}."
@@ -185,6 +172,16 @@ def collect_interval_and_shift_parameters():
         M2_set = parse_list(user_M2_set_str, int)
         if not M2_set:
             M2_set = generated_M2_set
+
+        M_set = sorted(set(M1_set + M2_set))
+        M_set_str = ', '.join(map(str, M_set))
+
+        st.text_area(
+            "M_set (Shifts, auto-generated as M1_set + M2_set)",
+            value=M_set_str,
+            disabled=True,
+            help="M_set is auto-generated from M1_set and M2_set."
+        )
 
         st.subheader("Oj (Intervals available for rest shift j, only for M1 shifts):")
         Oj = {}
