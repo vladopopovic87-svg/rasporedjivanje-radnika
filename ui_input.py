@@ -112,31 +112,6 @@ def collect_interval_and_shift_parameters():
             help="Length of half-time shifts in number of intervals."
         )
 
-        m1_shift_count = st.number_input(
-            "Broj punih smjena (M1):",
-            min_value=0,
-            max_value=20,
-            value=len(DEFAULT_M1_SET),
-            step=1,
-            key="m1_shift_count",
-            help="Broj punih smjena koji će automatski popuniti M1_set."
-        )
-
-        m2_shift_count = st.number_input(
-            "Broj pola radnog vremena smjena (M2):",
-            min_value=0,
-            max_value=20,
-            value=len(DEFAULT_M2_SET),
-            step=1,
-            key="m2_shift_count",
-            help="Broj pola radnog vremena smjena koji će automatski popuniti M2_set."
-        )
-
-        generated_M1_set = list(range(1, m1_shift_count + 1))
-        generated_M2_set = list(range(DEFAULT_M2_SHIFT_START, DEFAULT_M2_SHIFT_START + m2_shift_count))
-        generated_M1_set_str = ', '.join(map(str, generated_M1_set))
-        generated_M2_set_str = ', '.join(map(str, generated_M2_set))
-
         interval_duration = st.number_input(
             "Trajanje intervala (u minutama):",
             min_value=15,
@@ -170,6 +145,11 @@ def collect_interval_and_shift_parameters():
         )
         N_set = list(range(1, num_intervals + 1))
 
+        generated_M1_set = list(range(1, max(0, num_intervals - full_time_shift_length + 1) + 1))
+        generated_M2_set = DEFAULT_M2_SET
+        generated_M1_set_str = ', '.join(map(str, generated_M1_set))
+        generated_M2_set_str = ', '.join(map(str, generated_M2_set))
+
         generated_M_set = generated_M1_set + generated_M2_set
         default_M_set_str = ', '.join(map(str, generated_M_set or DEFAULT_M_SET))
 
@@ -184,8 +164,8 @@ def collect_interval_and_shift_parameters():
             M_set = generated_M_set or DEFAULT_M_SET
 
         st.caption(
-            "Ako unesete broj M1 i M2 smjena, polja za M1_set i M2_set se automatski popunjavaju. "
-            f"M1 počinje od 1, a M2 počinje od {DEFAULT_M2_SHIFT_START}."
+            "M1_set se automatski popunjava prema dužini pune smjene i raspoloživim intervalima. "
+            f"M1 počinje od 1, a M2 po defaultu od {DEFAULT_M2_SHIFT_START}."
         )
 
         user_M1_set_str = st.text_area(
