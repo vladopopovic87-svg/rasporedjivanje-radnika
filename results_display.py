@@ -12,13 +12,13 @@ from utils import count_consecutive_sequences
 # logika izgradnje pripada komponenti modela. Oni su sada umodulirani tamo.
 
 def generate_schedule_output(model, profil_types, M_set, M1_set, M2_set, N_set, ytj,
-                            ytija, activities, s, able):
+                            ytija, activities, s, able, full_time_shift_length=8, half_time_shift_length=4):
     """Generate worker schedules from optimized variables."""
     smjena_output = defaultdict(list)
 
     for j in [M1_set, M2_set]:
         for j_val in j:
-            current_i_range_length = 9 if j_val in M1_set else 4
+            current_i_range_length = full_time_shift_length if j_val in M1_set else half_time_shift_length
 
             for p_type_id in profil_types:
                 if (p_type_id, j_val) in ytj and ytj[(p_type_id, j_val)].varValue is not None:
@@ -31,7 +31,7 @@ def generate_schedule_output(model, profil_types, M_set, M1_set, M2_set, N_set, 
                         smjena_output[j_val, p_type_id, k_idx] = [0] * current_i_range_length
 
                     current_i_range_absolute = (
-                        list(range(j_val, j_val + 9)) if j_val in M1_set
+                        list(range(j_val, j_val + full_time_shift_length)) if j_val in M1_set
                         else list(range(j_val - 5, j_val - 5 + 4))
                     )
 
@@ -102,7 +102,7 @@ def balance_schedules(smjena_output, M1_set, profil_types, ytj):
 
 
 def create_shift_allocation_table(smjena_output, M_set, M1_set, M2_set, profil_types,
-                                  ytj, sp, display_start_interval=0, N_set=None):
+                                  ytj, sp, display_start_interval=0, N_set=None, full_time_shift_length=8, half_time_shift_length=4):
     """Create DataFrame for shift allocation timetable."""
     max_interval = max(N_set) if N_set else 0
     df = pd.DataFrame(index=range(1, max_interval + 1), dtype=object)
@@ -118,7 +118,7 @@ def create_shift_allocation_table(smjena_output, M_set, M1_set, M2_set, profil_t
                 col_name = f"Smjena_{j}_{sp[t]}_{k}"
 
                 if j in M1_set:
-                    for i_offset in range(9):
+                    for i_offset in range(full_time_shift_length):
                         row = j + i_offset
                         if 1 <= row <= max_interval and (j, t, k) in smjena_output:
                             if i_offset < len(smjena_output[j, t, k]):

@@ -216,7 +216,7 @@ def main():
             # Generate output
             smjena_output = generate_schedule_output(
                 model, profil_types, M_set, M1_set, M2_set, N_set, ytj,
-                ytija, activities, s, able
+                ytija, activities, s, able, full_time_shift_length, half_time_shift_length
             )
 
             # Balance schedules
@@ -227,7 +227,7 @@ def main():
             st.write("--- Starting DataFrame generation ---")
             df, df_display = create_shift_allocation_table(
                 smjena_output, M_set, M1_set, M2_set, profil_types,
-                ytj, sp, display_start_interval, N_set
+                ytj, sp, display_start_interval, N_set, full_time_shift_length, half_time_shift_length
             )
 
             # Calculate activity per interval
