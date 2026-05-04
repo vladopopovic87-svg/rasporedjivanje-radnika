@@ -32,7 +32,8 @@ def generate_schedule_output(model, profil_types, M_set, M1_set, M2_set, N_set, 
 
                     current_i_range_absolute = (
                         list(range(j_val, j_val + full_time_shift_length)) if j_val in M1_set
-                        else list(range(j_val - 5, j_val - 5 + 4))
+                        else list(range(j_val - DEFAULT_M2_SHIFT_START + 1,
+                                         j_val - DEFAULT_M2_SHIFT_START + 1 + half_time_shift_length))
                     )
 
                     for interval_offset, i in enumerate(current_i_range_absolute):
@@ -126,8 +127,8 @@ def create_shift_allocation_table(smjena_output, M_set, M1_set, M2_set, profil_t
                             else:
                                 df.loc[row, col_name] = ""
                 else:
-                    for i_offset in range(4):
-                        row = j - 5 + i_offset
+                    for i_offset in range(half_time_shift_length):
+                        row = j - DEFAULT_M2_SHIFT_START + i_offset + 1
                         if 1 <= row <= max_interval and (j, t, k) in smjena_output:
                             if i_offset < len(smjena_output[j, t, k]):
                                 df.loc[row, col_name] = smjena_output[j, t, k][i_offset]

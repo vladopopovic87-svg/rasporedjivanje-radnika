@@ -18,7 +18,8 @@ def build_bij_matrix(M_set, M1_set, M2_set, N_set, full_time_shift_length, half_
             if j in M1_set:
                 bij[(i, j)] = 1.00 if j <= i <= j + full_time_shift_length - 1 else 0.00
             elif j in M2_set:
-                bij[(i, j)] = 1.00 if j - (half_time_shift_length + 1) <= i <= j-2 else 0.00
+                m2_start = j - DEFAULT_M2_SHIFT_START + 1
+                bij[(i, j)] = 1.00 if m2_start <= i <= m2_start + half_time_shift_length - 1 else 0.00
 
     return bij
     
