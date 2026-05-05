@@ -137,8 +137,7 @@ pandas
 ```python
 DEFAULT_NUM_PROFILES = 3
 DEFAULT_NUM_ACTIVITIES = 6
-DEFAULT_M1_SET = [1, 2, 3]  # Pune smene
-DEFAULT_M2_SET = [6, 7, ...]  # Pola vremena
+DEFAULT_M2_SHIFT_START = 51  # Početak indeksa za pola vremena smene
 MAX_WORKERS_PER_INTERVAL = 40
 MAX_M1_SHIFTS = 3
 MAX_M2_SHIFTS = 1

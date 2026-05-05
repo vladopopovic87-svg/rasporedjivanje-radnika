@@ -146,13 +146,16 @@ def collect_interval_and_shift_parameters():
         N_set = list(range(1, num_intervals + 1))
 
         generated_M1_set = list(range(1, max(0, num_intervals - full_time_shift_length + 1) + 1))
-        generated_M2_set = DEFAULT_M2_SET
+        generated_M2_set = list(range(
+            DEFAULT_M2_SHIFT_START,
+            DEFAULT_M2_SHIFT_START + max(0, num_intervals - half_time_shift_length + 1)
+        ))
         generated_M1_set_str = ', '.join(map(str, generated_M1_set))
         generated_M2_set_str = ', '.join(map(str, generated_M2_set))
 
         st.caption(
             "M1_set se automatski popunjava prema dužini pune smjene i raspoloživim intervalima. "
-            f"M1 počinje od 1, a M2 po defaultu od {DEFAULT_M2_SHIFT_START}."
+            "M2_set se sada automatski popunjava prema trenutnom broju intervala i dužini half-time smjene."
         )
 
         user_M1_set_str = st.text_area(
@@ -166,7 +169,7 @@ def collect_interval_and_shift_parameters():
 
         user_M2_set_str = st.text_area(
             "M2_set (Part-time shifts, comma-separated integers)",
-            generated_M2_set_str or ', '.join(map(str, DEFAULT_M2_SET)),
+            generated_M2_set_str,
             help="List of part-time shifts (shorter working hours). Subset of M_set."
         )
         M2_set = parse_list(user_M2_set_str, int)

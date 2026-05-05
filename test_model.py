@@ -12,9 +12,12 @@ profil_types = ['profil1', 'profil2', 'profil3']
 activities = ['activity1', 'activity2', 'activity3', 'activity4', 'activity5', 'activity6']
 activity_full_names = DEFAULT_FULL_ACTIVITY_NAMES
 N_set = DEFAULT_N_SET
-M_set = DEFAULT_M_SET
-M1_set = DEFAULT_M1_SET
-M2_set = DEFAULT_M2_SET
+M1_set = list(range(1, max(0, len(N_set) - DEFAULT_FULL_TIME_SHIFT_LENGTH + 1) + 1))
+M2_set = list(range(
+    DEFAULT_M2_SHIFT_START,
+    DEFAULT_M2_SHIFT_START + max(0, len(N_set) - DEFAULT_HALF_TIME_SHIFT_LENGTH + 1)
+))
+M_set = sorted(set(M1_set + M2_set))
 ct_m1_inputs = {'profil1': 1.28, 'profil2': 1.6, 'profil3': 1.4}
 ct_m2_inputs = {'profil1': 0.64, 'profil2': 0.8, 'profil3': 0.7}
 allowed = DEFAULT_ALLOWED
