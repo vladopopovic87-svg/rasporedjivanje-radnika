@@ -157,7 +157,7 @@ def collect_interval_and_shift_parameters():
 
         user_M1_set_str = st.text_area(
             "M1_set (Full-time shifts, comma-separated integers)",
-            generated_M1_set_str or ', '.join(map(str, DEFAULT_M1_SET)),
+            generated_M1_set_str,
             help="List of full-time shifts (longer working hours). Subset of M_set."
         )
         M1_set = parse_list(user_M1_set_str, int)
@@ -170,8 +170,6 @@ def collect_interval_and_shift_parameters():
             help="List of part-time shifts (shorter working hours). Subset of M_set."
         )
         M2_set = parse_list(user_M2_set_str, int)
-        if not M2_set:
-            M2_set = generated_M2_set
 
         M_set = sorted(set(M1_set + M2_set))
         M_set_str = ', '.join(map(str, M_set))
