@@ -189,7 +189,7 @@ def analyze_activity_sequences(df, M1_set, M_set):
     rezultati = defaultdict(dict)
 
     for col in df.columns:
-        series = df[col].iloc[1:]
+        series = df[col].iloc[1:].tolist()  # Convert Pandas Series to list
         j = int(col.split("_")[1])
 
         rezultati[col]["maksimalni"] = 2 if j in M1_set else 1
