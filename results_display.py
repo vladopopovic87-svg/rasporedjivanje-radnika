@@ -184,7 +184,7 @@ def count_idle_intervals(df):
     return broj_nula
 
 
-def analyze_activity_sequences(df, M1_set, M_set):
+def analyze_activity_sequences(df, M1_set, M_set, min_len=3):
     """Analyze consecutive sequences of same activity."""
     rezultati = defaultdict(dict)
 
@@ -193,14 +193,14 @@ def analyze_activity_sequences(df, M1_set, M_set):
         j = int(col.split("_")[1])
 
         rezultati[col]["maksimalni"] = 2 if j in M1_set else 1
-        rezultati[col]["stvarni"] = count_consecutive_sequences(series, min_len=3)
+        rezultati[col]["stvarni"] = count_consecutive_sequences(series, min_len=min_len)
 
     return rezultati
 
 
 def display_results(model, obj_part_1, obj_part_2, P, profil_types, M_set, M1_set, M2_set,
                    N_set, ytj, ytija, activities, smjena_output, df, df_display,
-                   activity_per_interval, activity_full_names, demand,sp):
+                   activity_per_interval, activity_full_names, demand, sp, min_len):
     """Display all optimization results."""
     st.header("Optimization Results")
     st.success(f"Optimal Objective Value: {value(model.objective):.2f}")
@@ -239,7 +239,7 @@ def display_results(model, obj_part_1, obj_part_2, P, profil_types, M_set, M1_se
 
     # Activity sequences
     st.subheader("ðﾟﾓﾊ Activity Sequences Analysis")
-    rezultati = analyze_activity_sequences(df, M1_set, M_set)
+    rezultati = analyze_activity_sequences(df, M1_set, M_set, min_len)
 
     ukupno_stvarni = 0
     ukupno_maks = 0

@@ -196,7 +196,17 @@ def collect_interval_and_shift_parameters():
             )
             Oj[j_shift] = parse_list(oj_intervals_str, int)
 
-    return display_start_interval, full_time_shift_length, half_time_shift_length, interval_duration, rest_duration, N_set, M_set, M1_set, M2_set, Oj
+        min_len = st.number_input(
+            "Minimalna dužina uzastopnih aktivnosti (min_len):",
+            min_value=1,
+            max_value=100,
+            value=3,
+            step=1,
+            key="min_len",
+            help="Minimalna dužina uzastopnih aktivnosti (sekvenci) koje se analiziraju. Default je 3."
+        )
+
+    return display_start_interval, full_time_shift_length, half_time_shift_length, interval_duration, rest_duration, N_set, M_set, M1_set, M2_set, Oj, min_len
 
 
 def collect_cost_coefficients(profil_types, profile_full_names):

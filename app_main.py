@@ -59,7 +59,7 @@ def main():
      activity_full_names, s) = collect_general_parameters()
 
     (display_start_interval, full_time_shift_length, half_time_shift_length, interval_duration, rest_duration, N_set, M_set, M1_set, M2_set, 
-     Oj) = collect_interval_and_shift_parameters()
+     Oj, min_len) = collect_interval_and_shift_parameters()
 
     ct_m1_inputs, ct_m2_inputs = collect_cost_coefficients(profil_types, profile_full_names)
 
@@ -246,7 +246,7 @@ def main():
             display_results(
                 model, obj_part_1, obj_part_2, P, profil_types, M_set, M1_set, M2_set,
                 N_set, ytj, ytija, activities, smjena_output, df, df_display,
-                activity_per_interval, activity_full_names, demand, sp
+                activity_per_interval, activity_full_names, demand, sp, min_len
             )
 
         elif model.status == 0:  # LpStatusInfeasible
