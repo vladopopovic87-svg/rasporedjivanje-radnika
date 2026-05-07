@@ -246,7 +246,8 @@ def main():
             display_results(
                 model, obj_part_1, obj_part_2, P, profil_types, M_set, M1_set, M2_set,
                 N_set, ytj, ytija, activities, smjena_output, df, df_display,
-                activity_per_interval, activity_full_names, demand, sp, min_len
+                activity_per_interval, activity_full_names, demand, sp, min_len,
+                full_time_shift_length, half_time_shift_length, rest_duration, interval_duration
             )
 
         elif model.status == 0:  # LpStatusInfeasible

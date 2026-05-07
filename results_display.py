@@ -4,6 +4,7 @@ import streamlit as st
 import pandas as pd
 from collections import defaultdict
 import random
+import math
 from pulp import LpStatusOptimal, value
 from config import *
 from utils import count_consecutive_sequences
@@ -184,15 +185,32 @@ def count_idle_intervals(df):
     return broj_nula
 
 
-def analyze_activity_sequences(df, M1_set, M_set, min_len=3):
-    """Analyze consecutive sequences of same activity."""
+def analyze_activity_sequences(df, M1_set, M2_set, full_time_shift_length, half_time_shift_length, 
+                               rest_duration, interval_duration, min_len=3):
+    """Analyze consecutive sequences of same activity.
+    
+    Maksimalni broj sekvenci se računa kao:
+    (shift_length - rest_intervals) // min_len
+    """
     rezultati = defaultdict(dict)
+    
+    # Convert rest_duration (minutes) to number of intervals
+    rest_intervals = math.ceil(rest_duration / interval_duration) if interval_duration > 0 else 0
 
     for col in df.columns:
         series = df[col].iloc[1:].tolist()  # Convert Pandas Series to list
         j = int(col.split("_")[1])
 
-        rezultati[col]["maksimalni"] = 2 if j in M1_set else 1
+        # Calculate maksimalni based on shift length and min_len
+        if j in M1_set:
+            available_intervals = max(0, full_time_shift_length - rest_intervals)
+            rezultati[col]["maksimalni"] = available_intervals // min_len if min_len > 0 else 0
+        elif j in M2_set:
+            available_intervals = max(0, half_time_shift_length - rest_intervals)
+            rezultati[col]["maksimalni"] = available_intervals // min_len if min_len > 0 else 0
+        else:
+            rezultati[col]["maksimalni"] = 0
+            
         rezultati[col]["stvarni"] = count_consecutive_sequences(series, min_len=min_len)
 
     return rezultati
@@ -200,7 +218,8 @@ def analyze_activity_sequences(df, M1_set, M_set, min_len=3):
 
 def display_results(model, obj_part_1, obj_part_2, P, profil_types, M_set, M1_set, M2_set,
                    N_set, ytj, ytija, activities, smjena_output, df, df_display,
-                   activity_per_interval, activity_full_names, demand, sp, min_len):
+                   activity_per_interval, activity_full_names, demand, sp, min_len,
+                   full_time_shift_length, half_time_shift_length, rest_duration, interval_duration):
     """Display all optimization results."""
     st.header("Optimization Results")
     st.success(f"Optimal Objective Value: {value(model.objective):.2f}")
@@ -239,7 +258,9 @@ def display_results(model, obj_part_1, obj_part_2, P, profil_types, M_set, M1_se
 
     # Activity sequences
     st.subheader("ðﾟﾓﾊ Activity Sequences Analysis")
-    rezultati = analyze_activity_sequences(df, M1_set, M_set, min_len)
+    rezultati = analyze_activity_sequences(df, M1_set, M2_set, full_time_shift_length, 
+                                          half_time_shift_length, rest_duration, 
+                                          interval_duration, min_len)
 
     ukupno_stvarni = 0
     ukupno_maks = 0
