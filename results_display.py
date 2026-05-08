@@ -29,7 +29,7 @@ def generate_schedule_output(model, profil_types, M_set, M1_set, M2_set, N_set, 
 
                 if broj_usmjeni > 0:
                     for k_idx in range(1, broj_usmjeni + 1):
-                        smjena_output[j_val, p_type_id, k_idx] = [0] * current_i_range_length
+                        smjena_output[j_val, p_type_id, k_idx] = ["0"] * current_i_range_length
 
                     current_i_range_absolute = (
                         list(range(j_val, j_val + full_time_shift_length)) if j_val in M1_set
@@ -78,7 +78,7 @@ def balance_schedules(smjena_output, M1_set, profil_types, ytj):
                 for k_val in range(1, broj_usmjeni + 1):
                     worker_schedule = smjena_output.get((j, p_type_id, k_val), [])
                     if worker_schedule:
-                        d[k_val] = worker_schedule[3:6].count(0)
+                        d[k_val] = worker_schedule[3:6].count("0")
 
                 if d:
                     max_kljuc, max_v = max(d.items(), key=lambda k_v: k_v[1])
@@ -92,10 +92,10 @@ def balance_schedules(smjena_output, M1_set, profil_types, ytj):
 
                         if schedule_max and schedule_min:
                             for idx in [3, 4, 5]:
-                                if idx < len(schedule_max) and schedule_max[idx] == 0:
+                                if idx < len(schedule_max) and schedule_max[idx] == "0":
                                     if idx < len(schedule_min):
                                         schedule_max[idx] = schedule_min[idx]
-                                        schedule_min[idx] = 0
+                                        schedule_min[idx] = "0"
                                     break
                 else:
                     balance_loop_active = False
@@ -126,7 +126,7 @@ def create_shift_allocation_table(smjena_output, M_set, M1_set, M2_set, profil_t
                             if i_offset < len(smjena_output[j, t, k]):
                                 df.loc[row, col_name] = smjena_output[j, t, k][i_offset]
                             else:
-                                df.loc[row, col_name] = ""
+                                df.loc[row, col_name] = "0"
                 else:
                     for i_offset in range(half_time_shift_length):
                         row = j - DEFAULT_M2_SHIFT_START + i_offset + 1
@@ -134,7 +134,7 @@ def create_shift_allocation_table(smjena_output, M_set, M1_set, M2_set, profil_t
                             if i_offset < len(smjena_output[j, t, k]):
                                 df.loc[row, col_name] = smjena_output[j, t, k][i_offset]
                             else:
-                                df.loc[row, col_name] = ""
+                                df.loc[row, col_name] = "0"
 
     # Adjust display offset and show interval number with corresponding hour
     df_display = df.copy()
@@ -180,7 +180,7 @@ def count_idle_intervals(df):
     broj_nula = 0
     for col in df.columns:
         for v in df[col].iloc[1:]:
-            if v == 0:
+            if v == "0":
                 broj_nula += 1
     return broj_nula
 
