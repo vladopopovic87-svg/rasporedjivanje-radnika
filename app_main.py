@@ -76,6 +76,11 @@ def main():
     (max_workers_per_interval, max_m1_shifts, max_m2_shifts, 
      m2_ratio_limit, non_primary_activities_ratio, istovar_kontrola_ratio) = collect_constraint_parameters()
 
+    if "results" not in st.session_state:
+        st.session_state["results"] = None
+    if "show_activity_sequences" not in st.session_state:
+        st.session_state["show_activity_sequences"] = False
+
     # Run optimization button
     run_optimization_disabled = bool(overlap_activities)
     if st.button('Run Optimization', disabled=run_optimization_disabled):
@@ -242,18 +247,56 @@ def main():
                     )
                     activity_per_interval[i][a_id] = total_activity
 
-            # Display results
-            display_results(
-                model, obj_part_1, obj_part_2, P, profil_types, M_set, M1_set, M2_set,
-                N_set, ytj, ytija, activities, smjena_output, df, df_display,
-                activity_per_interval, activity_full_names, demand, sp, min_len,
-                full_time_shift_length, half_time_shift_length, rest_duration, interval_duration
-            )
+            # Cost breakdown
+            value_part_1 = value(obj_part_1)
+            value_part_2 = 0 if P == 0 else value(obj_part_2)
+
+            # Employee count per shift
+            ytj_data = []
+            for j in M_set:
+                for p_type_id in profil_types:
+                    if (p_type_id, j) in ytj and value(ytj[(p_type_id, j)]) > 0:
+                        ytj_data.append({
+                            "Shift": j,
+                            "Profile": sp[p_type_id],
+                            "Count": value(ytj[(p_type_id, j)])
+                        })
+
+            # Save results in session state so the page can rerun and still show main results
+            st.session_state["results"] = {
+                "objective": value(model.objective),
+                "value_part_1": value_part_1,
+                "value_part_2": value_part_2,
+                "P": P,
+                "ytj_data": ytj_data,
+                "df_display": df_display,
+                "broj_nula": count_idle_intervals(df),
+                "df": df,
+                "activity_per_interval": activity_per_interval,
+                "df_activities": create_demand_comparison_table(
+                    activity_per_interval, N_set, activities, activity_full_names, demand
+                ),
+                "non_zero_vars": [
+                    f"{v.name} = {v.varValue}"
+                    for v in model.variables()
+                    if v.varValue is not None and v.varValue > 0
+                ],
+                "M1_set": M1_set,
+                "M2_set": M2_set,
+                "full_time_shift_length": full_time_shift_length,
+                "half_time_shift_length": half_time_shift_length,
+                "rest_duration": rest_duration,
+                "interval_duration": interval_duration,
+                "min_len": min_len
+            }
 
         elif model.status == 0:  # LpStatusInfeasible
             st.error("Solver Status: Infeasible (No feasible solution found)")
         else:
             st.warning(f"Solver Status: {LpStatus[model.status]}")
+
+    if st.session_state["results"] is not None:
+        display_results(st.session_state["results"])
 
 
 if __name__ == "__main__":

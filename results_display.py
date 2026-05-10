@@ -216,75 +216,55 @@ def analyze_activity_sequences(df, M1_set, M2_set, full_time_shift_length, half_
     return rezultati
 
 
-def display_results(model, obj_part_1, obj_part_2, P, profil_types, M_set, M1_set, M2_set,
-                   N_set, ytj, ytija, activities, smjena_output, df, df_display,
-                   activity_per_interval, activity_full_names, demand, sp, min_len,
-                   full_time_shift_length, half_time_shift_length, rest_duration, interval_duration):
-    """Display all optimization results."""
+def display_results(results):
+    """Display all optimization results from stored session results."""
     st.header("Optimization Results")
-    st.success(f"Optimal Objective Value: {value(model.objective):.2f}")
-    st.info(f"Solver Status: Optimal")
+    st.success(f"Optimal Objective Value: {results['objective']:.2f}")
+    st.info("Solver Status: Optimal")
 
     # Cost breakdown
-    value_part_1 = value(obj_part_1)
-    value_part_2 = 0 if P == 0 else value(obj_part_2)
-
-    st.write(f"Ukupna vrijednost funkcije cilja: {value(model.objective):.2f}")
-    st.write(f"  - Dio 1 (trošak radnika): {value_part_1:.2f}")
-    st.write(f"  - Dio 2 (penal prelazaka): {value_part_2:.2f}")
-    st.write(f"  - Dio 2 ponderisan (P * dio 2): {(P * value_part_2):.2f}")
+    st.write(f"Ukupna vrijednost funkcije cilja: {results['objective']:.2f}")
+    st.write(f"  - Dio 1 (trošak radnika): {results['value_part_1']:.2f}")
+    st.write(f"  - Dio 2 (penal prelazaka): {results['value_part_2']:.2f}")
+    st.write(f"  - Dio 2 ponderisan (P * dio 2): {(results['P'] * results['value_part_2']):.2f}")
 
     # Employee count per shift
     st.subheader("Employees per Shift and Profile (ytj)")
-    ytj_data = []
-    for j in M_set:
-        for p_type_id in profil_types:
-            if (p_type_id, j) in ytj and value(ytj[(p_type_id, j)]) > 0:
-                ytj_data.append({
-                    "Shift": j,
-                    "Profile": sp[p_type_id],
-                    "Count": value(ytj[(p_type_id, j)])
-                })
-    if ytj_data:
-        st.dataframe(pd.DataFrame(ytj_data))
+    if results['ytj_data']:
+        st.dataframe(pd.DataFrame(results['ytj_data']))
 
     # Shift allocation timetable
     st.subheader("Shift Allocation Timetable")
-    st.dataframe(df_display.style.hide(axis="columns"))
+    st.dataframe(results['df_display'].style.hide(axis="columns"))
 
     # Idle intervals
-    broj_nula = count_idle_intervals(df)
-    st.markdown(f"### ðﾟﾧﾮ Total intervals without work (value = 0): **{broj_nula}**")
-
-    # Activity sequences
-    st.subheader("ðﾟﾓﾊ Activity Sequences Analysis")
-    rezultati = analyze_activity_sequences(df, M1_set, M2_set, full_time_shift_length, 
-                                          half_time_shift_length, rest_duration, 
-                                          interval_duration, min_len)
-
-    ukupno_stvarni = 0
-    ukupno_maks = 0
-    for col, r in rezultati.items():
-        st.write(f"**{col}** → actual: {r['stvarni']} / max: {r['maksimalni']}")
-        ukupno_stvarni += r["stvarni"]
-        ukupno_maks += r["maksimalni"]
-
-    st.markdown(f"### ✅ TOTAL: {ukupno_stvarni} / {ukupno_maks}")
+    st.markdown(f"### ðﾟﾧﾮ Total intervals without work (value = 0): **{results['broj_nula']}**")
 
     # Demand comparison
     st.subheader("Total activities per interval (Demanded vs. Realized)")
-    df_activities = create_demand_comparison_table(
-        activity_per_interval, N_set, activities, activity_full_names, demand
-    )
-    st.dataframe(df_activities)
+    st.dataframe(results['df_activities'])
 
-    for key, var in ytija.items():
-        if var.varValue and var.varValue > 0:
-            print(key, var.varValue)
+    # Activity sequences analysis
+    st.subheader("ðﾟﾓﾊ Activity Sequences Analysis")
+    if st.checkbox("Show Activity Sequences Analysis", key="show_activity_sequences_analysis"):
+        rezultati = analyze_activity_sequences(
+            results["df"], results["M1_set"], results["M2_set"],
+            results["full_time_shift_length"], results["half_time_shift_length"],
+            results["rest_duration"], results["interval_duration"],
+            results["min_len"]
+        )
+
+        ukupno_stvarni = 0
+        ukupno_maks = 0
+        for col, r in rezultati.items():
+            st.write(f"**{col}** → actual: {r['stvarni']} / max: {r['maksimalni']}")
+            ukupno_stvarni += r["stvarni"]
+            ukupno_maks += r["maksimalni"]
+
+        st.markdown(f"### ✅ TOTAL: {ukupno_stvarni} / {ukupno_maks}")
 
     # Non-zero variables
-    if st.checkbox("Show all PuLP variables with non-zero values"):
+    if st.checkbox("Show all PuLP variables with non-zero values", key="show_nonzero_pulp_vars"):
         st.subheader("All Non-Zero PuLP Variables")
-        for v in model.variables():
-            if v.varValue is not None and v.varValue > 0:
-                st.write(f"{v.name} = {v.varValue}")
+        for var_line in results['non_zero_vars']:
+            st.write(var_line)
