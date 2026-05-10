@@ -219,19 +219,23 @@ def analyze_activity_sequences(df, M1_set, M2_set, full_time_shift_length, half_
 def display_results(results):
     """Display all optimization results from stored session results."""
     st.header("Optimization Results")
-    st.success(f"Optimal Objective Value: {results['objective']:.2f}")
-    st.info("Solver Status: Optimal")
 
-    # Cost breakdown
-    st.write(f"Ukupna vrijednost funkcije cilja: {results['objective']:.2f}")
-    st.write(f"  - Dio 1 (trošak radnika): {results['value_part_1']:.2f}")
-    st.write(f"  - Dio 2 (penal prelazaka): {results['value_part_2']:.2f}")
-    st.write(f"  - Dio 2 ponderisan (P * dio 2): {(results['P'] * results['value_part_2']):.2f}")
+    col1, col2 = st.columns([2, 1])
+    col1.metric("Optimal Objective Value", f"{results['objective']:.2f}")
+    col2.success("Solver Status: Optimal")
+
+    st.markdown(
+        f"**Dio 1 (trošak radnika):** {results['value_part_1']:.2f}  |  "
+        f"**Dio 2 (penal prelazaka):** {results['value_part_2']:.2f}  |  "
+        f"**Dio 2 ponderisan (P * dio 2):** {(results['P'] * results['value_part_2']):.2f}"
+    )
 
     # Employee count per shift
     st.subheader("Employees per Shift and Profile (ytj)")
     if results['ytj_data']:
         st.dataframe(pd.DataFrame(results['ytj_data']))
+    else:
+        st.info("No shift assignments were generated.")
 
     # Shift allocation timetable
     st.subheader("Shift Allocation Timetable")
