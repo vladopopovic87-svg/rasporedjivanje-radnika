@@ -230,6 +230,35 @@ def display_results(results):
         f"**Dio 2 ponderisan (P * dio 2):** {(results['P'] * results['value_part_2']):.2f}"
     )
 
+    active_shifts = {entry["Shift"] for entry in results.get("ytj_data", [])}
+    total_shifts = len(active_shifts)
+    full_time_shifts = len({entry["Shift"] for entry in results.get("ytj_data", []) if entry["Shift"] in results.get("M1_set", [])})
+    part_time_shifts = len({entry["Shift"] for entry in results.get("ytj_data", []) if entry["Shift"] in results.get("M2_set", [])})
+
+    st.markdown(
+        f"**Ukupan broj aktivnih smijena:** {total_shifts}  |  "
+        f"**Punih:** {full_time_shifts}  |  "
+        f"**Nepunih:** {part_time_shifts}"
+    )
+
+    total_workers = sum(int(entry["Count"]) for entry in results.get("ytj_data", []))
+    full_time_workers = sum(
+        int(entry["Count"])
+        for entry in results.get("ytj_data", [])
+        if entry["Shift"] in results.get("M1_set", [])
+    )
+    part_time_workers = sum(
+        int(entry["Count"])
+        for entry in results.get("ytj_data", [])
+        if entry["Shift"] in results.get("M2_set", [])
+    )
+
+    st.markdown(
+        f"**Ukupan broj radnika:** {total_workers}  |  "
+        f"**Sa punim radnim vremenom:** {full_time_workers}  |  "
+        f"**Sa nepunim radnim vremenom:** {part_time_workers}"
+    )
+
     # Employee count per shift
     st.subheader("Employees per Shift and Profile (ytj)")
     if results['ytj_data']:
