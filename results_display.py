@@ -245,7 +245,7 @@ def display_results(results):
     st.dataframe(results['df_activities'])
 
     # Activity sequences analysis
-    st.subheader("ðﾟﾓﾊ Activity Sequences Analysis")
+    st.subheader("Additional Results Analysis")
     if st.checkbox("Show Activity Sequences Analysis", key="show_activity_sequences_analysis"):
         rezultati = analyze_activity_sequences(
             results["df"], results["M1_set"], results["M2_set"],

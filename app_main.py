@@ -84,7 +84,16 @@ def main():
     # Run optimization button
     run_optimization_disabled = bool(overlap_activities)
     if st.button('Run Optimization', disabled=run_optimization_disabled):
-        st.write("Running optimization with current parameters.")
+        placeholder = st.empty()
+        debug_messages = []
+        
+        def update_debug_messages(msg):
+            debug_messages.append(msg)
+            with placeholder.container():
+                for debug_msg in debug_messages:
+                    st.write(debug_msg)
+        
+        update_debug_messages("Running optimization with current parameters.")
 
         # Build PuLP model
         model = LpProblem("Cost minimising problem", LpMinimize)
@@ -112,7 +121,7 @@ def main():
         )
 
         # Add constraints
-        st.write("--- Model setup complete. Adding constraints. ---")
+        update_debug_messages("--- Model setup complete. Adding constraints. ---")
 
         # Constraint 2a
         add_activity_within_constraints(
@@ -206,17 +215,17 @@ def main():
             yj, max_m1_shifts, max_m2_shifts
         )
 
-        st.write("--- All constraints added. Solving model... ---")
-
         # Solve
+        update_debug_messages("--- All constraints added. Solving model... ---")
+
         with st.spinner('Solving optimization problem...'):
             model.solve(PULP_CBC_CMD(msg=0, timeLimit=10))
 
-        st.write(f"--- Solver Status: {LpStatus[model.status]} ---")
+        update_debug_messages(f"--- Solver Status: {LpStatus[model.status]} ---")
 
         # Process results
         if model.status == LpStatusOptimal:
-            st.write("--- Model solved optimally. Processing results for display. ---")
+            update_debug_messages("--- Model solved optimally. Processing results for display. ---")
 
             # Generate output
             smjena_output = generate_schedule_output(
@@ -225,11 +234,11 @@ def main():
             )
 
             # Balance schedules
-            st.write("--- Starting BALANCING ---")
+            update_debug_messages("--- Starting BALANCING ---")
             smjena_output = balance_schedules(smjena_output, M1_set, profil_types, ytj)
 
             # Create tables
-            st.write("--- Starting DataFrame generation ---")
+            update_debug_messages("--- Starting DataFrame generation ---")
             df, df_display = create_shift_allocation_table(
                 smjena_output, M_set, M1_set, M2_set, profil_types,
                 ytj, sp, display_start_interval, N_set, full_time_shift_length, half_time_shift_length
@@ -289,6 +298,8 @@ def main():
                 "interval_duration": interval_duration,
                 "min_len": min_len
             }
+            # Clear all debug messages
+            placeholder.empty()
 
         elif model.status == 0:  # LpStatusInfeasible
             st.error("Solver Status: Infeasible (No feasible solution found)")
