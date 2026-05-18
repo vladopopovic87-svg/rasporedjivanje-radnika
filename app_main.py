@@ -267,7 +267,7 @@ def main():
                     if (p_type_id, j) in ytj and value(ytj[(p_type_id, j)]) > 0:
                         ytj_data.append({
                             "Shift": j,
-                            "Profile": sp[p_type_id],
+                            "Profile": profile_full_names.get(p_type_id, sp[p_type_id]),
                             "Count": value(ytj[(p_type_id, j)])
                         })
 
@@ -290,6 +290,7 @@ def main():
                     for v in model.variables()
                     if v.varValue is not None and v.varValue > 0
                 ],
+                "display_start_interval": display_start_interval,
                 "M1_set": M1_set,
                 "M2_set": M2_set,
                 "full_time_shift_length": full_time_shift_length,

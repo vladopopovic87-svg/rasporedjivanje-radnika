@@ -117,7 +117,8 @@ def create_shift_allocation_table(smjena_output, M_set, M1_set, M2_set, profil_t
                 broj_usmjeni = 0
 
             for k in range(1, broj_usmjeni + 1):
-                col_name = f"Smjena_{j}_{sp[t]}_{k}"
+                display_shift = j if j in M1_set else j - DEFAULT_M2_SHIFT_START + 1
+                col_name = f"Smjena_{display_shift}_{sp[t]}_{k}"
 
                 if j in M1_set:
                     for i_offset in range(full_time_shift_length):
@@ -173,6 +174,21 @@ def create_demand_comparison_table(activity_per_interval, N_set, activities,
     df_activities = df_activities[final_columns]
 
     return df_activities
+
+
+def format_shift_time(shift_id, display_start_interval, M1_set, M2_set,
+                      full_time_shift_length, half_time_shift_length):
+    """Format shift time range from shift identifier and schedule settings."""
+    if shift_id in M1_set:
+        relative_start = shift_id
+        duration = full_time_shift_length
+    else:
+        relative_start = shift_id - DEFAULT_M2_SHIFT_START + 1
+        duration = half_time_shift_length
+
+    start_hour = display_start_interval + relative_start - 1
+    end_hour = start_hour + duration
+    return shift_id, f"{start_hour:02d} - {end_hour:02d}h"
 
 
 def count_idle_intervals(df):
@@ -262,7 +278,32 @@ def display_results(results):
     # Employee count per shift
     st.subheader("Employees per Shift and Profile (ytj)")
     if results['ytj_data']:
-        st.dataframe(pd.DataFrame(results['ytj_data']))
+        shift_lines = []
+        grouped = defaultdict(list)
+        for entry in results['ytj_data']:
+            grouped[entry['Shift']].append(entry)
+
+        for shift_id in sorted(grouped.keys()):
+            shift_entries = grouped[shift_id]
+            shift_start, shift_period = format_shift_time(
+                shift_id,
+                results['display_start_interval'],
+                results['M1_set'],
+                results['M2_set'],
+                results['full_time_shift_length'],
+                results['half_time_shift_length']
+            )
+            profile_parts = []
+            for entry in sorted(shift_entries, key=lambda x: x['Profile']):
+                count = int(entry['Count'])
+                profile_name = entry['Profile'].lower()
+                profile_parts.append(f"{count} {profile_name}")
+
+            shift_line = f"Smjena {shift_start} | {shift_period} | {' | '.join(profile_parts)}"
+            shift_lines.append(shift_line)
+
+        for line in shift_lines:
+            st.write(line)
     else:
         st.info("No shift assignments were generated.")
 
