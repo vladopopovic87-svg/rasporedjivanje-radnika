@@ -153,15 +153,14 @@ def collect_interval_and_shift_parameters():
         generated_M1_set_str = ', '.join(map(str, generated_M1_set))
         generated_M2_set_str = ', '.join(map(str, generated_M2_set))
 
-        st.caption(
-            "M1_set se automatski popunjava prema dužini pune smjene i raspoloživim intervalima. "
-            "M2_set se sada automatski popunjava prema trenutnom broju intervala i dužini half-time smjene."
-        )
-
         user_M1_set_str = st.text_area(
             "M1_set (Full-time shifts, comma-separated integers)",
             generated_M1_set_str,
-            help="List of full-time shifts (longer working hours). Subset of M_set."
+            help=(
+                "List of full-time shifts (longer working hours). Subset of M_set. "
+                "M1_set se automatski popunjava prema dužini pune smjene i raspoloživim intervalima. "
+                "M2_set se sada automatski popunjava prema trenutnom broju intervala i dužini half-time smjene."
+            )
         )
         M1_set = parse_list(user_M1_set_str, int)
         if not M1_set:

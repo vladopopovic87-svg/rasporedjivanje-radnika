@@ -41,7 +41,7 @@ DEFAULT_OJ = {1: [4, 5, 6], 2: [5, 6, 7], 3: [6, 7, 8], 4: [7, 8, 9]}
 DEFAULT_N_SET = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 
 # Shift lengths in intervals
-DEFAULT_FULL_TIME_SHIFT_LENGTH = 8
+DEFAULT_FULL_TIME_SHIFT_LENGTH = 9
 DEFAULT_HALF_TIME_SHIFT_LENGTH = 4
 
 #sym:DEFAULT_M2_SHIFT_START
