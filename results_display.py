@@ -275,6 +275,8 @@ def display_results(results):
         f"**Sa nepunim radnim vremenom:** {part_time_workers}"
     )
 
+    st.markdown(f"**Ukupan broj neradnih intervala:** {results['broj_nula']}")
+
     # Employee count per shift
     st.subheader("Employees per Shift and Profile (ytj)")
     if results['ytj_data']:
@@ -310,9 +312,6 @@ def display_results(results):
     # Shift allocation timetable
     st.subheader("Shift Allocation Timetable")
     st.dataframe(results['df_display'].style.hide(axis="columns"))
-
-    # Idle intervals
-    st.markdown(f"### ðﾟﾧﾮ Total intervals without work (value = 0): **{results['broj_nula']}**")
 
     # Demand comparison
     st.subheader("Total activities per interval (Demanded vs. Realized)")
