@@ -8,6 +8,7 @@ import math
 from pulp import LpStatusOptimal, value
 from config import *
 from utils import count_consecutive_sequences
+from translations import get_text
 
 # Matrice za pokrivanje smena i troškove preseljene su u model_builder.py, pošto
 # logika izgradnje pripada komponenti modela. Oni su sada umodulirani tamo.
@@ -104,7 +105,7 @@ def balance_schedules(smjena_output, M1_set, profil_types, ytj):
 
 
 def create_shift_allocation_table(smjena_output, M_set, M1_set, M2_set, profil_types,
-                                  ytj, sp, display_start_interval=0, N_set=None, full_time_shift_length=8, half_time_shift_length=4):
+                                  ytj, sp, display_start_interval=0, N_set=None, full_time_shift_length=8, half_time_shift_length=4, lang="sr"):
     """Create DataFrame for shift allocation timetable."""
     max_interval = max(N_set) if N_set else 0
     df = pd.DataFrame(index=range(1, max_interval + 1), dtype=object)
@@ -141,25 +142,25 @@ def create_shift_allocation_table(smjena_output, M_set, M1_set, M2_set, profil_t
     df_display = df.copy()
     display_hours = df_display.index + display_start_interval - 1
     df_display.index = [f"{interval}({hour})" for interval, hour in zip(df_display.index, display_hours)]
-    df_display.index.name = "Interval (Hour)"
+    df_display.index.name = get_text("interval_hour", lang)
 
     return df, df_display
 
 
 def create_demand_comparison_table(activity_per_interval, N_set, activities, 
-                                  activity_full_names, demand):
+                                  activity_full_names, demand, lang="sr"):
     """Create DataFrame comparing demand vs realized activities."""
     df_data = []
     for i in sorted(activity_per_interval.keys()):
         row_data = {"Interval": i}
         for a_id in activities:
             full_activity_name = activity_full_names.get(a_id, a_id)
-            row_data[f"{full_activity_name}_zahtjevano"] = (
+            row_data[f"{full_activity_name}_{get_text('demanded', lang)}"] = (
                 demand.get(a_id, [0] * (max(N_set) + 1))[i]
                 if i < len(demand.get(a_id, [0] * (max(N_set) + 1)))
                 else 0
             )
-            row_data[f"{full_activity_name}_rasporedjeno"] = activity_per_interval[i][a_id]
+            row_data[f"{full_activity_name}_{get_text('allocated', lang)}"] = activity_per_interval[i][a_id]
         df_data.append(row_data)
 
     df_activities = pd.DataFrame(df_data).set_index("Interval")
@@ -167,8 +168,8 @@ def create_demand_comparison_table(activity_per_interval, N_set, activities,
     ordered_columns = []
     for a_id in activities:
         full_activity_name = activity_full_names.get(a_id, a_id)
-        ordered_columns.append(f"{full_activity_name}_zahtjevano")
-        ordered_columns.append(f"{full_activity_name}_rasporedjeno")
+        ordered_columns.append(f"{full_activity_name}_{get_text('demanded', lang)}")
+        ordered_columns.append(f"{full_activity_name}_{get_text('allocated', lang)}")
 
     final_columns = [col for col in ordered_columns if col in df_activities.columns]
     df_activities = df_activities[final_columns]
@@ -234,16 +235,17 @@ def analyze_activity_sequences(df, M1_set, M2_set, full_time_shift_length, half_
 
 def display_results(results):
     """Display all optimization results from stored session results."""
-    st.header("Optimization Results")
+    lang = st.session_state.get("language", "sr")
+    st.header(get_text("optimization_results", lang))
 
     col1, col2 = st.columns([2, 1])
-    col1.metric("Optimal Objective Value", f"{results['objective']:.2f}")
-    col2.success("Solver Status: Optimal")
+    col1.metric(get_text("optimal_objective_value", lang), f"{results['objective']:.2f}")
+    col2.success(get_text("solver_status_optimal", lang))
 
     st.markdown(
-        f"**Dio 1 (trošak radnika):** {results['value_part_1']:.2f}  |  "
-        f"**Dio 2 (penal prelazaka):** {results['value_part_2']:.2f}  |  "
-        f"**Dio 2 ponderisan (P * dio 2):** {(results['P'] * results['value_part_2']):.2f}"
+        f"**{get_text('part_1_cost', lang)}:** {results['value_part_1']:.2f}  |  "
+        f"**{get_text('part_2_penalty', lang)}:** {results['value_part_2']:.2f}  |  "
+        f"**{get_text('part_2_weighted', lang)}:** {(results['P'] * results['value_part_2']):.2f}"
     )
 
     active_shifts = {entry["Shift"] for entry in results.get("ytj_data", [])}
@@ -252,9 +254,9 @@ def display_results(results):
     part_time_shifts = len({entry["Shift"] for entry in results.get("ytj_data", []) if entry["Shift"] in results.get("M2_set", [])})
 
     st.markdown(
-        f"**Ukupan broj aktivnih smijena:** {total_shifts}  |  "
-        f"**Punih:** {full_time_shifts}  |  "
-        f"**Nepunih:** {part_time_shifts}"
+        f"**{get_text('total_active_shifts', lang)}:** {total_shifts}  |  "
+        f"**{get_text('full_time', lang)}:** {full_time_shifts}  |  "
+        f"**{get_text('part_time', lang)}:** {part_time_shifts}"
     )
 
     total_workers = sum(int(entry["Count"]) for entry in results.get("ytj_data", []))
@@ -270,15 +272,15 @@ def display_results(results):
     )
 
     st.markdown(
-        f"**Ukupan broj radnika:** {total_workers}  |  "
-        f"**Sa punim radnim vremenom:** {full_time_workers}  |  "
-        f"**Sa nepunim radnim vremenom:** {part_time_workers}"
+        f"**{get_text('total_workers', lang)}:** {total_workers}  |  "
+        f"**{get_text('with_full_time', lang)}:** {full_time_workers}  |  "
+        f"**{get_text('with_part_time', lang)}:** {part_time_workers}"
     )
 
-    st.markdown(f"**Ukupan broj neradnih intervala:** {results['broj_nula']}")
+    st.markdown(f"**{get_text('total_idle_intervals', lang)}:** {results['broj_nula']}")
 
     # Employee count per shift
-    st.subheader("Employees per Shift and Profile (ytj)")
+    st.subheader(get_text("employees_per_shift", lang))
     if results['ytj_data']:
         shift_lines = []
         grouped = defaultdict(list)
@@ -307,19 +309,19 @@ def display_results(results):
         for line in shift_lines:
             st.write(line)
     else:
-        st.info("No shift assignments were generated.")
+        st.info(get_text("no_shift_assignments", lang))
 
     # Shift allocation timetable
-    st.subheader("Shift Allocation Timetable")
+    st.subheader(get_text("shift_allocation_timetable", lang))
     st.dataframe(results['df_display'].style.hide(axis="columns"))
 
     # Demand comparison
-    st.subheader("Total activities per interval (Demanded vs. Realized)")
+    st.subheader(get_text("total_activities_per_interval", lang))
     st.dataframe(results['df_activities'])
 
     # Activity sequences analysis
-    st.subheader("Additional Results Analysis")
-    if st.checkbox("Show Activity Sequences Analysis", key="show_activity_sequences_analysis"):
+    st.subheader(get_text("additional_results_analysis", lang))
+    if st.checkbox(get_text("show_activity_sequences", lang), key="show_activity_sequences_analysis"):
         rezultati = analyze_activity_sequences(
             results["df"], results["M1_set"], results["M2_set"],
             results["full_time_shift_length"], results["half_time_shift_length"],
@@ -330,14 +332,14 @@ def display_results(results):
         ukupno_stvarni = 0
         ukupno_maks = 0
         for col, r in rezultati.items():
-            st.write(f"**{col}** → actual: {r['stvarni']} / max: {r['maksimalni']}")
+            st.write(f"**{col}** → {get_text('actual', lang)}: {r['stvarni']} / {get_text('max', lang)}: {r['maksimalni']}")
             ukupno_stvarni += r["stvarni"]
             ukupno_maks += r["maksimalni"]
 
         st.markdown(f"### ✅ TOTAL: {ukupno_stvarni} / {ukupno_maks}")
 
     # Non-zero variables
-    if st.checkbox("Show all PuLP variables with non-zero values", key="show_nonzero_pulp_vars"):
-        st.subheader("All Non-Zero PuLP Variables")
+    if st.checkbox(get_text("show_nonzero_pulp_variables", lang), key="show_nonzero_pulp_vars"):
+        st.subheader(get_text("all_nonzero_variables", lang))
         for var_line in results['non_zero_vars']:
             st.write(var_line)

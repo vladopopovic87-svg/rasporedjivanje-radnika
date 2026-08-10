@@ -7,6 +7,7 @@ from collections import defaultdict
 # Import modules
 from config import *
 from utils import parse_list
+from translations import get_text
 from ui_input import (
     collect_general_parameters,
     collect_interval_and_shift_parameters,
@@ -51,8 +52,22 @@ from results_display import (
 def main():
     """Main application logic."""
     st.set_page_config(layout="wide")
-    st.title("Optimization Model with PuLP and Streamlit")
-    st.sidebar.header("Model Parameters")
+    
+    # Language selector in sidebar
+    if "language" not in st.session_state:
+        st.session_state.language = "sr"
+    
+    lang_index = 0 if st.session_state.language == "sr" else 1
+    selected_lang = st.sidebar.selectbox(
+        "🌐 Jezik / Language",
+        options=["sr", "en"],
+        index=lang_index
+    )
+    st.session_state.language = selected_lang
+    
+    language = st.session_state.language
+    st.title(get_text("app_title", language))
+    st.sidebar.header(get_text("model_parameters", language))
 
     # Collect all input parameters
     (P, profil_types, activities, profile_full_names, sp, 
@@ -239,9 +254,10 @@ def main():
 
             # Create tables
             update_debug_messages("--- Starting DataFrame generation ---")
+            lang = st.session_state.get("language", "sr")
             df, df_display = create_shift_allocation_table(
                 smjena_output, M_set, M1_set, M2_set, profil_types,
-                ytj, sp, display_start_interval, N_set, full_time_shift_length, half_time_shift_length
+                ytj, sp, display_start_interval, N_set, full_time_shift_length, half_time_shift_length, lang
             )
 
             # Calculate activity per interval
@@ -283,7 +299,7 @@ def main():
                 "df": df,
                 "activity_per_interval": activity_per_interval,
                 "df_activities": create_demand_comparison_table(
-                    activity_per_interval, N_set, activities, activity_full_names, demand
+                    activity_per_interval, N_set, activities, activity_full_names, demand, lang
                 ),
                 "non_zero_vars": [
                     f"{v.name} = {v.varValue}"

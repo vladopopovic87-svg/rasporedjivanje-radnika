@@ -4,13 +4,15 @@ import streamlit as st
 import pandas as pd
 from config import *
 from utils import parse_list, generate_profile_types, generate_activities
+from translations import get_text
 
 
 def collect_general_parameters():
     """Collect general model parameters from sidebar."""
-    with st.sidebar.expander("General Parameters"):
+    lang = st.session_state.get("language", "sr")
+    with st.sidebar.expander(get_text("general_parameters", lang)):
         P = st.number_input(
-            "Short-Duration Assignment Penalty",
+            get_text("short_duration_penalty", lang),
             min_value=0.00,
             max_value=1.00,
             value=0.00,
@@ -19,7 +21,7 @@ def collect_general_parameters():
         )
 
         num_profiles = st.number_input(
-            "Number of Worker Profiles",
+            get_text("num_profiles", lang),
             min_value=1,
             value=DEFAULT_NUM_PROFILES,
             step=1,
@@ -28,7 +30,7 @@ def collect_general_parameters():
         profil_types = generate_profile_types(num_profiles)
 
         num_activities = st.number_input(
-            "Number of Activities",
+            get_text("num_activities", lang),
             min_value=1,
             value=DEFAULT_NUM_ACTIVITIES,
             step=1,
@@ -37,40 +39,40 @@ def collect_general_parameters():
         activities = generate_activities(num_activities)
 
         # Profile names and codes
-        st.subheader("Define Profile Names and Short Codes:")
+        st.subheader(get_text("define_profile_names", lang))
         profile_full_names = {}
         sp = {}
         for generic_profile_id in profil_types:
             default_full = DEFAULT_FULL_PROFILE_NAMES.get(generic_profile_id, generic_profile_id.capitalize())
             profile_full_names[generic_profile_id] = st.text_input(
-                f"Full name for '{generic_profile_id}'",
+                f"{get_text('full_name_for', lang)} '{generic_profile_id}'",
                 value=default_full,
                 key=f"full_name_profile_{generic_profile_id}",
                 help="Full descriptive name for this worker profile type."
             )
             default_short = DEFAULT_SHORT_PROFILES.get(generic_profile_id, generic_profile_id[0:2])
             sp[generic_profile_id] = st.text_input(
-                f"Short code for '{generic_profile_id}'",
+                f"{get_text('short_code_for', lang)} '{generic_profile_id}'",
                 value=default_short,
                 key=f"short_code_profile_{generic_profile_id}",
                 help="Short abbreviation or code for this worker profile (used in tables and reports)."
             )
 
         # Activity names and codes
-        st.subheader("Define Activity Names and Short Codes:")
+        st.subheader(get_text("define_activity_names", lang))
         s = {}
         activity_full_names = {}
         for generic_activity_id in activities:
             default_full = DEFAULT_FULL_ACTIVITY_NAMES.get(generic_activity_id, generic_activity_id.capitalize())
             activity_full_names[generic_activity_id] = st.text_input(
-                f"Full name for '{generic_activity_id}'",
+                f"{get_text('full_name_for', lang)} '{generic_activity_id}'",
                 value=default_full,
                 key=f"full_name_activity_{generic_activity_id}",
                 help="Full descriptive name for this activity type."
             )
             default_short = DEFAULT_SHORT_ACTIVITIES.get(generic_activity_id, generic_activity_id[0:2])
             s[generic_activity_id] = st.text_input(
-                f"Short code for '{generic_activity_id}'",
+                f"{get_text('short_code_for', lang)} '{generic_activity_id}'",
                 value=default_short,
                 key=f"short_code_activity_{generic_activity_id}",
                 help="Short abbreviation or code for this activity (used in tables and reports)."
@@ -81,9 +83,10 @@ def collect_general_parameters():
 
 def collect_interval_and_shift_parameters():
     """Collect interval and shift set parameters."""
-    with st.sidebar.expander("Interval and Shift Sets"):
+    lang = st.session_state.get("language", "sr")
+    with st.sidebar.expander(get_text("interval_shift_sets", lang)):
         display_start_interval = st.number_input(
-            "Početak radnog dana (prikaz intervala počinje od):",
+            get_text("start_working_day", lang),
             min_value=1,
             max_value=100,
             value=8,
@@ -154,22 +157,18 @@ def collect_interval_and_shift_parameters():
         generated_M2_set_str = ', '.join(map(str, generated_M2_set))
 
         user_M1_set_str = st.text_area(
-            "M1_set (Full-time shifts, comma-separated integers)",
+            get_text("m1_set_label", lang),
             generated_M1_set_str,
-            help=(
-                "List of full-time shifts (longer working hours). Subset of M_set. "
-                "M1_set se automatski popunjava prema dužini pune smjene i raspoloživim intervalima. "
-                "M2_set se sada automatski popunjava prema trenutnom broju intervala i dužini half-time smjene."
-            )
+            help=get_text("m1_set_help", lang)
         )
         M1_set = parse_list(user_M1_set_str, int)
         if not M1_set:
             M1_set = generated_M1_set
 
         user_M2_set_str = st.text_area(
-            "M2_set (Part-time shifts, comma-separated integers)",
+            get_text("m2_set_label", lang),
             generated_M2_set_str,
-            help="List of part-time shifts (shorter working hours). Subset of M_set."
+            help=get_text("m2_set_help", lang)
         )
         M2_set = parse_list(user_M2_set_str, int)
 
@@ -177,32 +176,32 @@ def collect_interval_and_shift_parameters():
         M_set_str = ', '.join(map(str, M_set))
 
         st.text_area(
-            "M_set (Shifts, auto-generated as M1_set + M2_set)",
+            get_text("m_set_label", lang),
             value=M_set_str,
             disabled=True,
-            help="M_set is auto-generated from M1_set and M2_set."
+            help=get_text("m_set_help", lang)
         )
 
-        st.subheader("Oj (Intervals available for rest shift j, only for M1 shifts):")
+        st.subheader(get_text("oj_intervals_label", lang))
         Oj = {}
         for j_shift in M1_set:
             default_oj_intervals = DEFAULT_OJ.get(j_shift, [])
             oj_intervals_str = st.text_area(
-                f"Intervals for shift {j_shift} (comma-separated integers)",
+                f"{get_text('intervals_for_shift', lang)} {j_shift} (comma-separated integers)",
                 value=', '.join(map(str, default_oj_intervals)),
                 key=f"Oj_{j_shift}",
-                help=f"Time intervals available for rest during shift {j_shift}. Workers can take breaks in these intervals."
+                help=f"{get_text('oj_help_prefix', lang)} {j_shift}. Workers can take breaks in these intervals."
             )
             Oj[j_shift] = parse_list(oj_intervals_str, int)
 
         min_len = st.number_input(
-            "Minimalna dužina uzastopnih aktivnosti (min_len):",
+            get_text("min_len_label", lang),
             min_value=1,
             max_value=100,
             value=3,
             step=1,
             key="min_len",
-            help="Minimalna dužina uzastopnih aktivnosti (sekvenci) koje se analiziraju. Default je 3."
+            help=get_text("min_len_help", lang)
         )
 
     return display_start_interval, full_time_shift_length, half_time_shift_length, interval_duration, rest_duration, N_set, M_set, M1_set, M2_set, Oj, min_len
@@ -210,8 +209,9 @@ def collect_interval_and_shift_parameters():
 
 def collect_cost_coefficients(profil_types, profile_full_names):
     """Collect cost coefficients for shifts."""
-    with st.sidebar.expander("Cost Coefficients (ct)"):
-        st.write("Full-time shift (M1) cost rates:")
+    lang = st.session_state.get("language", "sr")
+    with st.sidebar.expander(get_text("cost_coefficients", lang)):
+        st.write(get_text("m1_cost_rates", lang))
         ct_m1_inputs = {}
         for p_type in profil_types:
             default_rate = DEFAULT_CT_RATES.get((p_type, 'm1'), 1.0)
@@ -219,10 +219,10 @@ def collect_cost_coefficients(profil_types, profile_full_names):
                 f"{profile_full_names.get(p_type, p_type)} (M1)",
                 value=default_rate,
                 key=f"ct_m1_{p_type}",
-                help=f"Cost rate per full shift for {profile_full_names.get(p_type, p_type)} working full-time shifts (M1)."
+                help=f"{get_text('m1_cost_help', lang)} {profile_full_names.get(p_type, p_type)} {get_text('working_full_time', lang)}"
             )
 
-        st.write("Part-time shift (M2) cost rates:")
+        st.write(get_text("m2_cost_rates", lang))
         ct_m2_inputs = {}
         for p_type in profil_types:
             default_rate = DEFAULT_CT_RATES.get((p_type, 'm2'), 0.5)
@@ -230,7 +230,7 @@ def collect_cost_coefficients(profil_types, profile_full_names):
                 f"{profile_full_names.get(p_type, p_type)} (M2)",
                 value=default_rate,
                 key=f"ct_m2_{p_type}",
-                help=f"Cost rate per shift for {profile_full_names.get(p_type, p_type)} working part-time shifts (M2)."
+                help=f"{get_text('m2_cost_help', lang)} {profile_full_names.get(p_type, p_type)} {get_text('working_part_time', lang)}"
             )
 
     return ct_m1_inputs, ct_m2_inputs
@@ -238,8 +238,9 @@ def collect_cost_coefficients(profil_types, profile_full_names):
 
 def collect_role_activity_mappings(profil_types, activities, profile_full_names, activity_full_names):
     """Collect role-activity mappings from user input."""
-    with st.sidebar.expander("Role-Activity Mappings"):
-        st.subheader("Allowed Activities per Role:")
+    lang = st.session_state.get("language", "sr")
+    with st.sidebar.expander(get_text("role_activity_mappings", lang)):
+        st.subheader(get_text("allowed_activities_per_role", lang))
         allowed = {}
         for generic_activity_id in activities:
             default_selection_generic_ids = [
@@ -251,11 +252,11 @@ def collect_role_activity_mappings(profil_types, activities, profile_full_names,
             ]
 
             selected_full_names = st.multiselect(
-                f"Profiles for '{activity_full_names.get(generic_activity_id, generic_activity_id)}'",
+                f"{get_text('profiles_for', lang)} '{activity_full_names.get(generic_activity_id, generic_activity_id)}'",
                 options=[profile_full_names.get(p, p) for p in profil_types],
                 default=default_selection_full_names,
                 key=f"allowed_{generic_activity_id}",
-                help=f"Select which worker profiles are allowed to perform the '{activity_full_names.get(generic_activity_id, generic_activity_id)}' activity."
+                help=f"{get_text('select_which_workers', lang)} '{activity_full_names.get(generic_activity_id, generic_activity_id)}'."
             )
             allowed[generic_activity_id] = [
                 pid for full_name in selected_full_names
@@ -263,7 +264,7 @@ def collect_role_activity_mappings(profil_types, activities, profile_full_names,
                 if pf_name == full_name
             ]
 
-        st.subheader("Able Activities per Profile:")
+        st.subheader(get_text("able_activities_per_profile", lang))
         able = {}
         for generic_profile_id in profil_types:
             default_selection_generic_ids = [
@@ -275,11 +276,11 @@ def collect_role_activity_mappings(profil_types, activities, profile_full_names,
             ]
 
             selected_full_names = st.multiselect(
-                f"Activities for '{profile_full_names.get(generic_profile_id, generic_profile_id)}'",
+                f"{get_text('activities_for', lang)} '{profile_full_names.get(generic_profile_id, generic_profile_id)}'",
                 options=[activity_full_names.get(a, a) for a in activities],
                 default=default_selection_full_names,
                 key=f"able_{generic_profile_id}",
-                help=f"Select which activities {profile_full_names.get(generic_profile_id, generic_profile_id)} workers are able to perform."
+                help=f"{get_text('select_which_activities', lang)} {profile_full_names.get(generic_profile_id, generic_profile_id)} {get_text('workers_are_able', lang)}."
             )
             able[generic_profile_id] = [
                 aid for full_name in selected_full_names
@@ -287,7 +288,7 @@ def collect_role_activity_mappings(profil_types, activities, profile_full_names,
                 if af_name == full_name
             ]
 
-        st.subheader("Non-Primary Able Activities per Profile:")
+        st.subheader(get_text("non_primary_able_activities", lang))
         able_ne = {}
         for generic_profile_id in profil_types:
             default_selection_generic_ids = [
@@ -299,11 +300,11 @@ def collect_role_activity_mappings(profil_types, activities, profile_full_names,
             ]
 
             selected_full_names = st.multiselect(
-                f"Non-primary activities for '{profile_full_names.get(generic_profile_id, generic_profile_id)}'",
+                f"{get_text('non_primary_activities_for', lang)} '{profile_full_names.get(generic_profile_id, generic_profile_id)}'",
                 options=[activity_full_names.get(a, a) for a in activities],
                 default=default_selection_full_names,
                 key=f"able_ne_{generic_profile_id}",
-                help=f"Select which activities {profile_full_names.get(generic_profile_id, generic_profile_id)} can perform as non-primary work (limited by ratio constraints)."
+                help=f"{get_text('select_which_activities', lang)} {profile_full_names.get(generic_profile_id, generic_profile_id)} {get_text('can_perform_non_primary', lang)}."
             )
             able_ne[generic_profile_id] = [
                 aid for full_name in selected_full_names
@@ -316,7 +317,8 @@ def collect_role_activity_mappings(profil_types, activities, profile_full_names,
 
 def collect_variant_parameters(activities, activity_full_names):
     """Collect variant-dependent parameters."""
-    with st.sidebar.expander("Variant-Dependent Parameters", expanded=True):
+    lang = st.session_state.get("language", "sr")
+    with st.sidebar.expander(get_text("variant_dependent_parameters", lang), expanded=True):
         # Create reverse mapping: activity name -> ID
         name_to_id = {v: k for k, v in activity_full_names.items()}
         
@@ -330,7 +332,7 @@ def collect_variant_parameters(activities, activity_full_names):
         ]
         
         selected_ind_within_names = st.multiselect(
-            "ind_within (activity names)",
+            get_text("ind_within", lang),
             options=[activity_full_names.get(a, a) for a in activities],
             default=default_ind_within_full_names,
             key="ind_within_multiselect",
@@ -349,7 +351,7 @@ def collect_variant_parameters(activities, activity_full_names):
         ]
         
         selected_ind_until_names = st.multiselect(
-            "ind_until (activity names)",
+            get_text("ind_until", lang),
             options=[activity_full_names.get(a, a) for a in activities],
             default=default_ind_until_full_names,
             key="ind_until_multiselect",
@@ -362,17 +364,17 @@ def collect_variant_parameters(activities, activity_full_names):
         overlap_activities = set(ind_within).intersection(set(ind_until))
         if overlap_activities:
             overlap_full_names = [activity_full_names.get(a, a) for a in overlap_activities]
-            st.error(f"Error: Activities in both 'ind_within' and 'ind_until': {', '.join(overlap_full_names)}")
+            st.error(f"{get_text('error_overlap', lang)} {', '.join(overlap_full_names)}")
         
         within = {}
         if not ind_within:
-            st.info("No activities selected in ind_within. Add activity IDs above to set within values.")
+            st.info(get_text("no_activities_ind_within", lang))
         else:
-            st.subheader("within values (integer per activity):")
+            st.subheader(get_text("within_values", lang))
             for generic_activity_id in ind_within:
                 default_val = DEFAULT_WITHIN.get(generic_activity_id, 1)
                 within[generic_activity_id] = st.number_input(
-                    f"'{activity_full_names.get(generic_activity_id, generic_activity_id)}' within value",
+                    f"'{activity_full_names.get(generic_activity_id, generic_activity_id)}' {get_text('within_value', lang)}",
                     value=default_val,
                     key=f"within_{generic_activity_id}",
                     min_value=0,
@@ -381,20 +383,20 @@ def collect_variant_parameters(activities, activity_full_names):
 
         until = {}
         if not ind_until:
-            st.info("No activities selected in ind_until. Add activity IDs above to set until values.")
+            st.info(get_text("no_activities_ind_until", lang))
         else:
-            st.subheader("until values (integer per activity):")
+            st.subheader(get_text("until_values", lang))
             for generic_activity_id in ind_until:
                 default_val = DEFAULT_UNTIL.get(generic_activity_id, 1)
                 until[generic_activity_id] = st.number_input(
-                    f"'{activity_full_names.get(generic_activity_id, generic_activity_id)}' until value",
+                    f"'{activity_full_names.get(generic_activity_id, generic_activity_id)}' {get_text('until_value', lang)}",
                     value=default_val,
                     key=f"until_{generic_activity_id}",
                     min_value=0,
                     help=f"Latest interval by which '{activity_full_names.get(generic_activity_id, generic_activity_id)}' activity must be started."
                 )
 
-        st.subheader("Dependent aktivnosti:")
+        st.subheader(get_text("dependent_activities", lang))
 
         # dep_within with multiselect
         default_dep_within_generic_ids = [
@@ -406,7 +408,7 @@ def collect_variant_parameters(activities, activity_full_names):
         ]
         
         selected_dep_within_names = st.multiselect(
-            "dep_within (activity names)",
+            get_text("dep_within", lang),
             options=[activity_full_names.get(a, a) for a in activities],
             default=default_dep_within_full_names,
             key="dep_within_multiselect",
@@ -425,7 +427,7 @@ def collect_variant_parameters(activities, activity_full_names):
         ]
         
         selected_dep_until_names = st.multiselect(
-            "dep_until (activity names)",
+            get_text("dep_until", lang),
             options=[activity_full_names.get(a, a) for a in activities],
             default=default_dep_until_full_names,
             key="dep_until_multiselect",
@@ -508,15 +510,16 @@ def collect_variant_parameters(activities, activity_full_names):
 
 def collect_demand_data(activities, activity_full_names, N_set):
     """Collect and edit demand data."""
-    st.subheader("Demand setup")
+    lang = st.session_state.get("language", "sr")
+    st.subheader(get_text("demand_data", lang))
     selected_example = st.selectbox(
-        "Odaberi defaultnu postavku potražnje:",
-        ["Primjer 1", "Primjer 2"],
+        get_text("select_demand_profile", lang),
+        [get_text("demand_example_1", lang), get_text("demand_example_2", lang)],
         key="demand_example_selector",
         help="Choose a predefined demand pattern to start with. You can then edit the values in the table below."
     )
 
-    if selected_example == "Primjer 1":
+    if selected_example == get_text("demand_example_1", lang):
         default_demand_data = DEMAND_EXAMPLE_1
     else:
         default_demand_data = DEMAND_EXAMPLE_2
@@ -577,9 +580,10 @@ def collect_demand_data(activities, activity_full_names, N_set):
 
 def collect_constraint_parameters():
     """Collect constraint parameters from sidebar."""
-    with st.sidebar.expander("Constraint Parameters"):
+    lang = st.session_state.get("language", "sr")
+    with st.sidebar.expander(get_text("constraint_parameters", lang)):
         max_workers_per_interval = st.number_input(
-            "Max Workers Per Interval",
+            get_text("max_workers_per_interval", lang),
             min_value=1,
             max_value=200,
             value=DEFAULT_MAX_WORKERS_PER_INTERVAL,
@@ -588,7 +592,7 @@ def collect_constraint_parameters():
         )
         
         max_m1_shifts = st.number_input(
-            "Max M1 Shifts (Full-time)",
+            get_text("max_m1_shifts", lang),
             min_value=1,
             max_value=50,
             value=DEFAULT_MAX_M1_SHIFTS,
@@ -597,7 +601,7 @@ def collect_constraint_parameters():
         )
         
         max_m2_shifts = st.number_input(
-            "Max M2 Shifts (Part-time)",
+            get_text("max_m2_shifts", lang),
             min_value=1,
             max_value=50,
             value=DEFAULT_MAX_M2_SHIFTS,
@@ -606,7 +610,7 @@ def collect_constraint_parameters():
         )
         
         m2_ratio_limit = st.slider(
-            "M2 Ratio Limit",
+            get_text("m2_ratio_limit", lang),
             min_value=0.0,
             max_value=1.0,
             value=DEFAULT_M2_RATIO_LIMIT,
@@ -615,7 +619,7 @@ def collect_constraint_parameters():
         )
         
         istovar_kontrola_ratio = st.slider(
-            "Istovar-Kontrola Ratio",
+            get_text("istovar_kontrola_ratio", lang),
             min_value=0.0,
             max_value=1.0,
             value=DEFAULT_ISTOVAR_KONTROLA_RATIO,
@@ -623,7 +627,7 @@ def collect_constraint_parameters():
             help="Udio radnika za kontrolu u odnosu na broja radnika kojio obavljaju istovar."
        )
         non_primary_activities_ratio = st.slider(
-            "Non-Primary Activities Ratio",
+            get_text("non_primary_activities_ratio", lang),
             min_value=0.0,
             max_value=1.0,
             value=DEFAULT_NON_PRIMARY_ACTIVITIES_RATIO,
