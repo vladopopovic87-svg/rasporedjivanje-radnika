@@ -79,6 +79,7 @@ DEFAULT_ABLE_NE = {
 DEFAULT_IND_WITHIN = ['activity5', 'activity6']
 DEFAULT_IND_UNTIL = ['activity1', 'activity2', 'activity3']
 DEFAULT_DEP_WITHIN = ['activity4']
+DEFAULT_DEP_UNTIL = []
 DEFAULT_DEP_ON = {'activity4': 'activity6'}
 DEFAULT_WITHIN = {'activity5': 1, 'activity6': 2, 'activity4': 1}
 DEFAULT_UNTIL = {'activity1': 5, 'activity2': 9, 'activity3': 12}

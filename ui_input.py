@@ -317,19 +317,46 @@ def collect_role_activity_mappings(profil_types, activities, profile_full_names,
 def collect_variant_parameters(activities, activity_full_names):
     """Collect variant-dependent parameters."""
     with st.sidebar.expander("Variant-Dependent Parameters", expanded=True):
-        user_ind_within_str = st.text_area(
-            "ind_within (comma-separated generic activity IDs)",
-            ', '.join(DEFAULT_IND_WITHIN),
+        # Create reverse mapping: activity name -> ID
+        name_to_id = {v: k for k, v in activity_full_names.items()}
+        
+        # ind_within with multiselect
+        default_ind_within_generic_ids = [
+            aid for aid in DEFAULT_IND_WITHIN
+            if aid in activities
+        ]
+        default_ind_within_full_names = [
+            activity_full_names.get(aid, aid) for aid in default_ind_within_generic_ids
+        ]
+        
+        selected_ind_within_names = st.multiselect(
+            "ind_within (activity names)",
+            options=[activity_full_names.get(a, a) for a in activities],
+            default=default_ind_within_full_names,
+            key="ind_within_multiselect",
             help="Activities that have 'within' constraints - workers must complete these activities within a certain number of intervals."
         )
-        ind_within = parse_list(user_ind_within_str)
+        # Convert names back to IDs
+        ind_within = [name_to_id.get(name, name) for name in selected_ind_within_names]
 
-        user_ind_until_str = st.text_area(
-            "ind_until (comma-separated generic activity IDs)",
-            ', '.join(DEFAULT_IND_UNTIL),
+        # ind_until with multiselect
+        default_ind_until_generic_ids = [
+            aid for aid in DEFAULT_IND_UNTIL
+            if aid in activities
+        ]
+        default_ind_until_full_names = [
+            activity_full_names.get(aid, aid) for aid in default_ind_until_generic_ids
+        ]
+        
+        selected_ind_until_names = st.multiselect(
+            "ind_until (activity names)",
+            options=[activity_full_names.get(a, a) for a in activities],
+            default=default_ind_until_full_names,
+            key="ind_until_multiselect",
             help="Activities that have 'until' constraints - workers must start these activities by a certain interval."
         )
-        ind_until = parse_list(user_ind_until_str)
+        # Convert names back to IDs
+        ind_until = [name_to_id.get(name, name) for name in selected_ind_until_names]
 
         # Validation for overlap
         overlap_activities = set(ind_within).intersection(set(ind_until))
@@ -369,18 +396,43 @@ def collect_variant_parameters(activities, activity_full_names):
 
         st.subheader("Dependent aktivnosti:")
 
-        user_dep_within_str = st.text_area(
-            "dep_within (comma-separated generic activity IDs)",
-            ', '.join(DEFAULT_DEP_WITHIN),
+        # dep_within with multiselect
+        default_dep_within_generic_ids = [
+            aid for aid in DEFAULT_DEP_WITHIN
+            if aid in activities
+        ]
+        default_dep_within_full_names = [
+            activity_full_names.get(aid, aid) for aid in default_dep_within_generic_ids
+        ]
+        
+        selected_dep_within_names = st.multiselect(
+            "dep_within (activity names)",
+            options=[activity_full_names.get(a, a) for a in activities],
+            default=default_dep_within_full_names,
+            key="dep_within_multiselect",
             help="Activities with dependent 'within' constraints - these depend on other activities being completed first."
         )
-        dep_within = parse_list(user_dep_within_str)
+        # Convert names back to IDs
+        dep_within = [name_to_id.get(name, name) for name in selected_dep_within_names]
         
-        user_dep_until_str = st.text_area(
-            "dep_until (comma-separated generic activity IDs)",    
+        # dep_until with multiselect
+        default_dep_until_generic_ids = [
+            aid for aid in DEFAULT_DEP_UNTIL
+            if aid in activities
+        ]
+        default_dep_until_full_names = [
+            activity_full_names.get(aid, aid) for aid in default_dep_until_generic_ids
+        ]
+        
+        selected_dep_until_names = st.multiselect(
+            "dep_until (activity names)",
+            options=[activity_full_names.get(a, a) for a in activities],
+            default=default_dep_until_full_names,
+            key="dep_until_multiselect",
             help="Activities with dependent 'until' constraints - these depend on other activities being completed first."
         )
-        dep_until = parse_list(user_dep_until_str)
+        # Convert names back to IDs
+        dep_until = [name_to_id.get(name, name) for name in selected_dep_until_names]
 
         dependent_activity_relations = {}
         for dep_activity_id in dep_within + dep_until:
