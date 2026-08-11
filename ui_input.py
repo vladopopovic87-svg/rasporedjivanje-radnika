@@ -17,7 +17,7 @@ def collect_general_parameters():
             max_value=1.00,
             value=0.00,
             step=0.01,
-            help="Weight of the transition penalty term in the objective function."
+            help=get_text("p_help_transition_penalty", lang)
         )
 
         num_profiles = st.number_input(
@@ -25,7 +25,7 @@ def collect_general_parameters():
             min_value=1,
             value=DEFAULT_NUM_PROFILES,
             step=1,
-            help="Number of different worker profile types (e.g., Komisioner, Kontrolor, Viljuskarista)."
+            help=get_text("num_profiles_help", lang)
         )
         profil_types = generate_profile_types(num_profiles)
 
@@ -34,7 +34,7 @@ def collect_general_parameters():
             min_value=1,
             value=DEFAULT_NUM_ACTIVITIES,
             step=1,
-            help="Number of different activity types that workers can perform."
+            help=get_text("num_activities_help", lang)
         )
         activities = generate_activities(num_activities)
 
@@ -48,14 +48,14 @@ def collect_general_parameters():
                 f"{get_text('full_name_for', lang)} '{generic_profile_id}'",
                 value=default_full,
                 key=f"full_name_profile_{generic_profile_id}",
-                help="Full descriptive name for this worker profile type."
+                help=get_text('profile_full_name_help', lang)
             )
             default_short = DEFAULT_SHORT_PROFILES.get(generic_profile_id, generic_profile_id[0:2])
             sp[generic_profile_id] = st.text_input(
                 f"{get_text('short_code_for', lang)} '{generic_profile_id}'",
                 value=default_short,
                 key=f"short_code_profile_{generic_profile_id}",
-                help="Short abbreviation or code for this worker profile (used in tables and reports)."
+                help=get_text('profile_short_code_help', lang)
             )
 
         # Activity names and codes
@@ -68,14 +68,14 @@ def collect_general_parameters():
                 f"{get_text('full_name_for', lang)} '{generic_activity_id}'",
                 value=default_full,
                 key=f"full_name_activity_{generic_activity_id}",
-                help="Full descriptive name for this activity type."
+                help=get_text("activity_full_name_help", lang)
             )
             default_short = DEFAULT_SHORT_ACTIVITIES.get(generic_activity_id, generic_activity_id[0:2])
             s[generic_activity_id] = st.text_input(
                 f"{get_text('short_code_for', lang)} '{generic_activity_id}'",
                 value=default_short,
                 key=f"short_code_activity_{generic_activity_id}",
-                help="Short abbreviation or code for this activity (used in tables and reports)."
+                help=get_text("activity_short_code_help", lang)
             )
 
     return P, profil_types, activities, profile_full_names, sp, activity_full_names, s
@@ -92,59 +92,59 @@ def collect_interval_and_shift_parameters():
             value=8,
             step=1,
             key="display_start_interval",
-            help="Starting hour for displaying time intervals in the schedule (e.g., 8 means intervals start from 8:00)."
+            help=get_text("display_start_interval_help", lang)
         )
 
         full_time_shift_length = st.number_input(
-            "Dužina smjene za puno radno vrijeme (u intervalima):",
+            get_text("full_time_shift_length", lang),
             min_value=1,
             max_value=100,
             value=DEFAULT_FULL_TIME_SHIFT_LENGTH,
             step=1,
             key="full_time_shift_length",
-            help="Length of full-time shifts in number of intervals."
+            help=get_text("full_time_shift_length_help", lang)
         )
 
         half_time_shift_length = st.number_input(
-            "Dužina smjene za pola radnog vremena (u intervalima):",
+            get_text("half_time_shift_length", lang),
             min_value=1,
             max_value=100,
             value=DEFAULT_HALF_TIME_SHIFT_LENGTH,
             step=1,
             key="half_time_shift_length",
-            help="Length of half-time shifts in number of intervals."
+            help=get_text("half_time_shift_length_help", lang)
         )
 
         interval_duration = st.number_input(
-            "Trajanje intervala (u minutama):",
+            get_text("interval_duration", lang),
             min_value=15,
             max_value=1440,
             value=60,
             step=15,
             key="interval_duration",
-            help="Duration of each time interval in minutes (e.g., 30 for 30 minutes, 60 for 1 hour)."
+            help=get_text("interval_duration_help", lang)
         )
        
 
         rest_duration = st.number_input(
-            "Trajanje odmora (u minutama):",
+            get_text("rest_duration", lang),
             min_value=15,
             max_value=1440,
             value=60,
             step=15,
             key="rest_duration",
-            help="Duration of rest intervals in minutes (e.g., 30 for 30 minutes, 60 for 1 hour)."
+            help=get_text("rest_duration_help", lang)
         )
        
 
         num_intervals = st.number_input(
-            "Broj intervala u 24h:",
+            get_text("num_intervals_label", lang),
             min_value=1,
             max_value=100,
             value=len(DEFAULT_N_SET),
             step=1,
             key="num_intervals",
-            help="Koliko intervala se radi u 24h. U pozadini se kreira N_set kao lista [1..N]."
+            help=get_text("num_intervals_help", lang)
         )
         N_set = list(range(1, num_intervals + 1))
 
@@ -187,10 +187,10 @@ def collect_interval_and_shift_parameters():
         for j_shift in M1_set:
             default_oj_intervals = DEFAULT_OJ.get(j_shift, [])
             oj_intervals_str = st.text_area(
-                f"{get_text('intervals_for_shift', lang)} {j_shift} (comma-separated integers)",
+                f"{get_text('intervals_for_shift', lang)} {j_shift} {get_text('comma_separated_integers', lang)}",
                 value=', '.join(map(str, default_oj_intervals)),
                 key=f"Oj_{j_shift}",
-                help=f"{get_text('oj_help_prefix', lang)} {j_shift}. Workers can take breaks in these intervals."
+                help=f"{get_text('oj_help_prefix', lang)} {j_shift}. {get_text('oj_intervals_help', lang)}"
             )
             Oj[j_shift] = parse_list(oj_intervals_str, int)
 
@@ -336,7 +336,7 @@ def collect_variant_parameters(activities, activity_full_names):
             options=[activity_full_names.get(a, a) for a in activities],
             default=default_ind_within_full_names,
             key="ind_within_multiselect",
-            help="Activities that have 'within' constraints - workers must complete these activities within a certain number of intervals."
+            help=get_text("ind_within_help", lang)
         )
         # Convert names back to IDs
         ind_within = [name_to_id.get(name, name) for name in selected_ind_within_names]
@@ -355,7 +355,7 @@ def collect_variant_parameters(activities, activity_full_names):
             options=[activity_full_names.get(a, a) for a in activities],
             default=default_ind_until_full_names,
             key="ind_until_multiselect",
-            help="Activities that have 'until' constraints - workers must start these activities by a certain interval."
+            help=get_text("ind_until_help", lang)
         )
         # Convert names back to IDs
         ind_until = [name_to_id.get(name, name) for name in selected_ind_until_names]
@@ -378,7 +378,7 @@ def collect_variant_parameters(activities, activity_full_names):
                     value=default_val,
                     key=f"within_{generic_activity_id}",
                     min_value=0,
-                    help=f"Maximum number of intervals allowed to complete '{activity_full_names.get(generic_activity_id, generic_activity_id)}' activity."
+                    help=get_text('within_help', lang).format(activity=activity_full_names.get(generic_activity_id, generic_activity_id))
                 )
 
         until = {}
@@ -393,7 +393,7 @@ def collect_variant_parameters(activities, activity_full_names):
                     value=default_val,
                     key=f"until_{generic_activity_id}",
                     min_value=0,
-                    help=f"Latest interval by which '{activity_full_names.get(generic_activity_id, generic_activity_id)}' activity must be started."
+                    help=get_text('until_help', lang).format(activity=activity_full_names.get(generic_activity_id, generic_activity_id))
                 )
 
         st.subheader(get_text("dependent_activities", lang))
@@ -412,7 +412,7 @@ def collect_variant_parameters(activities, activity_full_names):
             options=[activity_full_names.get(a, a) for a in activities],
             default=default_dep_within_full_names,
             key="dep_within_multiselect",
-            help="Activities with dependent 'within' constraints - these depend on other activities being completed first."
+            help=get_text('dependent_within_help', lang)
         )
         # Convert names back to IDs
         dep_within = [name_to_id.get(name, name) for name in selected_dep_within_names]
@@ -431,7 +431,7 @@ def collect_variant_parameters(activities, activity_full_names):
             options=[activity_full_names.get(a, a) for a in activities],
             default=default_dep_until_full_names,
             key="dep_until_multiselect",
-            help="Activities with dependent 'until' constraints - these depend on other activities being completed first."
+            help=get_text('dependent_until_help', lang)
         )
         # Convert names back to IDs
         dep_until = [name_to_id.get(name, name) for name in selected_dep_until_names]
@@ -451,7 +451,7 @@ def collect_variant_parameters(activities, activity_full_names):
             )
             depends_on_id = available_ids[selected_idx]
             ratio_val = st.slider(
-                f"Unesi ratio za '{activity_full_names.get(dep_activity_id, dep_activity_id)}' (od {activity_full_names.get(depends_on_id, depends_on_id)})",
+                get_text('dep_ratio_prompt', lang).format(dependent=activity_full_names.get(dep_activity_id, dep_activity_id), depends_on=activity_full_names.get(depends_on_id, depends_on_id)),
                 min_value=0.0,
                 max_value=1.0,
                 value=0.5,
@@ -462,30 +462,30 @@ def collect_variant_parameters(activities, activity_full_names):
 
         dep_within_values = {}
         if not dep_within:
-            st.info("No dependent activities selected in dep_within. Add activity IDs above to set dep within values.")
+            st.info(get_text('no_dependent_within_selected', lang))
         else:
-            st.subheader("dependent within values (integer per dependent activity):")
+            st.subheader(get_text('dep_within_values_header', lang))
             for generic_activity_id in dep_within:
                 default_val = DEFAULT_WITHIN.get(generic_activity_id, 1)
                 dep_within_values[generic_activity_id] = st.number_input(
-                    f"'{activity_full_names.get(generic_activity_id, generic_activity_id)}' dep within value",
+                    f"'{activity_full_names.get(generic_activity_id, generic_activity_id)}' {get_text('dep_within_value_label', lang)}",
                     value=default_val,
                     key=f"dep_within_{generic_activity_id}",
                     min_value=0,
-                    help=f"Maximum number of intervals allowed to complete dependent activity '{activity_full_names.get(generic_activity_id, generic_activity_id)}'."
+                    help=get_text('within_help', lang).format(activity=activity_full_names.get(generic_activity_id, generic_activity_id))
                 )
         
         dep_until_values = {}
         if not dep_until:
-            st.info("No dependent activities selected in dep_until. Add activity IDs above to set dep until values.")
+            st.info(get_text('no_dependent_until_selected', lang))
         else:
-            st.subheader("dependent until values (integer per dependent activity):")
+            st.subheader(get_text('dep_until_values_header', lang))
             for generic_activity_id in dep_until:
                 dep_until_values[generic_activity_id] = st.number_input(
-                    f"'{activity_full_names.get(generic_activity_id, generic_activity_id)}' dep until value",
+                    f"'{activity_full_names.get(generic_activity_id, generic_activity_id)}' {get_text('dep_until_value_label', lang)}",
                     key=f"dep_until_{generic_activity_id}",
                     min_value=0,
-                    help=f"Maximum number of intervals allowed to complete dependent activity '{activity_full_names.get(generic_activity_id, generic_activity_id)}'."
+                    help=get_text('until_help', lang).format(activity=activity_full_names.get(generic_activity_id, generic_activity_id))
                 )
         
 
@@ -516,7 +516,7 @@ def collect_demand_data(activities, activity_full_names, N_set):
         get_text("select_demand_profile", lang),
         [get_text("demand_example_1", lang), get_text("demand_example_2", lang)],
         key="demand_example_selector",
-        help="Choose a predefined demand pattern to start with. You can then edit the values in the table below."
+        help=get_text('select_demand_profile_help', lang)
     )
 
     if selected_example == get_text("demand_example_1", lang):
@@ -540,14 +540,14 @@ def collect_demand_data(activities, activity_full_names, N_set):
                 initial_df_data[full_activity_name] = [0] * len(N_set)
 
     if not initial_df_data:
-        st.warning("No demand data available. Using dummy data.")
+        st.warning(get_text("no_demand_data_dummy", lang))
         if not N_set:
             N_set = [1]
-        initial_df_data = {'Dummy Activity': [0] * len(N_set)}
+        initial_df_data = {get_text("dummy_activity", lang): [0] * len(N_set)}
 
     df_demand_editable = pd.DataFrame(initial_df_data, index=N_set)
 
-    st.subheader("Edit Demand per Interval")
+    st.subheader(get_text("edit_demand_per_interval", lang))
     edited_df_demand = st.data_editor(df_demand_editable, num_rows="fixed", use_container_width=True)
 
     # Find activity IDs for Istovar and Kontrola
@@ -588,7 +588,7 @@ def collect_constraint_parameters():
             max_value=200,
             value=DEFAULT_MAX_WORKERS_PER_INTERVAL,
             step=1,
-            help="Maximum number of workers that can be assigned to work in a single time interval. This constraint prevents overcrowding and ensures safety."
+            help=get_text('max_workers_per_interval_help', lang)
         )
         
         max_m1_shifts = st.number_input(
@@ -597,7 +597,7 @@ def collect_constraint_parameters():
             max_value=50,
             value=DEFAULT_MAX_M1_SHIFTS,
             step=1,
-            help="Maximum number of full-time shifts that can be scheduled. Full-time shifts typically have longer working hours."
+            help=get_text('max_m1_shifts_help', lang)
         )
         
         max_m2_shifts = st.number_input(
@@ -606,7 +606,7 @@ def collect_constraint_parameters():
             max_value=50,
             value=DEFAULT_MAX_M2_SHIFTS,
             step=1,
-            help="Maximum number of part-time shifts that can be scheduled. Part-time shifts usually have shorter working hours."
+            help=get_text('max_m2_shifts_help', lang)
         )
         
         m2_ratio_limit = st.slider(
@@ -615,7 +615,7 @@ def collect_constraint_parameters():
             max_value=1.0,
             value=DEFAULT_M2_RATIO_LIMIT,
             step=0.05,
-            help="Maximum ratio of part-time shifts (M2) relative to total shifts (M1 + M2). For example, 0.3 means max 30% of shifts can be part-time."
+            help=get_text('m2_ratio_limit_help', lang)
         )
         
         istovar_kontrola_ratio = st.slider(
@@ -624,7 +624,7 @@ def collect_constraint_parameters():
             max_value=1.0,
             value=DEFAULT_ISTOVAR_KONTROLA_RATIO,
             step=0.05,
-            help="Udio radnika za kontrolu u odnosu na broja radnika kojio obavljaju istovar."
+            help=get_text('istovar_kontrola_ratio_help', lang)
        )
         non_primary_activities_ratio = st.slider(
             get_text("non_primary_activities_ratio", lang),
@@ -632,7 +632,7 @@ def collect_constraint_parameters():
             max_value=1.0,
             value=DEFAULT_NON_PRIMARY_ACTIVITIES_RATIO,
             step=0.05,
-            help="Maximum ratio of non-primary activities that full-time workers (M1) can perform. For example, 0.5 means max 50% of their work can be non-primary activities."
+            help=get_text('non_primary_activities_ratio_help', lang)
         )
         
     

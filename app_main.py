@@ -98,7 +98,7 @@ def main():
 
     # Run optimization button
     run_optimization_disabled = bool(overlap_activities)
-    if st.button('Run Optimization', disabled=run_optimization_disabled):
+    if st.button(get_text('run_optimization', language), disabled=run_optimization_disabled):
         placeholder = st.empty()
         debug_messages = []
         
@@ -108,7 +108,7 @@ def main():
                 for debug_msg in debug_messages:
                     st.write(debug_msg)
         
-        update_debug_messages("Running optimization with current parameters.")
+        update_debug_messages(get_text("running_optimization", language))
 
         # Build PuLP model
         model = LpProblem("Cost minimising problem", LpMinimize)
@@ -233,7 +233,7 @@ def main():
         # Solve
         update_debug_messages("--- All constraints added. Solving model... ---")
 
-        with st.spinner('Solving optimization problem...'):
+        with st.spinner(get_text('solving_optimization', language)):
             model.solve(PULP_CBC_CMD(msg=0, timeLimit=10))
 
         update_debug_messages(f"--- Solver Status: {LpStatus[model.status]} ---")

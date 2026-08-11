@@ -11,7 +11,8 @@ def parse_list(input_str, item_type=str):
     try:
         return [item_type(x.strip()) for x in input_str.split(',') if x.strip()]
     except ValueError:
-        st.error(f"Error parsing list: '{input_str}'. Please ensure all items are of type {item_type.__name__}.")
+        from translations import get_text
+        st.error(get_text('error_parsing_list').format(input_str=input_str, item_type=item_type.__name__))
         return []
 
 
@@ -24,7 +25,8 @@ def parse_json_dict(input_str, default_value=None):
     try:
         return json.loads(input_str)
     except json.JSONDecodeError as e:
-        st.error(f"Error parsing JSON: {e}. Please ensure the input is valid JSON.")
+        from translations import get_text
+        st.error(get_text('error_parsing_json').format(error=e))
         return default_value
 
 
