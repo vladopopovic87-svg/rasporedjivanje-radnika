@@ -321,6 +321,7 @@ def collect_variant_parameters(activities, activity_full_names):
     with st.sidebar.expander(get_text("variant_dependent_parameters", lang), expanded=True):
         # Create reverse mapping: activity name -> ID
         name_to_id = {v: k for k, v in activity_full_names.items()}
+        st.subheader(get_text("independent_activities", lang), help="Aktivnosti čiji zahtevi za radnicima se definišu kroz tabelu.")
         
         # ind_within with multiselect
         default_ind_within_generic_ids = [
@@ -370,11 +371,14 @@ def collect_variant_parameters(activities, activity_full_names):
         if not ind_within:
             st.info(get_text("no_activities_ind_within", lang))
         else:
-            st.subheader(get_text("within_values", lang))
+            st.markdown(
+                f"<span style='color: black; font-weight: normal;'>{get_text('within_values', lang)}</span>",
+                unsafe_allow_html=True
+            )
             for generic_activity_id in ind_within:
                 default_val = DEFAULT_WITHIN.get(generic_activity_id, 1)
                 within[generic_activity_id] = st.number_input(
-                    f"'{activity_full_names.get(generic_activity_id, generic_activity_id)}' {get_text('within_value', lang)}",
+                    f"{get_text('within_value', lang)} za {activity_full_names.get(generic_activity_id, generic_activity_id)}",
                     value=default_val,
                     key=f"within_{generic_activity_id}",
                     min_value=0,
@@ -385,18 +389,21 @@ def collect_variant_parameters(activities, activity_full_names):
         if not ind_until:
             st.info(get_text("no_activities_ind_until", lang))
         else:
-            st.subheader(get_text("until_values", lang))
+            st.markdown(
+                f"<span style='color: black; font-weight: normal;'>{get_text('until_values', lang)}</span>",
+                unsafe_allow_html=True
+            )
             for generic_activity_id in ind_until:
                 default_val = DEFAULT_UNTIL.get(generic_activity_id, 1)
                 until[generic_activity_id] = st.number_input(
-                    f"'{activity_full_names.get(generic_activity_id, generic_activity_id)}' {get_text('until_value', lang)}",
+                    f"{get_text('until_value', lang)} za {activity_full_names.get(generic_activity_id, generic_activity_id)}",
                     value=default_val,
                     key=f"until_{generic_activity_id}",
                     min_value=0,
                     help=get_text('until_help', lang).format(activity=activity_full_names.get(generic_activity_id, generic_activity_id))
                 )
 
-        st.subheader(get_text("dependent_activities", lang))
+        st.subheader(get_text("dependent_activities", lang), help="Aktivnosti čiji zahtevi za radnicima zavise od realizacije drugih aktivnosti")
 
         # dep_within with multiselect
         default_dep_within_generic_ids = [
@@ -461,14 +468,12 @@ def collect_variant_parameters(activities, activity_full_names):
             dependent_activity_relations[dep_activity_id] = {"depends_on": depends_on_id, "ratio": ratio_val}
 
         dep_within_values = {}
-        if not dep_within:
-            st.info(get_text('no_dependent_within_selected', lang))
-        else:
-            st.subheader(get_text('dep_within_values_header', lang))
+        if dep_within:
+            st.markdown(f"<span style='color: black; font-weight: normal;'>{get_text('dep_within_values_header', lang)}</span>", unsafe_allow_html=True)
             for generic_activity_id in dep_within:
                 default_val = DEFAULT_WITHIN.get(generic_activity_id, 1)
                 dep_within_values[generic_activity_id] = st.number_input(
-                    f"'{activity_full_names.get(generic_activity_id, generic_activity_id)}' {get_text('dep_within_value_label', lang)}",
+                    f"{get_text('dep_within_value_label', lang)} za {activity_full_names.get(generic_activity_id, generic_activity_id)}",
                     value=default_val,
                     key=f"dep_within_{generic_activity_id}",
                     min_value=0,
@@ -476,13 +481,11 @@ def collect_variant_parameters(activities, activity_full_names):
                 )
         
         dep_until_values = {}
-        if not dep_until:
-            st.info(get_text('no_dependent_until_selected', lang))
-        else:
-            st.subheader(get_text('dep_until_values_header', lang))
+        if dep_until:
+            st.markdown(f"<span style='color: black; font-weight: normal;'>{get_text('dep_until_values_header', lang)}</span>", unsafe_allow_html=True)
             for generic_activity_id in dep_until:
                 dep_until_values[generic_activity_id] = st.number_input(
-                    f"'{activity_full_names.get(generic_activity_id, generic_activity_id)}' {get_text('dep_until_value_label', lang)}",
+                    f"{get_text('dep_until_value_label', lang)} za {activity_full_names.get(generic_activity_id, generic_activity_id)}",
                     key=f"dep_until_{generic_activity_id}",
                     min_value=0,
                     help=get_text('until_help', lang).format(activity=activity_full_names.get(generic_activity_id, generic_activity_id))
