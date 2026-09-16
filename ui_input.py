@@ -236,6 +236,18 @@ def collect_cost_coefficients(profil_types, profile_full_names):
     return ct_m1_inputs, ct_m2_inputs
 
 
+def compute_able_from_allowed(allowed, profil_types, activities):
+    """Derive profile activity list from the allowed profiles-per-activity mapping."""
+    able = {}
+    for generic_profile_id in profil_types:
+        able[generic_profile_id] = [
+            generic_activity_id
+            for generic_activity_id in activities
+            if generic_profile_id in allowed.get(generic_activity_id, [])
+        ]
+    return able
+
+
 def collect_role_activity_mappings(profil_types, activities, profile_full_names, activity_full_names):
     """Collect role-activity mappings from user input."""
     lang = st.session_state.get("language", "sr")
@@ -264,29 +276,22 @@ def collect_role_activity_mappings(profil_types, activities, profile_full_names,
                 if pf_name == full_name
             ]
 
-        st.subheader(get_text("able_activities_per_profile", lang))
-        able = {}
-        for generic_profile_id in profil_types:
-            default_selection_generic_ids = [
-                aid for aid in DEFAULT_ABLE.get(generic_profile_id, [])
-                if aid in activities
-            ]
-            default_selection_full_names = [
-                activity_full_names.get(aid, aid) for aid in default_selection_generic_ids
-            ]
-
-            selected_full_names = st.multiselect(
-                f"{get_text('activities_for', lang)} '{profile_full_names.get(generic_profile_id, generic_profile_id)}'",
-                options=[activity_full_names.get(a, a) for a in activities],
-                default=default_selection_full_names,
-                key=f"able_{generic_profile_id}",
-                help=f"{get_text('select_which_activities', lang)} {profile_full_names.get(generic_profile_id, generic_profile_id)} {get_text('workers_are_able', lang)}."
-            )
-            able[generic_profile_id] = [
-                aid for full_name in selected_full_names
-                for aid, af_name in activity_full_names.items()
-                if af_name == full_name
-            ]
+        able = compute_able_from_allowed(allowed, profil_types, activities)
+        with st.expander(get_text("able_activities_per_profile", lang), expanded=False):
+            for generic_profile_id in profil_types:
+                derived_full_names = [
+                    activity_full_names.get(aid, aid) for aid in able.get(generic_profile_id, [])
+                ]
+                st.write(
+                    f"{get_text('activities_for', lang)} '{profile_full_names.get(generic_profile_id, generic_profile_id)}'"
+                )
+                st.multiselect(
+                    "",
+                    options=[activity_full_names.get(a, a) for a in activities],
+                    default=derived_full_names,
+                    disabled=True,
+                    label_visibility="collapsed"
+                )
 
         st.subheader(get_text("non_primary_able_activities", lang))
         able_ne = {}
