@@ -149,7 +149,7 @@ def create_shift_allocation_table(smjena_output, M_set, M1_set, M2_set, profil_t
 
 def create_demand_comparison_table(activity_per_interval, N_set, activities, 
                                   activity_full_names, demand, lang="sr",
-                                  dependency_list=None):
+                                  dependency_list=None, display_start_interval=0):
     """Create DataFrame comparing demand vs realized activities."""
     dependency_list = dependency_list or []
     dependent_requirements = {
@@ -177,6 +177,12 @@ def create_demand_comparison_table(activity_per_interval, N_set, activities,
         df_data.append(row_data)
 
     df_activities = pd.DataFrame(df_data).set_index("Interval")
+    display_hours = df_activities.index + display_start_interval - 1
+    df_activities.index = [
+        f"{interval}({hour})"
+        for interval, hour in zip(df_activities.index, display_hours)
+    ]
+    df_activities.index.name = get_text("interval_hour", lang)
 
     ordered_columns = []
     for a_id in activities:

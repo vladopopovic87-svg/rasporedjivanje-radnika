@@ -92,7 +92,9 @@ def main():
         overlap_activities, dependency_list,
         activity_validation_errors) = collect_variant_parameters(activities, activity_full_names)
 
-    demand, istovar_generic_id, kontrola_generic_id = collect_demand_data(activities, activity_full_names, N_set)
+    demand, istovar_generic_id, kontrola_generic_id = collect_demand_data(
+        activities, activity_full_names, N_set, display_start_interval
+    )
 
     # Collect constraint parameters
     (max_workers_per_interval, max_m1_shifts, max_m2_shifts, 
@@ -314,6 +316,7 @@ def main():
                 "df_activities": create_demand_comparison_table(
                     activity_per_interval, N_set, activities, activity_full_names, demand, lang,
                     dependency_list=dependency_list_full,
+                    display_start_interval=display_start_interval,
                 ),
                 "non_zero_vars": [
                     f"{v.name} = {v.varValue}"

@@ -638,7 +638,7 @@ def collect_variant_parameters(activities, activity_full_names):
     )
 
 
-def collect_demand_data(activities, activity_full_names, N_set):
+def collect_demand_data(activities, activity_full_names, N_set, display_start_interval):
     """Collect and edit demand data."""
     lang = st.session_state.get("language", "sr")
     st.subheader(get_text("demand_data", lang))
@@ -676,6 +676,12 @@ def collect_demand_data(activities, activity_full_names, N_set):
         initial_df_data = {get_text("dummy_activity", lang): [0] * len(N_set)}
 
     df_demand_editable = pd.DataFrame(initial_df_data, index=N_set)
+    display_hours = df_demand_editable.index + display_start_interval - 1
+    df_demand_editable.index = [
+        f"{interval}({hour})"
+        for interval, hour in zip(df_demand_editable.index, display_hours)
+    ]
+    df_demand_editable.index.name = get_text("interval_hour", lang)
 
     st.subheader(get_text("edit_demand_per_interval", lang))
     edited_df_demand = st.data_editor(df_demand_editable, num_rows="fixed", use_container_width=True)
