@@ -293,29 +293,37 @@ def collect_role_activity_mappings(profil_types, activities, profile_full_names,
                     label_visibility="collapsed"
                 )
 
-        st.subheader(get_text("non_primary_able_activities", lang))
-        able_ne = {}
+        st.subheader(get_text("primary_able_activities", lang))
+        primary_able = {}
         for generic_profile_id in profil_types:
             default_selection_generic_ids = [
-                aid for aid in DEFAULT_ABLE_NE.get(generic_profile_id, [])
-                if aid in activities
+                aid for aid in DEFAULT_PRIMARY_ABLE.get(generic_profile_id, [])
+                if aid in able.get(generic_profile_id, [])
             ]
             default_selection_full_names = [
                 activity_full_names.get(aid, aid) for aid in default_selection_generic_ids
             ]
 
             selected_full_names = st.multiselect(
-                f"{get_text('non_primary_activities_for', lang)} '{profile_full_names.get(generic_profile_id, generic_profile_id)}'",
-                options=[activity_full_names.get(a, a) for a in activities],
+                f"{get_text('primary_activities_for', lang)} '{profile_full_names.get(generic_profile_id, generic_profile_id)}'",
+                options=[activity_full_names.get(a, a) for a in able.get(generic_profile_id, [])],
                 default=default_selection_full_names,
-                key=f"able_ne_{generic_profile_id}",
-                help=f"{get_text('select_which_activities', lang)} {profile_full_names.get(generic_profile_id, generic_profile_id)} {get_text('can_perform_non_primary', lang)}."
+                key=f"primary_able_{generic_profile_id}",
+                help=f"{get_text('select_which_activities', lang)} {profile_full_names.get(generic_profile_id, generic_profile_id)} {get_text('can_perform_primary', lang)}."
             )
-            able_ne[generic_profile_id] = [
+            primary_able[generic_profile_id] = [
                 aid for full_name in selected_full_names
                 for aid, af_name in activity_full_names.items()
                 if af_name == full_name
             ]
+
+        able_ne = {
+            generic_profile_id: [
+                aid for aid in able.get(generic_profile_id, [])
+                if aid not in primary_able.get(generic_profile_id, [])
+            ]
+            for generic_profile_id in profil_types
+        }
 
     return allowed, able, able_ne
 

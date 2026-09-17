@@ -22,7 +22,14 @@ ct_m1_inputs = {'profil1': 1.28, 'profil2': 1.6, 'profil3': 1.4}
 ct_m2_inputs = {'profil1': 0.64, 'profil2': 0.8, 'profil3': 0.7}
 allowed = DEFAULT_ALLOWED
 able = compute_able_from_allowed(allowed, profil_types, activities)
-able_ne = DEFAULT_ABLE_NE
+primary_able = DEFAULT_PRIMARY_ABLE
+able_ne = {
+    profile_id: [
+        activity_id for activity_id in able.get(profile_id, [])
+        if activity_id not in primary_able.get(profile_id, [])
+    ]
+    for profile_id in profil_types
+}
 demand = DEMAND_EXAMPLE_1
 max_workers = 50
 max_m1 = 10

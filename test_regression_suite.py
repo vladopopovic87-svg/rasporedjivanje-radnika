@@ -46,7 +46,7 @@ BASE_CASE = {
     "costs_m1": {"profil1": 1.28, "profil2": 1.6, "profil3": 1.4},
     "costs_m2": {"profil1": 0.64, "profil2": 0.8, "profil3": 0.7},
     "allowed": DEFAULT_ALLOWED,
-    "able_ne": DEFAULT_ABLE_NE,
+    "primary_able": DEFAULT_PRIMARY_ABLE,
     "p": 0,
     "m2_ratio_limit": DEFAULT_M2_RATIO_LIMIT,
     "non_primary_activities_ratio": DEFAULT_NON_PRIMARY_ACTIVITIES_RATIO,
@@ -88,6 +88,14 @@ def solve_case(overrides):
     case.update(deepcopy(overrides))
     allowed = case["allowed"]
     able = compute_able_from_allowed(allowed, PROFILES, ACTIVITIES)
+    primary_able = case["primary_able"]
+    able_ne = {
+        profile_id: [
+            activity_id for activity_id in able.get(profile_id, [])
+            if activity_id not in primary_able.get(profile_id, [])
+        ]
+        for profile_id in PROFILES
+    }
     demand = case["demand"]
     ind_within = ["activity5", "activity6"]
     ind_until = ["activity1", "activity2", "activity3"]
@@ -148,7 +156,7 @@ def solve_case(overrides):
     )
     add_non_primary_activities_constraint(
         model, M1_SET, PROFILES, DEFAULT_N_SET, ytija, able,
-        case["able_ne"], bij, case["non_primary_activities_ratio"],
+        able_ne, bij, case["non_primary_activities_ratio"],
     )
     add_worker_ableno_constraints(model, PROFILES, DEFAULT_N_SET, M_SET, ytj, ytija, able, ACTIVITIES)
 

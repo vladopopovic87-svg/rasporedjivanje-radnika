@@ -92,12 +92,12 @@ TRANSLATIONS = {
         "profiles_for": "Profiles for",
         "able_activities_per_profile": "Activity Overview: Activities Profiles Can Perform",
         "activities_for": "Activities of profile",
-        "non_primary_able_activities": "Non-Primary Able Activities per Profile",
-        "non_primary_activities_for": "Non-primary activities for",
+        "primary_able_activities": "Primary Activities per Profile",
+        "primary_activities_for": "Primary activities for",
         "select_which_workers": "Select worker profiles that can perform the",
         "select_which_activities": "Select which activities",
         "workers_are_able": "workers are able to perform",
-        "can_perform_non_primary": "can perform as non-primary work",
+        "can_perform_primary": "can perform as primary work",
         
         # Variant-Dependent Parameters
         "variant_dependent_parameters": "Variant-Dependent Parameters",
@@ -271,12 +271,12 @@ TRANSLATIONS = {
         "profiles_for": "Profili za",
         "able_activities_per_profile": "Pregled aktivnosti koje profili mogu da obavljaju",
         "activities_for": "Aktivnosti profila",
-        "non_primary_able_activities": "Sporedne aktivnosti po profilu",
-        "non_primary_activities_for": "Sporedne aktivnosti za",
+        "primary_able_activities": "Primarne aktivnosti po profilu",
+        "primary_activities_for": "Primarne aktivnosti za",
         "select_which_workers": "Odaberi profile radnika koji mogu obavljati",
         "select_which_activities": "Odaberi koje aktivnosti",
         "workers_are_able": "Radnici mogu obaviti",
-        "can_perform_non_primary": "Mogu obaviti kao sporedni rad",
+        "can_perform_primary": "Mogu obaviti kao primarni rad",
         
         # Variant-Dependent Parameters
         "variant_dependent_parameters": "Tipovi aktivnosti",

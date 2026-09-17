@@ -63,10 +63,10 @@ DEFAULT_ALLOWED = {
     'activity6': ['profil3']
 }
 
-DEFAULT_ABLE_NE = {
-    'profil1': [],
-    'profil2': ['activity1', 'activity2', 'activity3'],
-    'profil3': ['activity1', 'activity2', 'activity3']
+DEFAULT_PRIMARY_ABLE = {
+    'profil1': ['activity1', 'activity2', 'activity3'],
+    'profil2': ['activity4'],
+    'profil3': ['activity5', 'activity6']
 }
 
 # Variant-dependent parameters
