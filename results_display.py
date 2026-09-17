@@ -10,7 +10,7 @@ from config import *
 from utils import count_consecutive_sequences
 from translations import get_text
 
-# Matrice za pokrivanje smena i troškove preseljene su u model_builder.py, pošto
+# Matrice za pokrivanje smjena i troškove preseljene su u model_builder.py, pošto
 # logika izgradnje pripada komponenti modela. Oni su sada umodulirani tamo.
 
 def generate_schedule_output(model, profil_types, M_set, M1_set, M2_set, N_set, ytj,

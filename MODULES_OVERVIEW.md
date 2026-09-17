@@ -53,7 +53,7 @@ if __name__ == "__main__":
   - `DEFAULT_FULL_PROFILE_NAMES` - Imena profila (Komisioner, Kontrolor, itd.)
   - `DEFAULT_FULL_ACTIVITY_NAMES` - Imena aktivnosti (Komisioniranje, Kontrola, itd.)
   - `DEFAULT_SHORT_*` - Kratke kodove za prikaz
-  - `DEFAULT_*_SET` - Intervale i smene
+  - `DEFAULT_*_SET` - Intervale i smjene
   - `DEFAULT_CT_RATES` - Troškovne stope
   - `DEFAULT_ALLOWED` - Osnovno mapiranje profila po aktivnostima
   - `DEMAND_EXAMPLE_1`, `DEMAND_EXAMPLE_2` - Primeri potražnje
@@ -91,7 +91,7 @@ N_set = parse_list("1, 2, 3, 4, 5", int)
 - **Uloga**: Sve Streamlit widgete za prikupljanje korisničkog unosa
 - **Funkcije** (6 velikih funkcija):
   1. `collect_general_parameters()` - Osnovni parametri (broj profila, aktivnosti, imena)
-  2. `collect_interval_and_shift_parameters()` - Intervale i smene
+  2. `collect_interval_and_shift_parameters()` - Intervale i smjene
   3. `collect_cost_coefficients()` - Troškovne stope
   4. `collect_role_activity_mappings()` - Koje aktivnosti mogu obavljati profili
   5. `collect_variant_parameters()` - Zahteve za aktivnosti (within, until)
@@ -124,7 +124,7 @@ P, profil_types, activities, ... = collect_general_parameters()
   7. `add_activity_allocation_constraints()` - Linkovanje aktivnosti na radnike
   8. `add_worker_capacity_constraints()` - Kapacitet radnika
   9. `add_interval_worker_limit()` - Max radnika po intervalu
-  10. `add_shift_constraints()` - Ograničenja za smene
+  10. `add_shift_constraints()` - Ograničenja za smjene
 
 - **Prednosti Modularnog Pristupa**:
   - Lako se vide sva ograničenja

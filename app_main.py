@@ -70,13 +70,13 @@ def main():
     st.sidebar.header(get_text("model_parameters", language))
 
     # Collect all input parameters
-    (P, profil_types, activities, profile_full_names, sp, 
+    (profil_types, activities, profile_full_names, sp, 
      activity_full_names, s) = collect_general_parameters()
 
     (display_start_interval, full_time_shift_length, half_time_shift_length, interval_duration, rest_duration, N_set, M_set, M1_set, M2_set, 
      Oj, min_len) = collect_interval_and_shift_parameters()
 
-    ct_m1_inputs, ct_m2_inputs = collect_cost_coefficients(profil_types, profile_full_names)
+    P, ct_m1_inputs, ct_m2_inputs = collect_cost_coefficients(profil_types, profile_full_names)
 
     allowed, able, able_ne = collect_role_activity_mappings(
         profil_types, activities, profile_full_names, activity_full_names

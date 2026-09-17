@@ -23,7 +23,7 @@
 **Uloga**: Skladište svih konstanti
 **Sadrži**: 
 - Default imena (profila, aktivnosti)
-- Default intervale i smene
+- Default intervale i smjene
 - Primere potražnje
 - Konstante za ograničenja
 
@@ -42,7 +42,7 @@
 **Uloga**: Sve Streamlit widgete za ulaz
 **Funkcije**:
 - Opšti parametri
-- Intervali i smene
+- Intervali i smjene
 - Troškovi
 - Mapiranja uloga
 - Varijantu-zavisni parametri
@@ -137,7 +137,7 @@ pandas
 ```python
 DEFAULT_NUM_PROFILES = 3
 DEFAULT_NUM_ACTIVITIES = 6
-DEFAULT_M2_SHIFT_START = 51  # Početak indeksa za pola vremena smene
+DEFAULT_M2_SHIFT_START = 51  # Početak indeksa za nepuno radno vrijeme
 MAX_WORKERS_PER_INTERVAL = 40
 MAX_M1_SHIFTS = 3
 MAX_M2_SHIFTS = 1

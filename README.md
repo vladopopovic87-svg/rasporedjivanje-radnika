@@ -18,7 +18,7 @@ Projekat je refaktorisan u modularnu strukturu sa sledećim komponentama:
 #### 1. **`config.py`** - Konfiguracija i Default Vrednosti
 Sadrži sve default vrednosti za:
 - Profil radnika i aktivnosti
-- Intervale i smene
+- Intervale i smjene
 - Troškovne koeficijente (ct)
 - Mapiranja uloga i aktivnosti
 - Zahteve za aktivnosti (within, until)
@@ -34,8 +34,8 @@ Pomoćne funkcije:
 
 #### 3. **`ui_input.py`** - Prikupljanje Ulaza UI-ja
 Funkcije za prikupljanje korisničkog unosa:
-- `collect_general_parameters()` - Opšti parametri
-- `collect_interval_and_shift_parameters()` - Intervali i smene
+- `collect_general_parameters()` - Radnici i aktivnosti
+- `collect_interval_and_shift_parameters()` - Intervali i smjene
 - `collect_cost_coefficients()` - Troškovni koeficijenti
 - `collect_role_activity_mappings()` - Mapiranja uloga
 - `collect_variant_parameters()` - Varijantu-zavisni parametri
@@ -54,7 +54,7 @@ Funkcije za procesiranje i prikaz rezultata:
 - `build_ct_matrix()` - Izgradnja matrice troškova
 - `generate_schedule_output()` - Generisanje rasporeda iz PuLP rešenja
 - `balance_schedules()` - Balansiranje rasporeda između radnika
-- `create_shift_allocation_table()` - Kreiranje tabele sa rasporedom smena
+- `create_shift_allocation_table()` - Kreiranje tabele sa rasporedom smjena
 - `create_demand_comparison_table()` - Kreiranje tabele sa poređenjem potražnje
 - `display_results()` - Prikazivanje svih rezultata
 
@@ -76,19 +76,19 @@ Aplikacija će se otvoriti na `http://localhost:8501`
 
 ## Kako Koristiti
 
-### 1. Opšti Parametri
+### 1. Radnici i aktivnosti
 - Unesite broj profila radnika i aktivnosti
 - Definirajte imena profila i aktivnosti na lokalnom jeziku
 - Definirajte kratke kodove za brži prikaz
 
-### 2. Intervali i Smene
+### 2. Intervali i Smjene
 - Postavite intervale (N_set) - vremenske periode
-- Postavite smene (M_set) - raspored smena
-- Podelite smene na pune (M1) i pola radnog vremena (M2)
+- Postavite smjene (M_set) - raspored smjena
+- Podelite smjene na pune (M1) i nepune (M2)
 - Definirajte dostupne intervale za odmor (Oj)
 
 ### 3. Troškovni Koeficijenti
-- Postavite trošak po radniku za pune i pola smene
+- Postavite trošak po radniku za pune i nepune smjene
 
 ### 4. Mapiranja Uloga i Aktivnosti
 - Izaberite koje aktivnosti može obavljati svaki profil
@@ -118,7 +118,7 @@ Aplikacija će se otvoriti na `http://localhost:8501`
 ### Ograničenja
 1. **Ograničenja Potražnje** - Svaka aktivnost mora biti pokrivena zahtevima
 2. **Ograničenja Kapaciteta** - Radnici ne mogu obavljati više od svog kapaciteta
-3. **Ograničenja Smena** - Broj smena je ograničen
+3. **Ograničenja Smjena** - Broj smjena je ograničen
 4. **Ograničenja Intervala** - Maksimalan broj radnika po intervalu
 5. **Ograničenja Uloga** - Samo određeni profili mogu obavljati određene aktivnosti
 
@@ -129,7 +129,7 @@ Aplikacija će se otvoriti na `http://localhost:8501`
 
 Aplikacija prikazuje:
 1. **Optimalna vrijednost** - Minimalni troškovi
-2. **Rasporedi smena** - Tabela sa rasporedom radnika po smeni
+2. **Rasporedi smjena** - Tabela sa rasporedom radnika po smjeni
 3. **Analiza aktivnosti** - Broj uzastopnih aktivnosti
 4. **Poređenje potražnje** - Zahtevana vs. dodeljena potražnja
 5. **Detaljne promenljive** - Sve PuLP promenljive sa ne-nula vrednostima
@@ -138,7 +138,7 @@ Aplikacija prikazuje:
 
 Sve default vrednosti se mogu promeniti u `config.py`:
 - Promjena default imena profila i aktivnosti
-- Promjena default intervala i smena
+- Promjena default intervala i smjena
 - Promjena default troškova
 - Promjena primena potražnje
 

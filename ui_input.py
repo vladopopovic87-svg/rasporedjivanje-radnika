@@ -11,15 +11,6 @@ def collect_general_parameters():
     """Collect general model parameters from sidebar."""
     lang = st.session_state.get("language", "sr")
     with st.sidebar.expander(get_text("general_parameters", lang)):
-        P = st.number_input(
-            get_text("short_duration_penalty", lang),
-            min_value=0.00,
-            max_value=1.00,
-            value=0.00,
-            step=0.01,
-            help=get_text("p_help_transition_penalty", lang)
-        )
-
         num_profiles = st.number_input(
             get_text("num_profiles", lang),
             min_value=1,
@@ -78,7 +69,7 @@ def collect_general_parameters():
                 help=get_text("activity_short_code_help", lang)
             )
 
-    return P, profil_types, activities, profile_full_names, sp, activity_full_names, s
+    return profil_types, activities, profile_full_names, sp, activity_full_names, s
 
 
 def collect_interval_and_shift_parameters():
@@ -233,7 +224,16 @@ def collect_cost_coefficients(profil_types, profile_full_names):
                 help=f"{get_text('m2_cost_help', lang)} {profile_full_names.get(p_type, p_type)} {get_text('working_part_time', lang)}"
             )
 
-    return ct_m1_inputs, ct_m2_inputs
+        P = st.number_input(
+            get_text("short_duration_penalty", lang),
+            min_value=0.00,
+            max_value=1.00,
+            value=0.00,
+            step=0.01,
+            help=get_text("p_help_transition_penalty", lang)
+        )
+
+    return P, ct_m1_inputs, ct_m2_inputs
 
 
 def compute_able_from_allowed(allowed, profil_types, activities):
@@ -331,7 +331,7 @@ def collect_role_activity_mappings(profil_types, activities, profile_full_names,
 def collect_variant_parameters(activities, activity_full_names):
     """Collect variant-dependent parameters."""
     lang = st.session_state.get("language", "sr")
-    with st.sidebar.expander(get_text("variant_dependent_parameters", lang), expanded=True):
+    with st.sidebar.expander(get_text("variant_dependent_parameters", lang), expanded=False):
         # Create reverse mapping: activity name -> ID
         name_to_id = {v: k for k, v in activity_full_names.items()}
         st.subheader(get_text("independent_activities", lang), help="Aktivnosti čiji zahtevi za radnicima se definišu kroz tabelu.")
