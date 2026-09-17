@@ -1,7 +1,7 @@
 from pulp import LpProblem, LpMinimize, PULP_CBC_CMD, LpStatus
 from config import *
 from utils import parse_list
-from ui_input import collect_variant_parameters
+from ui_input import collect_variant_parameters, compute_able_from_allowed
 from model_builder import *
 from results_display import *
 
@@ -21,7 +21,7 @@ M_set = sorted(set(M1_set + M2_set))
 ct_m1_inputs = {'profil1': 1.28, 'profil2': 1.6, 'profil3': 1.4}
 ct_m2_inputs = {'profil1': 0.64, 'profil2': 0.8, 'profil3': 0.7}
 allowed = DEFAULT_ALLOWED
-able = DEFAULT_ABLE
+able = compute_able_from_allowed(allowed, profil_types, activities)
 able_ne = DEFAULT_ABLE_NE
 demand = DEMAND_EXAMPLE_1
 max_workers = 50

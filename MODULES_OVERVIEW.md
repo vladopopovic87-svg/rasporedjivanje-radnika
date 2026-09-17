@@ -55,7 +55,7 @@ if __name__ == "__main__":
   - `DEFAULT_SHORT_*` - Kratke kodove za prikaz
   - `DEFAULT_*_SET` - Intervale i smene
   - `DEFAULT_CT_RATES` - Troškovne stope
-  - `DEFAULT_ALLOWED`, `DEFAULT_ABLE` - Mapiranja uloga
+  - `DEFAULT_ALLOWED` - Osnovno mapiranje profila po aktivnostima
   - `DEMAND_EXAMPLE_1`, `DEMAND_EXAMPLE_2` - Primeri potražnje
   - Konstante za ograničenja
 
