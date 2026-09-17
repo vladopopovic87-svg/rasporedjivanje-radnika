@@ -62,7 +62,7 @@ TRANSLATIONS = {
         "no_dependent_within_selected": "No dependent activities selected in dep_within. Add activity IDs above to set dependent within values.",
         "no_dependent_until_selected": "No dependent activities selected in dep_until. Add activity IDs above to set dependent until values.",
         "within_help": "Maximum number of intervals allowed to complete '{activity}' activity.",
-        "until_help": "Latest interval by which '{activity}' activity must be started.",
+        "until_help": "Latest interval by which activity '{activity}' must be completed, excluding that interval.",
         "select_demand_profile_help": "Choose a predefined demand pattern to start with. You can then edit the values in the table below.",
         "dep_within_values_header": "dependent within values (integer per dependent activity):",
         "dep_until_values_header": "dependent until values (integer per dependent activity):",
@@ -124,6 +124,7 @@ TRANSLATIONS = {
         "activity_type_multiple": "Activity '{activity}' is assigned to multiple activity types. Select only one.",
         "activity_value_required": "Enter a value for '{value_type}' for activity '{activity}'.",
         "activity_profile_required": "Activity '{activity}' must have at least one worker profile that can perform it.",
+        "until_value_exceeds_intervals": "The 'until' value {value} for '{activity}' exceeds the maximum allowed value {max_interval}. Because the end interval is excluded, enter a value within the allowed range.",
         "select_activity_depends_on": "Select activity that",
         "depends_on": "depends on",
         
@@ -249,7 +250,7 @@ TRANSLATIONS = {
         "no_dependent_within_selected": "Nema odabranih zavisnih aktivnosti u dep_within. Dodaj ID-e aktivnosti iznad da postaviš vrednosti.",
         "no_dependent_until_selected": "Nema odabranih zavisnih aktivnosti u dep_until. Dodaj ID-e aktivnosti iznad da postaviš vrednosti.",
         "within_help": "Maksimalan broj intervala dozvoljen za završetak aktivnosti '{activity}'.",
-        "until_help": "Najkasniji interval do kojeg aktivnost '{activity}' mora biti završena.",
+        "until_help": "Najkasniji interval do kojeg aktivnost '{activity}' mora biti završena, ne uključujući njega.",
         "select_demand_profile_help": "Odaberi unapred definisani obrazac potražnje da počneš. Možeš potom uređivati vrednosti u tabeli ispod.",
         "dep_within_values_header": "\"U okviru\" vrijednosti",
         "dep_within_value_label": "Vrijednost \"u okviru\"",
@@ -311,6 +312,7 @@ TRANSLATIONS = {
         "activity_type_multiple": "Aktivnost '{activity}' pripada više tipova. Odaberi samo jedan tip.",
         "activity_value_required": "Unesi vrijednost za '{value_type}' za aktivnost '{activity}'.",
         "activity_profile_required": "Aktivnosti '{activity}' mora biti dodijeljen bar jedan profil radnika koji može da je obavlja.",
+        "until_value_exceeds_intervals": "Vrijednost 'do' {value} za aktivnost '{activity}' veća je od najveće dozvoljene vrijednosti {max_interval}. Pošto se krajnji interval ne uključuje, pomjeri vrijednost u dozvoljeni raspon.",
         "select_activity_depends_on": "Odaberi aktivnost od koje",
         "depends_on": "zavisi",
         

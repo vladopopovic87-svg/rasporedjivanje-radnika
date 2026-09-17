@@ -214,12 +214,17 @@ def collect_interval_and_shift_parameters():
         generated_M1_set_str = ', '.join(map(str, generated_M1_set))
         generated_M2_set_str = ', '.join(map(str, generated_M2_set))
 
-        user_M1_set_str = st.text_area(
+        m1_generation_signature = (num_intervals, full_time_shift_length)
+        if st.session_state.get("m1_generation_signature") != m1_generation_signature:
+            st.session_state["m1_generation_signature"] = m1_generation_signature
+            st.session_state["m1_set_input"] = generated_M1_set_str
+
+        st.text_area(
             get_text("m1_set_label", lang),
-            generated_M1_set_str,
+            key="m1_set_input",
             help=get_text("m1_set_help", lang)
         )
-        M1_set = parse_list(user_M1_set_str, int)
+        M1_set = parse_list(st.session_state.get("m1_set_input", generated_M1_set_str), int)
         if not M1_set:
             M1_set = generated_M1_set
 
@@ -403,9 +408,10 @@ def collect_role_activity_mappings(profil_types, activities, profile_full_names,
     return allowed, able, able_ne, role_activity_validation_errors
 
 
-def collect_variant_parameters(activities, activity_full_names):
+def collect_variant_parameters(activities, activity_full_names, N_set):
     """Collect variant-dependent parameters."""
     lang = st.session_state.get("language", "sr")
+    max_interval = max(N_set) if N_set else 0
     with st.sidebar.expander(get_text("variant_dependent_parameters", lang), expanded=False):
         # Create reverse mapping: activity name -> ID
         name_to_id = {v: k for k, v in activity_full_names.items()}
@@ -482,7 +488,10 @@ def collect_variant_parameters(activities, activity_full_names):
                 unsafe_allow_html=True
             )
             for generic_activity_id in ind_until:
-                default_val = DEFAULT_UNTIL.get(generic_activity_id)
+                default_val = min(
+                    DEFAULT_UNTIL.get(generic_activity_id, max_interval + 1),
+                    max_interval + 1,
+                )
                 until[generic_activity_id] = st.number_input(
                     f"{get_text('until_value', lang)} za {activity_full_names.get(generic_activity_id, generic_activity_id)}",
                     value=default_val,
@@ -624,6 +633,17 @@ def collect_variant_parameters(activities, activity_full_names):
                         )
                     )
 
+                if activity_type in ("ind_until", "dep_until") and (
+                    value_by_type[activity_type].get(activity_id, 0) > max_interval + 1
+                ):
+                    activity_validation_errors.append(
+                        get_text("until_value_exceeds_intervals", lang).format(
+                            activity=activity_full_names.get(activity_id, activity_id),
+                            value=value_by_type[activity_type][activity_id],
+                            max_interval=max_interval + 1,
+                        )
+                    )
+
     # Priprema liste zavisnosti za model
     dependency_list = []
     for dep_id, rel in dependent_activity_relations.items():
@@ -684,7 +704,13 @@ def collect_demand_data(activities, activity_full_names, N_set, display_start_in
     df_demand_editable.index.name = get_text("interval_hour", lang)
 
     st.subheader(get_text("edit_demand_per_interval", lang))
-    edited_df_demand = st.data_editor(df_demand_editable, num_rows="fixed", use_container_width=True)
+    demand_editor_key = f"demand_editor_{len(N_set)}_{'_'.join(activities)}"
+    edited_df_demand = st.data_editor(
+        df_demand_editable,
+        num_rows="fixed",
+        use_container_width=True,
+        key=demand_editor_key,
+    )
 
     # Find activity IDs for Istovar and Kontrola
     istovar_generic_id = None

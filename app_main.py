@@ -90,7 +90,9 @@ def main():
 
     (ind_within, ind_until, dep_within, dep_until, within, until, 
         overlap_activities, dependency_list,
-        activity_validation_errors) = collect_variant_parameters(activities, activity_full_names)
+        activity_validation_errors) = collect_variant_parameters(
+            activities, activity_full_names, N_set
+        )
 
     demand, istovar_generic_id, kontrola_generic_id = collect_demand_data(
         activities, activity_full_names, N_set, display_start_interval

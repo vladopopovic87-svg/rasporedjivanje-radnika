@@ -159,7 +159,10 @@ def add_activity_within_constraints(model, ind_within, N_set, M_set, profil_type
             if i < len(demand[a_id]):
                 model += lpSum(
                     xaijk[(a_id, i, j, k)] * bij.get((k, j), 0)
-                    for k in range(i, min(i + within.get(a_id, 11), 12))
+                    for k in range(
+                        i,
+                        min(i + within.get(a_id, max(N_set) + 1), max(N_set) + 1),
+                    )
                     #for j in M_set if (a_id, i, j, k) in xaijk and (k, j) in bij
                     for j in M_set 
                 ) == demand[a_id][i], f"Constraint_within_{activity_full_names.get(a_id, a_id)}_{i}"
@@ -180,7 +183,7 @@ def add_activity_until_constraints(model, ind_until, N_set, M_set, xaijk, bij,
             #if i < len(demand[a_id]):
                 model += lpSum(
                     xaijk[(a_id, i, j, k)] * bij.get((k, j), 0)
-                    for k in range(i, min(until.get(a_id, 11), 12))
+                    for k in range(i, min(until.get(a_id, max(N_set) + 1), max(N_set) + 1))
                     for j in M_set 
                 ) == demand[a_id][i], f"Constraint_until_{activity_full_names.get(a_id, a_id)}_{i}"
 
@@ -214,7 +217,7 @@ def add_activity_dependency_ratio_constraints(
                     if (depends_on_id, i, j, k) in xaijk
                 )
 
-                # koliko "unaprijed" gledamo (fallback = 11)
+                # koliko "unaprijed" gledamo (fallback = kraj N_set-a)
                 # window = within.get(dependent_id, 11)
 
                 # suma dependent aktivnosti
@@ -246,7 +249,7 @@ def add_activity_dependency_ratio_constraints(
                     if (depends_on_id, i, j, k) in xaijk
                 )
 
-                # koliko "unazad" gledamo (fallback = 11)
+                # koliko "unazad" gledamo (fallback = kraj N_set-a)
                 # window = until.get(dependent_id, 11)
 
                 # suma dependent aktivnosti
