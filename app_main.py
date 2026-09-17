@@ -312,7 +312,8 @@ def main():
                 "df": df,
                 "activity_per_interval": activity_per_interval,
                 "df_activities": create_demand_comparison_table(
-                    activity_per_interval, N_set, activities, activity_full_names, demand, lang
+                    activity_per_interval, N_set, activities, activity_full_names, demand, lang,
+                    dependency_list=dependency_list_full,
                 ),
                 "non_zero_vars": [
                     f"{v.name} = {v.varValue}"

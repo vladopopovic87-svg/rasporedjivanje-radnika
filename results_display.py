@@ -148,18 +148,31 @@ def create_shift_allocation_table(smjena_output, M_set, M1_set, M2_set, profil_t
 
 
 def create_demand_comparison_table(activity_per_interval, N_set, activities, 
-                                  activity_full_names, demand, lang="sr"):
+                                  activity_full_names, demand, lang="sr",
+                                  dependency_list=None):
     """Create DataFrame comparing demand vs realized activities."""
+    dependency_list = dependency_list or []
+    dependent_requirements = {
+        dependency.get("dependent"): dependency
+        for dependency in dependency_list
+        if dependency.get("dependent") and dependency.get("depends_on")
+    }
     df_data = []
     for i in sorted(activity_per_interval.keys()):
         row_data = {"Interval": i}
         for a_id in activities:
             full_activity_name = activity_full_names.get(a_id, a_id)
-            row_data[f"{full_activity_name}_{get_text('demanded', lang)}"] = (
-                demand.get(a_id, [0] * (max(N_set) + 1))[i]
-                if i < len(demand.get(a_id, [0] * (max(N_set) + 1)))
-                else 0
-            )
+            dependency = dependent_requirements.get(a_id)
+            if dependency and dependency["depends_on"] in activity_per_interval[i]:
+                demanded_value = round(
+                    dependency.get("ratio", 1)
+                    * activity_per_interval[i][dependency["depends_on"]]
+                )
+            else:
+                activity_demand = demand.get(a_id, [0] * (max(N_set) + 1))
+                demanded_value = activity_demand[i] if i < len(activity_demand) else 0
+
+            row_data[f"{full_activity_name}_{get_text('demanded', lang)}"] = demanded_value
             row_data[f"{full_activity_name}_{get_text('allocated', lang)}"] = activity_per_interval[i][a_id]
         df_data.append(row_data)
 
