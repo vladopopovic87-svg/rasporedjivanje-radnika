@@ -11,6 +11,31 @@ def collect_general_parameters():
     """Collect general model parameters from sidebar."""
     lang = st.session_state.get("language", "sr")
     with st.sidebar.expander(get_text("general_parameters", lang)):
+        st.markdown(
+            """
+            <style>
+            [class*="st-key-remove_profile_"] button,
+            [class*="st-key-remove_activity_"] button,
+            button[aria-label="×"] {
+                color: #d32f2f !important;
+                background: transparent !important;
+                border: 0 !important;
+                box-shadow: none !important;
+                min-height: 0 !important;
+                padding: 0 !important;
+                transform: translateY(-0.1rem);
+                font-size: 10rem !important;
+            }
+            [class*="st-key-remove_profile_"] button:hover,
+            [class*="st-key-remove_activity_"] button:hover,
+            button[aria-label="×"]:hover {
+                color: #9f1d1d !important;
+                background: transparent !important;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
         num_profiles = st.number_input(
             get_text("num_profiles", lang),
             min_value=1,
@@ -18,7 +43,12 @@ def collect_general_parameters():
             step=1,
             help=get_text("num_profiles_help", lang)
         )
-        profil_types = generate_profile_types(num_profiles)
+        all_profile_types = generate_profile_types(num_profiles)
+        removed_profiles = st.session_state.setdefault("removed_profiles", set())
+        profil_types = [
+            profile_id for profile_id in all_profile_types
+            if profile_id not in removed_profiles
+        ]
 
         num_activities = st.number_input(
             get_text("num_activities", lang),
@@ -27,47 +57,84 @@ def collect_general_parameters():
             step=1,
             help=get_text("num_activities_help", lang)
         )
-        activities = generate_activities(num_activities)
+        all_activities = generate_activities(num_activities)
+        removed_activities = st.session_state.setdefault("removed_activities", set())
+        activities = [
+            activity_id for activity_id in all_activities
+            if activity_id not in removed_activities
+        ]
 
         # Profile names and codes
         st.subheader(get_text("define_profile_names", lang))
         profile_full_names = {}
         sp = {}
         for generic_profile_id in profil_types:
+            profile_number = generic_profile_id.removeprefix("profil")
+            st.markdown(f"**Profil {profile_number}**")
             default_full = DEFAULT_FULL_PROFILE_NAMES.get(generic_profile_id, generic_profile_id.capitalize())
-            profile_full_names[generic_profile_id] = st.text_input(
-                f"{get_text('full_name_for', lang)} '{generic_profile_id}'",
-                value=default_full,
-                key=f"full_name_profile_{generic_profile_id}",
-                help=get_text('profile_full_name_help', lang)
-            )
             default_short = DEFAULT_SHORT_PROFILES.get(generic_profile_id, generic_profile_id[0:2])
-            sp[generic_profile_id] = st.text_input(
-                f"{get_text('short_code_for', lang)} '{generic_profile_id}'",
-                value=default_short,
-                key=f"short_code_profile_{generic_profile_id}",
-                help=get_text('profile_short_code_help', lang)
+            name_col, code_col, remove_col = st.columns(
+                [2, 1, 0.35], vertical_alignment="top"
             )
+            with name_col:
+                profile_full_names[generic_profile_id] = st.text_input(
+                    get_text('full_name_for', lang),
+                    value=default_full,
+                    key=f"full_name_profile_{generic_profile_id}",
+                    help=get_text('profile_full_name_help', lang)
+                )
+            with code_col:
+                sp[generic_profile_id] = st.text_input(
+                    get_text('short_code_for', lang),
+                    value=default_short,
+                    key=f"short_code_profile_{generic_profile_id}",
+                    help=get_text('profile_short_code_help', lang)
+                )
+            with remove_col:
+                if st.button(
+                    "×",
+                    key=f"remove_profile_{generic_profile_id}",
+                    disabled=len(profil_types) <= 1,
+                    help=get_text("remove_profile_help", lang),
+                ):
+                    removed_profiles.add(generic_profile_id)
+                    st.rerun()
 
         # Activity names and codes
         st.subheader(get_text("define_activity_names", lang))
         s = {}
         activity_full_names = {}
         for generic_activity_id in activities:
+            activity_number = generic_activity_id.removeprefix("activity")
+            st.markdown(f"**Aktivnost {activity_number}**")
             default_full = DEFAULT_FULL_ACTIVITY_NAMES.get(generic_activity_id, generic_activity_id.capitalize())
-            activity_full_names[generic_activity_id] = st.text_input(
-                f"{get_text('full_name_for', lang)} '{generic_activity_id}'",
-                value=default_full,
-                key=f"full_name_activity_{generic_activity_id}",
-                help=get_text("activity_full_name_help", lang)
-            )
             default_short = DEFAULT_SHORT_ACTIVITIES.get(generic_activity_id, generic_activity_id[0:2])
-            s[generic_activity_id] = st.text_input(
-                f"{get_text('short_code_for', lang)} '{generic_activity_id}'",
-                value=default_short,
-                key=f"short_code_activity_{generic_activity_id}",
-                help=get_text("activity_short_code_help", lang)
+            name_col, code_col, remove_col = st.columns(
+                [2, 1, 0.35], vertical_alignment="top"
             )
+            with name_col:
+                activity_full_names[generic_activity_id] = st.text_input(
+                    get_text('full_name_for', lang),
+                    value=default_full,
+                    key=f"full_name_activity_{generic_activity_id}",
+                    help=get_text("activity_full_name_help", lang)
+                )
+            with code_col:
+                s[generic_activity_id] = st.text_input(
+                    get_text('short_code_for', lang),
+                    value=default_short,
+                    key=f"short_code_activity_{generic_activity_id}",
+                    help=get_text("activity_short_code_help", lang)
+                )
+            with remove_col:
+                if st.button(
+                    "×",
+                    key=f"remove_activity_{generic_activity_id}",
+                    disabled=len(activities) <= 1,
+                    help=get_text("remove_activity_help", lang),
+                ):
+                    removed_activities.add(generic_activity_id)
+                    st.rerun()
 
     return profil_types, activities, profile_full_names, sp, activity_full_names, s
 
