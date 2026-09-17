@@ -544,16 +544,16 @@ def collect_demand_data(activities, activity_full_names, N_set):
 
     # Convert to DataFrame
     initial_df_data = {}
-    for generic_activity_id, demand_list in base_demand.items():
-        if generic_activity_id in activities:
-            full_activity_name = activity_full_names.get(generic_activity_id, generic_activity_id)
-            if demand_list and len(demand_list[1:]) >= len(N_set):
-                initial_df_data[full_activity_name] = demand_list[1:len(N_set)+1]
-            elif demand_list:
-                padded_list = demand_list[1:] + [0] * (len(N_set) - len(demand_list[1:]))
-                initial_df_data[full_activity_name] = padded_list
-            else:
-                initial_df_data[full_activity_name] = [0] * len(N_set)
+    for generic_activity_id in activities:
+        demand_list = base_demand.get(generic_activity_id, [])
+        full_activity_name = activity_full_names.get(generic_activity_id, generic_activity_id)
+        if demand_list and len(demand_list[1:]) >= len(N_set):
+            initial_df_data[full_activity_name] = demand_list[1:len(N_set)+1]
+        elif demand_list:
+            padded_list = demand_list[1:] + [0] * (len(N_set) - len(demand_list[1:]))
+            initial_df_data[full_activity_name] = padded_list
+        else:
+            initial_df_data[full_activity_name] = [0] * len(N_set)
 
     if not initial_df_data:
         st.warning(get_text("no_demand_data_dummy", lang))
