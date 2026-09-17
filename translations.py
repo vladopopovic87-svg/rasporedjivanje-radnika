@@ -116,6 +116,10 @@ TRANSLATIONS = {
         "no_activities_dep_within": "No dependent activities selected in dep_within.",
         "no_activities_dep_until": "No dependent activities selected in dep_until.",
         "error_overlap": "Error: Activities in both 'ind_within' and 'ind_until':",
+        "activity_type_required": "Activity '{activity}' must be assigned to exactly one activity type: within, until, dependent within, or dependent until.",
+        "activity_type_multiple": "Activity '{activity}' is assigned to multiple activity types. Select only one.",
+        "activity_value_required": "Enter a value for '{value_type}' for activity '{activity}'.",
+        "activity_profile_required": "Activity '{activity}' must have at least one worker profile that can perform it.",
         "select_activity_depends_on": "Select activity that",
         "depends_on": "depends on",
         
@@ -295,6 +299,10 @@ TRANSLATIONS = {
         "no_activities_dep_within": "Nema odabranih zavisnih aktivnosti u dep_within.",
         "no_activities_dep_until": "Nema odabranih zavisnih aktivnosti u dep_until.",
         "error_overlap": "Greška: Aktivnosti su u oba 'ind_within' i 'ind_until':",
+        "activity_type_required": "Aktivnosti '{activity}' mora biti određen jedan tip: u okviru, do, zavisna u okviru ili zavisna do.",
+        "activity_type_multiple": "Aktivnost '{activity}' pripada više tipova. Odaberi samo jedan tip.",
+        "activity_value_required": "Unesi vrijednost za '{value_type}' za aktivnost '{activity}'.",
+        "activity_profile_required": "Aktivnosti '{activity}' mora biti dodijeljen bar jedan profil radnika koji može da je obavlja.",
         "select_activity_depends_on": "Odaberi aktivnost od koje",
         "depends_on": "zavisi",
         

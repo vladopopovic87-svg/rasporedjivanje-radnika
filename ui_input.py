@@ -276,6 +276,14 @@ def collect_role_activity_mappings(profil_types, activities, profile_full_names,
                 if pf_name == full_name
             ]
 
+        role_activity_validation_errors = [
+            get_text("activity_profile_required", lang).format(
+                activity=activity_full_names.get(activity_id, activity_id)
+            )
+            for activity_id in activities
+            if not allowed.get(activity_id)
+        ]
+
         able = compute_able_from_allowed(allowed, profil_types, activities)
         with st.expander(get_text("able_activities_per_profile", lang), expanded=False):
             for generic_profile_id in profil_types:
@@ -325,7 +333,7 @@ def collect_role_activity_mappings(profil_types, activities, profile_full_names,
             for generic_profile_id in profil_types
         }
 
-    return allowed, able, able_ne
+    return allowed, able, able_ne, role_activity_validation_errors
 
 
 def collect_variant_parameters(activities, activity_full_names):
@@ -389,7 +397,7 @@ def collect_variant_parameters(activities, activity_full_names):
                 unsafe_allow_html=True
             )
             for generic_activity_id in ind_within:
-                default_val = DEFAULT_WITHIN.get(generic_activity_id, 1)
+                default_val = DEFAULT_WITHIN.get(generic_activity_id)
                 within[generic_activity_id] = st.number_input(
                     f"{get_text('within_value', lang)} za {activity_full_names.get(generic_activity_id, generic_activity_id)}",
                     value=default_val,
@@ -407,7 +415,7 @@ def collect_variant_parameters(activities, activity_full_names):
                 unsafe_allow_html=True
             )
             for generic_activity_id in ind_until:
-                default_val = DEFAULT_UNTIL.get(generic_activity_id, 1)
+                default_val = DEFAULT_UNTIL.get(generic_activity_id)
                 until[generic_activity_id] = st.number_input(
                     f"{get_text('until_value', lang)} za {activity_full_names.get(generic_activity_id, generic_activity_id)}",
                     value=default_val,
@@ -484,7 +492,7 @@ def collect_variant_parameters(activities, activity_full_names):
         if dep_within:
             st.markdown(f"<span style='color: black; font-weight: normal;'>{get_text('dep_within_values_header', lang)}</span>", unsafe_allow_html=True)
             for generic_activity_id in dep_within:
-                default_val = DEFAULT_WITHIN.get(generic_activity_id, 1)
+                default_val = DEFAULT_WITHIN.get(generic_activity_id)
                 dep_within_values[generic_activity_id] = st.number_input(
                     f"{get_text('dep_within_value_label', lang)} za {activity_full_names.get(generic_activity_id, generic_activity_id)}",
                     value=default_val,
@@ -512,6 +520,42 @@ def collect_variant_parameters(activities, activity_full_names):
         if dep_until_values:
             until.update(dep_until_values)
 
+        activity_validation_errors = []
+        activity_types = {
+            activity_id: [activity_type for activity_type, selected_ids in (
+                ("ind_within", ind_within),
+                ("ind_until", ind_until),
+                ("dep_within", dep_within),
+                ("dep_until", dep_until),
+            ) if activity_id in selected_ids]
+            for activity_id in activities
+        }
+        for activity_id, selected_types in activity_types.items():
+            activity_name = activity_full_names.get(activity_id, activity_id)
+            if not selected_types:
+                activity_validation_errors.append(
+                    get_text("activity_type_required", lang).format(activity=activity_name)
+                )
+            elif len(selected_types) > 1:
+                activity_validation_errors.append(
+                    get_text("activity_type_multiple", lang).format(activity=activity_name)
+                )
+
+        value_by_type = {
+            "ind_within": within,
+            "ind_until": until,
+            "dep_within": dep_within_values,
+            "dep_until": dep_until_values,
+        }
+        for activity_id, selected_types in activity_types.items():
+            for activity_type in selected_types:
+                if value_by_type[activity_type].get(activity_id) is None:
+                    activity_validation_errors.append(
+                        get_text("activity_value_required", lang).format(
+                            activity=activity_full_names.get(activity_id, activity_id),
+                            value_type=get_text(activity_type, lang),
+                        )
+                    )
 
     # Priprema liste zavisnosti za model
     dependency_list = []
@@ -521,7 +565,10 @@ def collect_variant_parameters(activities, activity_full_names):
             'depends_on': rel['depends_on'],
             'ratio': rel['ratio']
         })
-    return ind_within, ind_until, dep_within, dep_until, within, until, overlap_activities, dependency_list
+    return (
+        ind_within, ind_until, dep_within, dep_until, within, until,
+        overlap_activities, dependency_list, activity_validation_errors,
+    )
 
 
 def collect_demand_data(activities, activity_full_names, N_set):

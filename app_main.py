@@ -84,12 +84,13 @@ def main():
 
     P, ct_m1_inputs, ct_m2_inputs = collect_cost_coefficients(profil_types, profile_full_names)
 
-    allowed, able, able_ne = collect_role_activity_mappings(
+    allowed, able, able_ne, role_activity_validation_errors = collect_role_activity_mappings(
         profil_types, activities, profile_full_names, activity_full_names
     )
 
     (ind_within, ind_until, dep_within, dep_until, within, until, 
-     overlap_activities, dependency_list) = collect_variant_parameters(activities, activity_full_names)
+        overlap_activities, dependency_list,
+        activity_validation_errors) = collect_variant_parameters(activities, activity_full_names)
 
     demand, istovar_generic_id, kontrola_generic_id = collect_demand_data(activities, activity_full_names, N_set)
 
@@ -105,6 +106,12 @@ def main():
     # Run optimization button
     run_optimization_disabled = bool(overlap_activities)
     if st.button(get_text('run_optimization', language), disabled=run_optimization_disabled):
+        validation_errors = role_activity_validation_errors + activity_validation_errors
+        if validation_errors:
+            for error_message in validation_errors:
+                st.error(error_message)
+            st.stop()
+
         placeholder = st.empty()
         debug_messages = []
         
