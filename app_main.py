@@ -53,20 +53,26 @@ def main():
     """Main application logic."""
     st.set_page_config(layout="wide")
     
-    # Language selector in sidebar
+    # Language selector in the top-right corner
     if "language" not in st.session_state:
         st.session_state.language = "sr"
     
-    lang_index = 0 if st.session_state.language == "sr" else 1
-    selected_lang = st.sidebar.selectbox(
-        "🌐 Jezik / Language",
-        options=["sr", "en"],
-        index=lang_index
-    )
-    st.session_state.language = selected_lang
+    language = st.session_state.language
+    title_col, language_col = st.columns([6.2, 0.8], vertical_alignment="top")
+    with language_col:
+        selected_lang = st.segmented_control(
+            "Jezik / Language",
+            options=["sr", "en"],
+            default=language,
+            key="language_selector",
+            label_visibility="collapsed",
+        )
+    if selected_lang:
+        st.session_state.language = selected_lang
     
     language = st.session_state.language
-    st.title(get_text("app_title", language))
+    with title_col:
+        st.title(get_text("app_title", language))
     st.sidebar.header(get_text("model_parameters", language))
 
     # Collect all input parameters
