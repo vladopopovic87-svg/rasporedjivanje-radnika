@@ -551,7 +551,10 @@ def collect_variant_parameters(activities, activity_full_names, N_set):
                 options=range(len(available_ids)),
                 index=default_dep_idx,
                 format_func=lambda idx: available_names[idx],
-                key=f"dep_relation_{dep_activity_id}"
+                key=f"dep_relation_{dep_activity_id}",
+                help=get_text("dependency_activity_help", lang).format(
+                    activity=activity_full_names.get(dep_activity_id, dep_activity_id)
+                ),
             )
             depends_on_id = available_ids[selected_idx]
             ratio_val = st.slider(
@@ -560,7 +563,11 @@ def collect_variant_parameters(activities, activity_full_names, N_set):
                 max_value=1.0,
                 value=0.5,
                 step=0.05,
-                key=f"dep_ratio_{dep_activity_id}"
+                key=f"dep_ratio_{dep_activity_id}",
+                help=get_text("dependency_ratio_help", lang).format(
+                    dependent=activity_full_names.get(dep_activity_id, dep_activity_id),
+                    depends_on=activity_full_names.get(depends_on_id, depends_on_id),
+                ),
             )
             dependent_activity_relations[dep_activity_id] = {"depends_on": depends_on_id, "ratio": ratio_val}
 
