@@ -370,7 +370,8 @@ def collect_role_activity_mappings(profil_types, activities, profile_full_names,
                     options=[activity_full_names.get(a, a) for a in activities],
                     default=derived_full_names,
                     disabled=True,
-                    label_visibility="collapsed"
+                    label_visibility="collapsed",
+                    key=f"able_preview_{generic_profile_id}"
                 )
 
         st.subheader(get_text("primary_able_activities", lang))
@@ -787,14 +788,6 @@ def collect_constraint_parameters():
             help=get_text('m2_ratio_limit_help', lang)
         )
         
-        istovar_kontrola_ratio = st.slider(
-            get_text("istovar_kontrola_ratio", lang),
-            min_value=0.0,
-            max_value=1.0,
-            value=DEFAULT_ISTOVAR_KONTROLA_RATIO,
-            step=0.05,
-            help=get_text('istovar_kontrola_ratio_help', lang)
-       )
         non_primary_activities_ratio = st.slider(
             get_text("non_primary_activities_ratio", lang),
             min_value=0.0,
@@ -805,4 +798,4 @@ def collect_constraint_parameters():
         )
         
     
-    return max_workers_per_interval, max_m1_shifts, max_m2_shifts, m2_ratio_limit, non_primary_activities_ratio, istovar_kontrola_ratio
+    return max_workers_per_interval, max_m1_shifts, max_m2_shifts, m2_ratio_limit, non_primary_activities_ratio

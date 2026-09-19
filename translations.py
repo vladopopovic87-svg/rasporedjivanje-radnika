@@ -336,7 +336,6 @@ TRANSLATIONS = {
         "max_m2_shifts": "Maks M2 smjena",
         "non_primary_activities_ratio": "Odnos sporednih aktivnosti",
         "m2_ratio_limit": "Granica M2 odnosa",
-        "istovar_kontrola_ratio": "Odnos Utovar/Kontrola",
         "max_number_of": "Maksimalan broj",
         
         # Results

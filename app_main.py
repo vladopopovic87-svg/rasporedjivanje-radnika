@@ -99,8 +99,8 @@ def main():
     )
 
     # Collect constraint parameters
-    (max_workers_per_interval, max_m1_shifts, max_m2_shifts, 
-     m2_ratio_limit, non_primary_activities_ratio, istovar_kontrola_ratio) = collect_constraint_parameters()
+    (max_workers_per_interval, max_m1_shifts, max_m2_shifts,
+     m2_ratio_limit, non_primary_activities_ratio) = collect_constraint_parameters()
 
     if "results" not in st.session_state:
         st.session_state["results"] = None
@@ -175,7 +175,7 @@ def main():
             dependency_list_full.append({
                 'dependent': kontrola_generic_id,
                 'depends_on': istovar_generic_id,
-                'ratio': istovar_kontrola_ratio
+                'ratio': DEFAULT_ISTOVAR_KONTROLA_RATIO
             })
         print (f"dependency_list_full: {dependency_list_full}")
 
@@ -183,15 +183,14 @@ def main():
         for dep in dependency_list_full:
             dependent = dep['dependent']
             depends_on = dep['depends_on']
-            ratio = dep.get('ratio', istovar_kontrola_ratio)
+            ratio = dep.get('ratio', DEFAULT_ISTOVAR_KONTROLA_RATIO)
 
             if dependent in demand and depends_on in demand:
                 demand[dependent] = [0] + [
                     round(ratio * v)
                     for v in demand.get(depends_on, [0] * (len(N_set) + 1))[1:len(N_set) + 1]
                 ]
-                
-        print (f"Updated demand for {dependent} based on {depends_on} with ratio {ratio}: {demand[dependent]}")
+                print(f"Updated demand for {dependent} based on {depends_on} with ratio {ratio}: {demand[dependent]}")
 
         from model_builder import add_activity_dependency_ratio_constraints
         add_activity_dependency_ratio_constraints(
