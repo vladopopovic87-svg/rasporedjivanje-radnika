@@ -15,7 +15,8 @@ from ui_input import (
     collect_role_activity_mappings,
     collect_variant_parameters,
     collect_demand_data,
-    collect_constraint_parameters
+    collect_constraint_parameters,
+    display_instructions
 )
 from model_builder import (
     add_worker_ableno_constraints,
@@ -58,7 +59,17 @@ def main():
         st.session_state.language = "sr"
     
     language = st.session_state.language
-    title_col, language_col = st.columns([6.2, 0.8], vertical_alignment="top")
+    title_col, page_col, language_col = st.columns([4.7, 1.5, 0.8], vertical_alignment="top")
+    with page_col:
+        selected_page = st.segmented_control(
+            "page_selector",
+            options=[get_text("schedule_page", language), get_text("instructions_page", language)],
+            default=get_text("schedule_page", language),
+            key="page_selector",
+            label_visibility="collapsed",
+        )
+    if not selected_page:
+        selected_page = get_text("schedule_page", language)
     with language_col:
         selected_lang = st.segmented_control(
             "Jezik / Language",
@@ -94,13 +105,18 @@ def main():
             activities, activity_full_names, N_set
         )
 
+    is_instructions_page = selected_page in {"Uputstvo", "Instructions"}
     demand, istovar_generic_id, kontrola_generic_id = collect_demand_data(
-        activities, activity_full_names, N_set, display_start_interval
+        activities, activity_full_names, N_set, display_start_interval,
+        show_editor=not is_instructions_page
     )
 
     # Collect constraint parameters
     (max_workers_per_interval, max_m1_shifts, max_m2_shifts,
      m2_ratio_limit, non_primary_activities_ratio) = collect_constraint_parameters()
+    if is_instructions_page:
+        display_instructions()
+        return
 
     if "results" not in st.session_state:
         st.session_state["results"] = None

@@ -5,6 +5,8 @@ TRANSLATIONS = {
         # App titles and headers
         "app_title": "Worker Scheduling Optimization",
         "model_parameters": "Model Parameters",
+        "schedule_page": "Schedule",
+        "instructions_page": "Instructions",
         
         # General Parameters
         "general_parameters": "General Parameters",
@@ -148,6 +150,93 @@ TRANSLATIONS = {
         "m2_ratio_limit": "M2 Ratio Limit",
         "istovar_kontrola_ratio": "Istovar/Kontrola Ratio",
         "max_number_of": "Maximum number of",
+        "instructions": "Instructions",
+        "instructions_content": """
+    ### Kako unijeti svoj problem
+
+    Aplikacija traži odgovor na tri pitanja: **ko radi**, **šta treba da se uradi** i **kada rad treba da bude pokriven**. Prije unosa pripremi spisak profila radnika, aktivnosti, trajanje intervala, dozvoljene smjene i potreban broj radnika po aktivnosti i vremenu.
+
+    Najlakše je početi od ponuđenog primjera, a zatim ga prilagoditi svom problemu. Unos se vrši redom odozgo prema dolje.
+
+    ### 1. Radnici i aktivnosti
+
+    - **Broj profila radnika**: Unesi koliko različitih vrsta radnika imaš, na primjer komisioner, kontrolor i viljuškarista.
+    - **Broj aktivnosti**: Unesi koliko različitih poslova treba raspoređivati.
+    - **Puno ime**: Upiši razumljiv naziv profila ili aktivnosti.
+    - **Kod**: Upiši kratku oznaku koja će se prikazivati u tabeli rasporeda, na primjer KOM ili VIL.
+
+    ### 2. Intervali i smjene
+
+    Prvo odluči koliko traje jedan interval. Ako interval traje 60 minuta, 8 intervala predstavlja 8 sati.
+
+    - **Početak radnog dana**: Unesi sat od kojeg počinje prikaz, na primjer 8 za 08:00.
+    - **Trajanje jednog intervala**: Unesi trajanje intervala u minutama, na primjer 60.
+    - **Broj intervala u 24h**: Unesi koliko intervala obuhvata plan, na primjer 12 intervala za period od 08:00 do 20:00.
+    - **Dužina pune smjene**: Unesi broj intervala koje radi radnik sa punim radnim vremenom, na primjer 8.
+    - **Dužina nepune smjene**: Unesi broj intervala koje radi radnik sa nepunim radnim vremenom, na primjer 4.
+    - **Trajanje pauze**: Unesi trajanje pauze u minutama.
+    - **Skup smjena sa punim radnim vremenom i skup smjena sa nepunim radnim vremenom**: Odredi u kojim intervalima smjene mogu početi; koristi brojeve odvojene zarezima, na primjer `1, 2, 3`.
+    - **Oj**: Za svaku smjenu sa punim radnim vremenom upiši intervale u kojima je dozvoljena pauza.
+    - **Minimalna dužina uzastopnih aktivnosti**: Koristi se samo za dodatnu analizu sekvenci, a ne za osnovno kreiranje rasporeda.
+
+    ### 3. Troškovi
+
+    Za svaki profil odredi cijenu pune i nepune smjene. Veća vrijednost znači da će optimizacija više izbjegavati tu opciju.
+
+    - **Koeficijent troška pune smjene**: Cijena smjene sa punim radnim vremenom za profil.
+    - **Koeficijent troška nepune smjene**: Cijena smjene sa nepunim radnim vremenom za profil.
+    - **Koeficijent troška prebrzog mijenjanja aktivnosti**: Kazna za često mijenjanje aktivnosti; postavi 0 ako to nije važno.
+
+    ### 4. Mapiranje profila i aktivnosti
+
+    Za svaku aktivnost izaberi profile koji je stvarno mogu obavljati. Zatim za svaki profil označi primarne aktivnosti koje taj profil prvenstveno treba da radi. Ne dozvoli aktivnosti koje radnik ne zna ili ne smije obavljati, jer će model tada pokušati koristiti samo dozvoljene profile.
+
+    ### 5. Tipovi aktivnosti i zavisnosti
+
+    Ovaj dio koristi samo kada aktivnost ima vremensko pravilo.
+
+    - **U okviru**: Koristi kada aktivnost mora biti pokrivena unutar određenog broja intervala.
+    - **Do**: Koristi kada aktivnost mora biti pokrivena najkasnije do određenog intervala.
+    - **Zavisna aktivnost**: Koristi kada se potreban broj radnika računa iz druge aktivnosti, na primjer kontrola je 50% istovara.
+    - Nemoj istu aktivnost istovremeno označiti kao "u okviru" i "do".
+
+    ### 6. Potražnja - glavna ulazna tabela
+
+    Izaberi primjer kao početnu vrijednost, pa u tabeli upiši stvarne potrebe.
+
+    - Svaki **red** predstavlja vremenski interval.
+    - Svaka **kolona** predstavlja aktivnost.
+    - U ćeliju upiši koliko je radnika potrebno za tu aktivnost u tom intervalu.
+    - Upiši 0 kada aktivnost nije potrebna.
+    - Unosi nenegativne cijele brojeve; ne upisuj ukupan broj radnika u svaku kolonu, nego potrebu po svakom intervalu.
+
+    Primjer: ako su u intervalu 3 potrebna 2 komisionera i 1 kontrolor, u red za interval 3 upiši `2` u kolonu komisioner i `1` u kolonu kontrolor.
+
+    ### 7. Parametri ograničenja
+
+    Ovi parametri ograničavaju koliko slobode model ima pri izboru rasporeda.
+
+    - **Maks radnika po intervalu**: Najveći ukupan broj radnika koji smije istovremeno raditi.
+    - **Maksimalan broj smjena sa punim radnim vremenom**: Najveći broj punih smjena koje model smije otvoriti.
+    - **Maksimalan broj smjena sa nepunim radnim vremenom**: Najveći broj nepunih smjena koje model smije otvoriti.
+    - **Granica odnosa smjena sa nepunim radnim vremenom**: Najveći dozvoljeni udio nepunih smjena među svim smjenama; 0.30 znači najviše 30%.
+    - **Odnos sporednih aktivnosti**: Najveći udio vremena radnika sa punim radnim vremenom koji se smije potrošiti na aktivnosti koje nisu primarne.
+
+    Postavi ograničenja dovoljno široko za prvi pokušaj. Ako je rješenje nemoguće, prvo povećaj maksimalan broj radnika ili smjena i provjeri da li su profili pravilno povezani sa aktivnostima.
+
+    ### 8. Pokretanje i provjera rezultata
+
+    Klikni **Pokreni optimizaciju**. U tabeli rasporeda svaka kolona predstavlja jednu smjenu, profil i konkretnog radnika. Tabela aktivnosti po intervalu poredi **Zahtevano** i **Raspoređeno**. Ako se vrijednosti razlikuju, provjeri potražnju, dozvoljene profile, trajanje smjena i ograničenja.
+
+    ### Brza kontrolna lista
+
+    1. Svaka aktivnost ima naziv, kod i bar jedan dozvoljeni profil.
+    2. Dužine smjena i broj intervala odgovaraju stvarnom radnom vremenu.
+    3. Potražnja je unesena po intervalima, bez izostavljenih potrebnih aktivnosti.
+    4. M1/M2 setovi sadrže dozvoljene početke smjena.
+    5. Maksimalni broj radnika i smjena nije manji od realne potrebe.
+    6. Nakon optimizacije provjereno je da su traženi i raspoređeni radnici usklađeni.
+    """,
         
         # Results
         "run_optimization": "Run Optimization",
@@ -195,6 +284,8 @@ TRANSLATIONS = {
         # App titles and headers
         "app_title": "Optimizacija raspoređivanja radnika",
         "model_parameters": "Parametri modela",
+        "schedule_page": "Raspored",
+        "instructions_page": "Uputstvo",
         
         # General Parameters
         "general_parameters": "Radnici i aktivnosti",
@@ -337,6 +428,63 @@ TRANSLATIONS = {
         "non_primary_activities_ratio": "Odnos sporednih aktivnosti",
         "m2_ratio_limit": "Granica M2 odnosa",
         "max_number_of": "Maksimalan broj",
+        "instructions": "Uputstvo",
+        "instructions_content": """
+    ### Sidebar sekcije
+
+    **Radnici i aktivnosti** - Definiše profile radnika i aktivnosti koje se koriste u rasporedu.
+    - **Broj profila radnika**: Određuje koliko tipova profila radnika postoji.
+    - **Broj aktivnosti**: Određuje koliko tipova aktivnosti može biti raspoređeno.
+    - **Puno ime**: Definiše opisni naziv profila ili aktivnosti.
+    - **Kod**: Definiše kratku oznaku koja se prikazuje u rasporedu i izvještajima.
+
+    **Intervali i smjene** - Definiše vremenski horizont i početke punih i nepunih smjena.
+    - **Početak radnog dana**: Određuje početni sat za prikaz vremena intervala.
+    - **Dužina pune smjene**: Definiše broj intervala u M1 smjeni.
+    - **Dužina nepune smjene**: Definiše broj intervala u M2 smjeni.
+    - **Trajanje jednog intervala**: Definiše trajanje planskog intervala u minutama.
+    - **Trajanje pauze**: Definiše koliko minuta traje pauza.
+    - **Broj intervala u 24h**: Definiše ukupni planski horizont.
+    - **M1_set**: Definiše dostupne početne intervale punih smjena.
+    - **M2_set**: Definiše dostupne početne intervale nepunih smjena.
+    - **M_set**: Prikazuje sve smjene dobijene iz M1_set i M2_set.
+    - **Oj**: Definiše intervale u kojima M1 radnik može koristiti pauzu.
+    - **Minimalna dužina uzastopnih aktivnosti**: Određuje dužinu sekvence koju analizira rezultat.
+
+    **Troškovi** - Definiše relativni trošak dodjele svakog profila punim i nepunim smjenama.
+    - **Koeficijent troška M1**: Definiše trošak jedne pune smjene za profil.
+    - **Koeficijent troška M2**: Definiše trošak jedne nepune smjene za profil.
+    - **Koeficijent troška prebrzog mijenjanja aktivnosti**: Definiše kaznu za promjenu aktivnosti.
+
+    **Mapiranje uloga i aktivnosti** - Definiše koje profile mogu obavljati aktivnosti i koje su aktivnosti primarne.
+    - **Profili za aktivnost**: Bira profile kojima je dozvoljeno obavljanje aktivnosti.
+    - **Primarne aktivnosti po profilu**: Definiše aktivnosti koje su primarne za profil.
+
+    **Tipovi aktivnosti** - Definiše vremenska pravila i zavisnosti između aktivnosti.
+    - **Aktivnosti i vrijednosti "u okviru"**: Zahtijeva da se aktivnost pokrije u zadanom broju intervala.
+    - **Aktivnosti i vrijednosti "do"**: Zahtijeva da se aktivnost pokrije do zadanog intervala.
+    - **Zavisne aktivnosti**: Definiše aktivnosti čija potražnja zavisi od druge aktivnosti.
+    - **Odnos zavisnosti**: Definiše koliko zavisne aktivnosti treba obezbijediti po jedinici izvorne aktivnosti.
+
+    **Potražnja** - Bira primjer i omogućava unos potrebnog broja radnika po aktivnosti i intervalu.
+    - **Profil potražnje**: Bira početni obrazac potražnje.
+    - **Ulazna tabela potražnje**: Definiše potreban broj radnika, gdje su aktivnosti kolone, a vremenski intervali redovi.
+
+    **Parametri ograničenja** - Ograničava broj radnika, broj smjena, odnos smjena i sporedni rad.
+    - **Maks radnika po intervalu**: Ograničava ukupan broj radnika raspoređenih u jednom intervalu.
+    - **Maks M1 smjena**: Ograničava broj punih smjena.
+    - **Maks M2 smjena**: Ograničava broj nepunih smjena.
+    - **Granica M2 odnosa**: Ograničava udio nepunih smjena među svim smjenama.
+    - **Odnos sporednih aktivnosti**: Ograničava udio sporednog rada kod M1 radnika.
+
+    ### Tabele
+
+    **Ulazna tabela - Potražnja po intervalu**: U njoj se prije optimizacije unosi potreban broj radnika za svaku aktivnost i vremenski interval.
+
+    **Izlazna tabela - Tabela rasporeda smjena**: Prikazuje generisani raspored, a svaka kolona predstavlja smjenu, profil i konkretnog radnika.
+
+    **Izlazna tabela - Ukupne aktivnosti po intervalu**: Upoređuje traženi i raspoređeni broj radnika za svaku aktivnost i interval.
+    """,
         
         # Results
         "run_optimization": "Pokreni optimizaciju",
@@ -381,6 +529,8 @@ TRANSLATIONS = {
         "solving_optimization": "Rješava se problem optimizacije...",
     }
 }
+
+TRANSLATIONS["sr"]["instructions_content"] = TRANSLATIONS["en"]["instructions_content"]
 
 def get_text(key, language="sr"):
     """Get translated text for a given key and language."""

@@ -7,6 +7,13 @@ from utils import parse_list, generate_profile_types, generate_activities
 from translations import get_text
 
 
+def display_instructions():
+    """Display the instructions page content."""
+    lang = st.session_state.get("language", "sr")
+    st.header(get_text("instructions", lang))
+    st.markdown(get_text("instructions_content", lang))
+
+
 def collect_general_parameters():
     """Collect general model parameters from sidebar."""
     lang = st.session_state.get("language", "sr")
@@ -666,16 +673,21 @@ def collect_variant_parameters(activities, activity_full_names, N_set):
     )
 
 
-def collect_demand_data(activities, activity_full_names, N_set, display_start_interval):
+def collect_demand_data(activities, activity_full_names, N_set, display_start_interval, show_editor=True):
     """Collect and edit demand data."""
     lang = st.session_state.get("language", "sr")
-    st.subheader(get_text("demand_data", lang))
-    selected_example = st.selectbox(
-        get_text("select_demand_profile", lang),
-        [get_text("demand_example_1", lang), get_text("demand_example_2", lang)],
-        key="demand_example_selector",
-        help=get_text('select_demand_profile_help', lang)
-    )
+    if show_editor:
+        st.subheader(get_text("demand_data", lang))
+    demand_profiles = [get_text("demand_example_1", lang), get_text("demand_example_2", lang)]
+    if show_editor:
+        selected_example = st.selectbox(
+            get_text("select_demand_profile", lang),
+            demand_profiles,
+            key="demand_example_selector",
+            help=get_text('select_demand_profile_help', lang)
+        )
+    else:
+        selected_example = demand_profiles[0]
 
     if selected_example == get_text("demand_example_1", lang):
         default_demand_data = DEMAND_EXAMPLE_1
@@ -711,14 +723,17 @@ def collect_demand_data(activities, activity_full_names, N_set, display_start_in
     ]
     df_demand_editable.index.name = get_text("interval_hour", lang)
 
-    st.subheader(get_text("edit_demand_per_interval", lang))
-    demand_editor_key = f"demand_editor_{len(N_set)}_{'_'.join(activities)}"
-    edited_df_demand = st.data_editor(
-        df_demand_editable,
-        num_rows="fixed",
-        use_container_width=True,
-        key=demand_editor_key,
-    )
+    if show_editor:
+        st.subheader(get_text("edit_demand_per_interval", lang))
+        demand_editor_key = f"demand_editor_{len(N_set)}_{'_'.join(activities)}"
+        edited_df_demand = st.data_editor(
+            df_demand_editable,
+            num_rows="fixed",
+            use_container_width=True,
+            key=demand_editor_key,
+        )
+    else:
+        edited_df_demand = df_demand_editable
 
     # Find activity IDs for Istovar and Kontrola
     istovar_generic_id = None
