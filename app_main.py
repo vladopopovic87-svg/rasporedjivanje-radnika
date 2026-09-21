@@ -1,6 +1,8 @@
 # Main Streamlit application - Worker Scheduling Optimization
 
 import streamlit as st
+import base64
+from pathlib import Path
 from pulp import LpProblem, LpMinimize, PULP_CBC_CMD, LpStatus, LpStatusOptimal, value
 from collections import defaultdict
 
@@ -95,6 +97,27 @@ def main():
     language = st.session_state.language
     with title_col:
         st.title(get_text("app_title", language))
+    logo_path = Path(__file__).parent / "logo.png"
+    logo_data = base64.b64encode(logo_path.read_bytes()).decode("ascii")
+    st.sidebar.markdown(
+        f"""
+        <style>
+        section[data-testid="stSidebar"] h2 {{
+            position: relative;
+        }}
+        section[data-testid="stSidebar"] h2::before {{
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 52px;
+            top: -58px;
+            left: 0;
+            background: url("data:image/png;base64,{logo_data}") center / contain no-repeat;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
     st.sidebar.header(get_text("model_parameters", language))
 
     # Collect all input parameters
