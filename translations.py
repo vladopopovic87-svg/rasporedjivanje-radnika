@@ -154,9 +154,9 @@ TRANSLATIONS = {
         "instructions_content": """
     ### Kako unijeti svoj problem
 
-    Aplikacija traži odgovor na tri pitanja: **ko radi**, **šta treba da se uradi** i **kada rad treba da bude pokriven**. Prije unosa pripremi spisak profila radnika, aktivnosti, trajanje intervala, dozvoljene smjene i potreban broj radnika po aktivnosti i vremenu.
+    Aplikacija traži odgovor na tri osnovna pitanja: **ko radi**, **šta treba da se uradi** i **kada treba**. Prije početka unosa potrebno je pripremiti vrijednosti parametara kojima se definiše problem raspoređivanja radnika, a koji su pobrojani i pojašnjeni u nastavku. Potražnja za radnicima unosi se kroz tabelu, dok se ostali parametri unose kroz za to predviđena polja sa lijeve strane.
 
-    Najlakše je početi od ponuđenog primjera, a zatim ga prilagoditi svom problemu. Unos se vrši redom odozgo prema dolje.
+    Dimenzije tabele potražnje zavise od unesenog **broja aktivnosti** i **broja vremenskih intervala**. Tabela je početno popunjena vrijednostima iz primjera, koje se mogu u potpunosti izmijeniti i prilagoditi konkretnom problemu raspoređivanja. Isto važi i za početno zadate vrijednosti ostalih parametara.
 
     ### 1. Radnici i aktivnosti
 
@@ -200,19 +200,7 @@ TRANSLATIONS = {
     - **Zavisna aktivnost**: Koristi kada se potreban broj radnika računa iz druge aktivnosti, na primjer kontrola je 50% istovara.
     - Nemoj istu aktivnost istovremeno označiti kao "u okviru" i "do".
 
-    ### 6. Potražnja - glavna ulazna tabela
-
-    Izaberi primjer kao početnu vrijednost, pa u tabeli upiši stvarne potrebe.
-
-    - Svaki **red** predstavlja vremenski interval.
-    - Svaka **kolona** predstavlja aktivnost.
-    - U ćeliju upiši koliko je radnika potrebno za tu aktivnost u tom intervalu.
-    - Upiši 0 kada aktivnost nije potrebna.
-    - Unosi nenegativne cijele brojeve; ne upisuj ukupan broj radnika u svaku kolonu, nego potrebu po svakom intervalu.
-
-    Primjer: ako su u intervalu 3 potrebna 2 komisionera i 1 kontrolor, u red za interval 3 upiši `2` u kolonu komisioner i `1` u kolonu kontrolor.
-
-    ### 7. Parametri ograničenja
+    ### 6. Parametri ograničenja
 
     Ovi parametri ograničavaju koliko slobode model ima pri izboru rasporeda.
 
@@ -224,7 +212,7 @@ TRANSLATIONS = {
 
     Postavi ograničenja dovoljno široko za prvi pokušaj. Ako je rješenje nemoguće, prvo povećaj maksimalan broj radnika ili smjena i provjeri da li su profili pravilno povezani sa aktivnostima.
 
-    ### 8. Pokretanje i provjera rezultata
+    ### 7. Pokretanje i provjera rezultata
 
     Klikni **Pokreni optimizaciju**. U tabeli rasporeda svaka kolona predstavlja jednu smjenu, profil i konkretnog radnika. Tabela aktivnosti po intervalu poredi **Zahtevano** i **Raspoređeno**. Ako se vrijednosti razlikuju, provjeri potražnju, dozvoljene profile, trajanje smjena i ograničenja.
 
@@ -412,7 +400,7 @@ TRANSLATIONS = {
         "depends_on": "zavisi",
         
         # Demand Data
-        "demand_data": "Potražnja",
+        "demand_data": "Potražnja - glavna ulazna tabela",
         "select_demand_profile": "Odaberi profil potražnje",
         "demand_example_1": "Primer 1",
         "demand_example_2": "Primer 2",
