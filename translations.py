@@ -7,6 +7,8 @@ TRANSLATIONS = {
         "model_parameters": "Model Parameters",
         "schedule_page": "Schedule",
         "instructions_page": "Instructions",
+        "about_page": "About the application",
+        "about_content": "Content for this page will be added later.",
         
         # General Parameters
         "general_parameters": "General Parameters",
@@ -274,6 +276,8 @@ TRANSLATIONS = {
         "model_parameters": "Parametri modela",
         "schedule_page": "Raspored",
         "instructions_page": "Uputstvo",
+        "about_page": "O aplikaciji",
+        "about_content": "Tekst ove stranice biće dodat naknadno.",
         
         # General Parameters
         "general_parameters": "Radnici i aktivnosti",
@@ -400,7 +404,7 @@ TRANSLATIONS = {
         "depends_on": "zavisi",
         
         # Demand Data
-        "demand_data": "Potražnja - glavna ulazna tabela",
+        "demand_data": "Potražnja",
         "select_demand_profile": "Odaberi profil potražnje",
         "demand_example_1": "Primer 1",
         "demand_example_2": "Primer 2",

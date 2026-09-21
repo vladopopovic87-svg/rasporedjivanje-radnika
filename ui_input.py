@@ -14,6 +14,13 @@ def display_instructions():
     st.markdown(get_text("instructions_content", lang))
 
 
+def display_about():
+    """Display the about page content."""
+    lang = st.session_state.get("language", "sr")
+    st.header(get_text("about_page", lang))
+    st.markdown(get_text("about_content", lang))
+
+
 def collect_general_parameters():
     """Collect general model parameters from sidebar."""
     lang = st.session_state.get("language", "sr")
@@ -676,8 +683,6 @@ def collect_variant_parameters(activities, activity_full_names, N_set):
 def collect_demand_data(activities, activity_full_names, N_set, display_start_interval, show_editor=True):
     """Collect and edit demand data."""
     lang = st.session_state.get("language", "sr")
-    if show_editor:
-        st.subheader(get_text("demand_data", lang))
     demand_profiles = [get_text("demand_example_1", lang), get_text("demand_example_2", lang)]
     if show_editor:
         selected_example = st.selectbox(

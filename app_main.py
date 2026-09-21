@@ -16,7 +16,8 @@ from ui_input import (
     collect_variant_parameters,
     collect_demand_data,
     collect_constraint_parameters,
-    display_instructions
+    display_instructions,
+    display_about,
 )
 from model_builder import (
     add_worker_ableno_constraints,
@@ -59,17 +60,27 @@ def main():
         st.session_state.language = "sr"
     
     language = st.session_state.language
-    title_col, page_col, language_col = st.columns([4.7, 1.5, 0.8], vertical_alignment="top")
+    title_col, page_col, language_col = st.columns([4.2, 3.2, 0.8], vertical_alignment="top")
+    page_options = {
+        "schedule": get_text("schedule_page", language),
+        "instructions": get_text("instructions_page", language),
+        "about": get_text("about_page", language),
+    }
+    if "selected_page" not in st.session_state:
+        st.session_state.selected_page = "schedule"
     with page_col:
-        selected_page = st.segmented_control(
+        selected_page_label = st.segmented_control(
             "page_selector",
-            options=[get_text("schedule_page", language), get_text("instructions_page", language)],
-            default=get_text("schedule_page", language),
+            options=list(page_options.values()),
+            default=page_options[st.session_state.selected_page],
             key="page_selector",
             label_visibility="collapsed",
         )
-    if not selected_page:
-        selected_page = get_text("schedule_page", language)
+    if selected_page_label:
+        st.session_state.selected_page = next(
+            page_id for page_id, page_label in page_options.items()
+            if page_label == selected_page_label
+        )
     with language_col:
         selected_lang = st.segmented_control(
             "Jezik / Language",
@@ -105,10 +116,11 @@ def main():
             activities, activity_full_names, N_set
         )
 
-    is_instructions_page = selected_page in {"Uputstvo", "Instructions"}
+    is_instructions_page = st.session_state.selected_page == "instructions"
+    is_about_page = st.session_state.selected_page == "about"
     demand, istovar_generic_id, kontrola_generic_id = collect_demand_data(
         activities, activity_full_names, N_set, display_start_interval,
-        show_editor=not is_instructions_page
+        show_editor=not (is_instructions_page or is_about_page)
     )
 
     # Collect constraint parameters
@@ -116,6 +128,9 @@ def main():
      m2_ratio_limit, non_primary_activities_ratio) = collect_constraint_parameters()
     if is_instructions_page:
         display_instructions()
+        return
+    if is_about_page:
+        display_about()
         return
 
     if "results" not in st.session_state:
