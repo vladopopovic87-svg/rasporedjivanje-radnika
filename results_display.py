@@ -2,6 +2,7 @@
 
 import streamlit as st
 import pandas as pd
+from io import BytesIO
 from collections import defaultdict
 import random
 import math
@@ -196,6 +197,21 @@ def create_demand_comparison_table(activity_per_interval, N_set, activities,
     return df_activities
 
 
+def create_excel_export(schedule_df, activity_df):
+    """Create an Excel workbook containing the generated schedule tables."""
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
+        schedule_df.to_excel(writer, sheet_name="Raspored smjena")
+        activity_df.to_excel(writer, sheet_name="Aktivnosti po intervalu")
+
+        for worksheet in writer.sheets.values():
+            worksheet.freeze_panes(1, 1)
+            worksheet.set_column(0, 0, 18)
+            worksheet.set_column(1, worksheet.dim_colmax, 16)
+
+    return output.getvalue()
+
+
 def format_shift_time(shift_id, display_start_interval, M1_set, M2_set,
                       full_time_shift_length, half_time_shift_length):
     """Format shift time range from shift identifier and schedule settings."""
@@ -331,7 +347,21 @@ def display_results(results):
         st.info(get_text("no_shift_assignments", lang))
 
     # Shift allocation timetable
-    st.subheader(get_text("shift_allocation_timetable", lang))
+    timetable_col, excel_col, _ = st.columns([1.8, 0.16, 4], vertical_alignment="bottom")
+    with timetable_col:
+        st.subheader(get_text("shift_allocation_timetable", lang))
+    with excel_col:
+        st.markdown("<div style='height: 6px;'></div>", unsafe_allow_html=True)
+        st.download_button(
+            label="",
+            data=create_excel_export(results["df_display"], results["df_activities"]),
+            file_name="raspored_smjena.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            help=get_text("export_schedule_excel", lang),
+            icon=":material/download:",
+            type="tertiary",
+            width="content",
+        )
     st.dataframe(results['df_display'].style.hide(axis="columns"))
 
     # Demand comparison
