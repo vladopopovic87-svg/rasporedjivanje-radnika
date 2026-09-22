@@ -197,24 +197,35 @@ def create_demand_comparison_table(activity_per_interval, N_set, activities,
     return df_activities
 
 
-def create_excel_export(schedule_df, activity_df, shift_summary=None):
+def create_excel_export(schedule_df, activity_df, shift_summary=None, result_summary=None):
     """Create an Excel workbook containing the generated schedule tables."""
     output = BytesIO()
     with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
         schedule_sheet = "Raspored smjena"
+        result_summary = result_summary or []
+        summary_df = pd.DataFrame({"Sažetak rezultata": result_summary})
+        summary_df.to_excel(
+            writer,
+            sheet_name=schedule_sheet,
+            startrow=1,
+            index=False,
+        )
+        worksheet = writer.sheets[schedule_sheet]
+        worksheet.write(0, 0, "Sažetak rezultata")
+
         if shift_summary:
             summary_df = pd.DataFrame({"Sažetak smjena": shift_summary})
+            shift_startrow = len(result_summary) + 4
             summary_df.to_excel(
                 writer,
                 sheet_name=schedule_sheet,
-                startrow=1,
+                startrow=shift_startrow,
                 index=False,
             )
-            schedule_startrow = len(summary_df) + 4
-            worksheet = writer.sheets[schedule_sheet]
-            worksheet.write(0, 0, "Pregled smjena")
+            schedule_startrow = shift_startrow + len(summary_df) + 3
+            worksheet.write(shift_startrow - 1, 0, "Pregled smjena")
         else:
-            schedule_startrow = 0
+            schedule_startrow = len(result_summary) + 4
 
         schedule_df.to_excel(
             writer,
@@ -333,6 +344,19 @@ def display_results(results):
 
     st.markdown(f"**{get_text('total_idle_intervals', lang)}:** {results['broj_nula']}")
 
+    result_summary = [
+        f"{get_text('part_1_cost', lang)}: {results['value_part_1']:.2f} | "
+        f"{get_text('part_2_penalty', lang)}: {results['value_part_2']:.2f} | "
+        f"{get_text('part_2_weighted', lang)}: {(results['P'] * results['value_part_2']):.2f}",
+        f"{get_text('total_active_shifts', lang)}: {total_shifts} | "
+        f"{get_text('full_time', lang)}: {full_time_shifts} | "
+        f"{get_text('part_time', lang)}: {part_time_shifts}",
+        f"{get_text('total_workers', lang)}: {total_workers} | "
+        f"{get_text('with_full_time', lang)}: {full_time_workers} | "
+        f"{get_text('with_part_time', lang)}: {part_time_workers}",
+        f"{get_text('total_idle_intervals', lang)}: {results['broj_nula']}",
+    ]
+
     # Employee count per shift
     st.subheader(get_text("employees_per_shift", lang))
     if results['ytj_data']:
@@ -377,6 +401,7 @@ def display_results(results):
                 results["df_display"],
                 results["df_activities"],
                 shift_lines if results["ytj_data"] else [],
+                result_summary,
             ),
             file_name="raspored_smjena.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
