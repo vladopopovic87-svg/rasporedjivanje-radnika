@@ -410,7 +410,11 @@ def display_results(results):
             type="tertiary",
             width="content",
         )
-    st.dataframe(results['df_display'].style.hide(axis="columns"))
+    st.dataframe(
+        results["df_display"],
+        hide_index=False,
+        use_container_width=True,
+    )
 
     # Demand comparison
     st.subheader(get_text("total_activities_per_interval", lang))
