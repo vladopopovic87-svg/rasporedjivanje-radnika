@@ -197,11 +197,30 @@ def create_demand_comparison_table(activity_per_interval, N_set, activities,
     return df_activities
 
 
-def create_excel_export(schedule_df, activity_df):
+def create_excel_export(schedule_df, activity_df, shift_summary=None):
     """Create an Excel workbook containing the generated schedule tables."""
     output = BytesIO()
     with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
-        schedule_df.to_excel(writer, sheet_name="Raspored smjena")
+        schedule_sheet = "Raspored smjena"
+        if shift_summary:
+            summary_df = pd.DataFrame({"Sažetak smjena": shift_summary})
+            summary_df.to_excel(
+                writer,
+                sheet_name=schedule_sheet,
+                startrow=1,
+                index=False,
+            )
+            schedule_startrow = len(summary_df) + 4
+            worksheet = writer.sheets[schedule_sheet]
+            worksheet.write(0, 0, "Pregled smjena")
+        else:
+            schedule_startrow = 0
+
+        schedule_df.to_excel(
+            writer,
+            sheet_name=schedule_sheet,
+            startrow=schedule_startrow,
+        )
         activity_df.to_excel(writer, sheet_name="Aktivnosti po intervalu")
 
         for worksheet in writer.sheets.values():
@@ -354,7 +373,11 @@ def display_results(results):
         st.markdown("<div style='height: 6px;'></div>", unsafe_allow_html=True)
         st.download_button(
             label="",
-            data=create_excel_export(results["df_display"], results["df_activities"]),
+            data=create_excel_export(
+                results["df_display"],
+                results["df_activities"],
+                shift_lines if results["ytj_data"] else [],
+            ),
             file_name="raspored_smjena.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
             help=get_text("export_schedule_excel", lang),
