@@ -366,7 +366,7 @@ def display_results(results):
         st.info(get_text("no_shift_assignments", lang))
 
     # Shift allocation timetable
-    timetable_col, excel_col, _ = st.columns([2.2, 0.16, 3.8], vertical_alignment="bottom")
+    timetable_col, excel_col, _ = st.columns([3.2, 0.16, 3.8], vertical_alignment="bottom")
     with timetable_col:
         st.subheader(get_text("shift_allocation_timetable", lang))
     with excel_col:
