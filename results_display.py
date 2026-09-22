@@ -119,7 +119,7 @@ def create_shift_allocation_table(smjena_output, M_set, M1_set, M2_set, profil_t
                 broj_usmjeni = 0
 
             for k in range(1, broj_usmjeni + 1):
-                display_shift = j if j in M1_set else j - DEFAULT_M2_SHIFT_START + 1
+                display_shift = j
                 col_name = f"Smjena_{display_shift}_{sp[t]}_{k}"
 
                 if j in M1_set:
