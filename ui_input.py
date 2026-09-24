@@ -21,6 +21,23 @@ def display_about():
     st.markdown(get_text("about_content", lang))
 
 
+def cleanup_removed_mapping_state(session_state, profile_id=None, profile_name=None,
+                                  activity_id=None, activity_name=None):
+    """Remove deleted profiles or activities from role-activity widget state."""
+    if profile_id is not None:
+        for key, value in session_state.items():
+            if key.startswith("allowed_") and isinstance(value, list):
+                session_state[key] = [name for name in value if name != profile_name]
+        session_state.pop(f"primary_able_{profile_id}", None)
+        session_state.pop(f"able_preview_{profile_id}", None)
+
+    if activity_id is not None:
+        session_state.pop(f"allowed_{activity_id}", None)
+        for key, value in session_state.items():
+            if key.startswith("primary_able_") and isinstance(value, list):
+                session_state[key] = [name for name in value if name != activity_name]
+
+
 def collect_general_parameters():
     """Collect general model parameters from sidebar."""
     lang = st.session_state.get("language", "sr")
@@ -90,6 +107,7 @@ def collect_general_parameters():
         sp = {}
         for generic_profile_id in profil_types:
             profile_number = generic_profile_id.removeprefix("profil")
+            default_full = DEFAULT_FULL_PROFILE_NAMES.get(generic_profile_id, generic_profile_id.capitalize())
             if st.button(
                 f"Profil {profile_number} ×",
                 key=f"remove_profile_{generic_profile_id}",
@@ -98,9 +116,15 @@ def collect_general_parameters():
                 use_container_width=False,
             ):
                 removed_profiles.add(generic_profile_id)
+                cleanup_removed_mapping_state(
+                    st.session_state,
+                    profile_id=generic_profile_id,
+                    profile_name=st.session_state.get(
+                        f"full_name_profile_{generic_profile_id}", default_full
+                    ),
+                )
                 st.rerun()
 
-            default_full = DEFAULT_FULL_PROFILE_NAMES.get(generic_profile_id, generic_profile_id.capitalize())
             default_short = DEFAULT_SHORT_PROFILES.get(generic_profile_id, generic_profile_id[0:2])
             name_col, code_col = st.columns([2, 1], vertical_alignment="top")
             with name_col:
@@ -124,6 +148,7 @@ def collect_general_parameters():
         activity_full_names = {}
         for generic_activity_id in activities:
             activity_number = generic_activity_id.removeprefix("activity")
+            default_full = DEFAULT_FULL_ACTIVITY_NAMES.get(generic_activity_id, generic_activity_id.capitalize())
             if st.button(
                 f"Aktivnost {activity_number} ×",
                 key=f"remove_activity_{generic_activity_id}",
@@ -132,9 +157,15 @@ def collect_general_parameters():
                 use_container_width=False,
             ):
                 removed_activities.add(generic_activity_id)
+                cleanup_removed_mapping_state(
+                    st.session_state,
+                    activity_id=generic_activity_id,
+                    activity_name=st.session_state.get(
+                        f"full_name_activity_{generic_activity_id}", default_full
+                    ),
+                )
                 st.rerun()
 
-            default_full = DEFAULT_FULL_ACTIVITY_NAMES.get(generic_activity_id, generic_activity_id.capitalize())
             default_short = DEFAULT_SHORT_ACTIVITIES.get(generic_activity_id, generic_activity_id[0:2])
             name_col, code_col = st.columns([2, 1], vertical_alignment="top")
             with name_col:

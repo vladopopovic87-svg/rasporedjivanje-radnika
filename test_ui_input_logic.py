@@ -1,4 +1,4 @@
-from ui_input import compute_able_from_allowed
+from ui_input import cleanup_removed_mapping_state, compute_able_from_allowed
 
 
 def test_compute_able_from_allowed():
@@ -13,4 +13,47 @@ def test_compute_able_from_allowed():
     assert compute_able_from_allowed(allowed, profil_types, activities) == {
         "profil1": ["activity1"],
         "profil2": ["activity1", "activity2"],
+    }
+
+
+def test_cleanup_removed_profile_from_mapping_state():
+    session_state = {
+        "allowed_activity1": ["Komisioner", "Kontrolor"],
+        "allowed_activity2": ["Kontrolor"],
+        "primary_able_profil1": ["Komisioniranje1"],
+        "primary_able_profil2": ["Kontrola"],
+        "able_preview_profil1": ["Komisioniranje1"],
+    }
+
+    cleanup_removed_mapping_state(
+        session_state,
+        profile_id="profil1",
+        profile_name="Komisioner",
+    )
+
+    assert session_state == {
+        "allowed_activity1": ["Kontrolor"],
+        "allowed_activity2": ["Kontrolor"],
+        "primary_able_profil2": ["Kontrola"],
+    }
+
+
+def test_cleanup_removed_activity_from_mapping_state():
+    session_state = {
+        "allowed_activity1": ["profil1", "profil2"],
+        "allowed_activity2": ["profil2"],
+        "primary_able_profil1": ["Komisioniranje1", "Komisioniranje2"],
+        "primary_able_profil2": ["Komisioniranje2"],
+    }
+
+    cleanup_removed_mapping_state(
+        session_state,
+        activity_id="activity1",
+        activity_name="Komisioniranje1",
+    )
+
+    assert session_state == {
+        "allowed_activity2": ["profil2"],
+        "primary_able_profil1": ["Komisioniranje2"],
+        "primary_able_profil2": ["Komisioniranje2"],
     }
