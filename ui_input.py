@@ -38,6 +38,18 @@ def cleanup_removed_mapping_state(session_state, profile_id=None, profile_name=N
                 session_state[key] = [name for name in value if name != activity_name]
 
 
+def get_default_profile_short_code(profile_id):
+    return DEFAULT_SHORT_PROFILES.get(
+        profile_id, f"p{profile_id.removeprefix('profil')}"
+    )
+
+
+def get_default_activity_short_code(activity_id):
+    return DEFAULT_SHORT_ACTIVITIES.get(
+        activity_id, f"a{activity_id.removeprefix('activity')}"
+    )
+
+
 def collect_general_parameters():
     """Collect general model parameters from sidebar."""
     lang = st.session_state.get("language", "sr")
@@ -125,7 +137,7 @@ def collect_general_parameters():
                 )
                 st.rerun()
 
-            default_short = DEFAULT_SHORT_PROFILES.get(generic_profile_id, generic_profile_id[0:2])
+            default_short = get_default_profile_short_code(generic_profile_id)
             name_col, code_col = st.columns([2, 1], vertical_alignment="top")
             with name_col:
                 profile_full_names[generic_profile_id] = st.text_input(
@@ -166,7 +178,7 @@ def collect_general_parameters():
                 )
                 st.rerun()
 
-            default_short = DEFAULT_SHORT_ACTIVITIES.get(generic_activity_id, generic_activity_id[0:2])
+            default_short = get_default_activity_short_code(generic_activity_id)
             name_col, code_col = st.columns([2, 1], vertical_alignment="top")
             with name_col:
                 activity_full_names[generic_activity_id] = st.text_input(

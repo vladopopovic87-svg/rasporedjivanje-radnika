@@ -1,4 +1,9 @@
-from ui_input import cleanup_removed_mapping_state, compute_able_from_allowed
+from ui_input import (
+    cleanup_removed_mapping_state,
+    compute_able_from_allowed,
+    get_default_activity_short_code,
+    get_default_profile_short_code,
+)
 
 
 def test_compute_able_from_allowed():
@@ -57,3 +62,10 @@ def test_cleanup_removed_activity_from_mapping_state():
         "primary_able_profil1": ["Komisioniranje2"],
         "primary_able_profil2": ["Komisioniranje2"],
     }
+
+
+def test_new_profile_and_activity_short_codes():
+    assert get_default_profile_short_code("profil8") == "p8"
+    assert get_default_activity_short_code("activity7") == "a7"
+    assert get_default_profile_short_code("profil1") == "ks"
+    assert get_default_activity_short_code("activity1") == "k1"
