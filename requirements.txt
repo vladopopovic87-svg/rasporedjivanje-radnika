@@ -1,4 +1,4 @@
 streamlit
-pulp
+pulp==3.3.0
 pandas
 xlsxwriter
