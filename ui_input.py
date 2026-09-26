@@ -338,7 +338,7 @@ def collect_cost_coefficients(profil_types, profile_full_names):
         for p_type in profil_types:
             default_rate = DEFAULT_CT_RATES.get((p_type, 'm1'), 1.0)
             ct_m1_inputs[p_type] = st.number_input(
-                f"{profile_full_names.get(p_type, p_type)} (M1)",
+                f"{profile_full_names.get(p_type, p_type)} ({get_text('full_time_label', lang)})",
                 value=default_rate,
                 key=f"ct_m1_{p_type}",
                 help=f"{get_text('m1_cost_help', lang)} {profile_full_names.get(p_type, p_type)} {get_text('working_full_time', lang)}"
@@ -349,7 +349,7 @@ def collect_cost_coefficients(profil_types, profile_full_names):
         for p_type in profil_types:
             default_rate = DEFAULT_CT_RATES.get((p_type, 'm2'), 0.5)
             ct_m2_inputs[p_type] = st.number_input(
-                f"{profile_full_names.get(p_type, p_type)} (M2)",
+                f"{profile_full_names.get(p_type, p_type)} ({get_text('part_time_label', lang)})",
                 value=default_rate,
                 key=f"ct_m2_{p_type}",
                 help=f"{get_text('m2_cost_help', lang)} {profile_full_names.get(p_type, p_type)} {get_text('working_part_time', lang)}"
