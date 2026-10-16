@@ -343,7 +343,7 @@ def display_results(results):
 
     st.markdown(
         f"**{get_text('total_idle_intervals', lang)}:** {results['broj_nula']}  |  "
-        f"**{get_text('part_2_penalty', lang)}:** {results['value_part_2']:.0f}"
+        f"**{get_text('part_2_penalty', lang)}:** {results['activity_transition_count']:.0f}"
     )
 
     result_summary = [
@@ -356,7 +356,7 @@ def display_results(results):
         f"{get_text('with_full_time', lang)}: {full_time_workers} | "
         f"{get_text('with_part_time', lang)}: {part_time_workers}",
         f"{get_text('total_idle_intervals', lang)}: {results['broj_nula']} | "
-        f"{get_text('part_2_penalty', lang)}: {results['value_part_2']:.0f}",
+        f"{get_text('part_2_penalty', lang)}: {results['activity_transition_count']:.0f}",
     ]
 
     # Employee count per shift

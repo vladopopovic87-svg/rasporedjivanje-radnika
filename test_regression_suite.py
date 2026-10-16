@@ -21,6 +21,7 @@ from model_builder import (
     build_delta_variables,
     build_model_variables,
     setup_objective_function,
+    count_activity_transitions,
 )
 from ui_input import compute_able_from_allowed
 
@@ -172,3 +173,25 @@ def test_regression_case_matches_baseline(case_name):
     expected_status, expected_objective = EXPECTED_RESULTS[case_name]
     assert status == expected_status
     assert objective == pytest.approx(expected_objective, abs=1e-6)
+
+
+def test_activity_transition_count_is_available_without_penalty():
+    profiles = ["profile"]
+    shifts = [1]
+    intervals = [1, 2, 3]
+    activities = ["loading", "inspection"]
+    _, _, _, ytija, _ = build_model_variables(
+        profiles, shifts, shifts, [], intervals, activities
+    )
+    assignments = {
+        "loading": [2, 1, 0],
+        "inspection": [0, 1, 2],
+    }
+
+    for activity, counts in assignments.items():
+        for interval, count in zip(intervals, counts):
+            ytija[(profiles[0], interval, shifts[0], activity)].varValue = count
+
+    assert count_activity_transitions(
+        ytija, profiles, shifts, intervals, activities
+    ) == 2

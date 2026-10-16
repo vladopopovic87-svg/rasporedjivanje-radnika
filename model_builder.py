@@ -136,6 +136,22 @@ def add_delta_constraints(model, P, profil_types, M_set, N_set, activities, ytij
                                 #model += delta[t, j, a, i] >= 0
 
 
+def count_activity_transitions(ytija, profil_types, M_set, N_set, activities):
+    """Count activity transitions using the same assignment differences as the penalty."""
+    return sum(
+        max(
+            0,
+            (ytija[t, i, j, a].varValue or 0)
+            - (ytija[t, i + 1, j, a].varValue or 0),
+        )
+        for t in profil_types
+        for j in M_set
+        for a in activities
+        for i in N_set
+        if i < max(N_set)
+    )
+
+
 # Ograničenje za ukupan broj radnika i potražnje
 def add_demand_constraints(model, activities, N_set, M_set, ytija, demand, profil_types):
     """Add constraint for total demand satisfaction."""

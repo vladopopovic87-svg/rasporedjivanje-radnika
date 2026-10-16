@@ -40,7 +40,8 @@ from model_builder import (
     add_non_primary_activities_constraint,
     add_m1_m2_ratio_per_interval_constraint,
     build_bij_matrix,
-    build_ct_matrix
+    build_ct_matrix,
+    count_activity_transitions,
 )
 from results_display import (
     generate_schedule_output,
@@ -345,6 +346,9 @@ def main():
             # Cost breakdown
             value_part_1 = value(obj_part_1)
             value_part_2 = 0 if P == 0 else value(obj_part_2)
+            activity_transition_count = count_activity_transitions(
+                ytija, profil_types, M_set, N_set, activities
+            )
 
             # Employee count per shift
             ytj_data = []
@@ -362,6 +366,7 @@ def main():
                 "objective": value(model.objective),
                 "value_part_1": value_part_1,
                 "value_part_2": value_part_2,
+                "activity_transition_count": activity_transition_count,
                 "P": P,
                 "ytj_data": ytj_data,
                 "df_display": df_display,
@@ -401,4 +406,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
