@@ -180,28 +180,31 @@ TRANSLATIONS = {
     - **Dužina pune smjene**: Unesi broj intervala koje radi radnik sa punim radnim vremenom, na primjer 8.
     - **Dužina nepune smjene**: Unesi broj intervala koje radi radnik sa nepunim radnim vremenom, na primjer 4.
     - **Trajanje pauze**: Unesi trajanje pauze u minutama.
-    - **Skup smjena sa punim radnim vremenom i skup smjena sa nepunim radnim vremenom**: Odredi u kojim intervalima smjene mogu početi; koristi brojeve odvojene zarezima, na primjer `1, 2, 3`.
-    - **Oj**: Za svaku smjenu sa punim radnim vremenom upiši intervale u kojima je dozvoljena pauza.
-    - **Minimalna dužina uzastopnih aktivnosti**: Koristi se samo za dodatnu analizu sekvenci, a ne za osnovno kreiranje rasporeda.
+    - **Skup smjena sa punim radnim vremenom**: Automatski se popunjava prema dužini pune smjene i broju raspoloživih intervala. Na primjer, ako je dostupno 9 intervala, a smjena traje 8 intervala, postoje dvije smjene. Ako interval traje sat vremena i radni dan počinje u 8, prva počinje u 8, a druga u 9. Smjene se mogu brisati, ali su sve iste dužine.
+    - **Skup smjena sa nepunim radnim vremenom**: Automatski se popunjava prema dužini nepune smjene i broju raspoloživih intervala. Smjene počinju od oznake 51 nadalje; broj 5 na početku razlikuje ih od smjena sa punim radnim vremenom. Sve su iste dužine.
+    - **Intervali dostupni za odmor**: Za svaku smjenu sa punim radnim vremenom upiši redne brojeve intervala u kojima je dozvoljena pauza.
+    - **Minimalna dužina uzastopnih aktivnosti**: Određuje minimalnu dužinu sekvenci koje se prikazuju u dodatnoj analizi rezultata. Ovaj parametar ne utiče na raspored. Na raspored utiče koeficijent troška promjene aktivnosti ako je veći od 0.
 
     ### 3. Troškovi
 
-    Za svaki profil odredi cijenu pune i nepune smjene. Veća vrijednost znači da će optimizacija više izbjegavati tu opciju.
+    Unose se relativni koeficijenti troška, a ne moraju se unositi stvarni iznosi plata. Koeficijenti se mogu normalizovati prema izabranoj referentnoj vrijednosti. Na primjer, ako su dnevne plate 100, 200 i 300 novčanih jedinica, a 200 se uzme kao referenca, koeficijenti su 0,5, 1 i 1,5. Veći koeficijent znači da će optimizacija više izbjegavati tu opciju.
 
-    - **Koeficijent troška pune smjene**: Cijena smjene sa punim radnim vremenom za profil.
-    - **Koeficijent troška nepune smjene**: Cijena smjene sa nepunim radnim vremenom za profil.
-    - **Koeficijent troška prebrzog mijenjanja aktivnosti**: Kazna za često mijenjanje aktivnosti; postavi 0 ako to nije važno.
+    - **Koeficijent troška pune smjene**: Relativni trošak smjene sa punim radnim vremenom za profil.
+    - **Koeficijent troška nepune smjene**: Relativni trošak smjene sa nepunim radnim vremenom za profil.
+    - **Koeficijent troška prebrzog mijenjanja aktivnosti**: Ako je veći od 0, model dodaje kaznu za promjene aktivnosti i time utiče na raspored. Postavi 0 ako ne želiš da se te promjene kažnjavaju.
 
     ### 4. Mapiranje profila i aktivnosti
 
-    Za svaku aktivnost izaberi profile koji je stvarno mogu obavljati. Zatim za svaki profil označi primarne aktivnosti koje taj profil prvenstveno treba da radi. Ne dozvoli aktivnosti koje radnik ne zna ili ne smije obavljati, jer će model tada pokušati koristiti samo dozvoljene profile.
+    Za svaku aktivnost izaberi profile koji je mogu obavljati. Zatim za svaki profil označi primarne aktivnosti koje taj profil prvenstveno treba da radi. Ne dozvoli aktivnosti koje radnik ne zna ili ne smije obavljati.
 
     ### 5. Tipovi aktivnosti i zavisnosti
 
-    Ovaj dio koristi samo kada aktivnost ima vremensko pravilo.
+    Nezavisne aktivnosti su aktivnosti čija potražnja za radnicima ne zavisi od neke druge aktivnosti. Njihovu potražnju unesi u početnu tabelu potražnje za svaki interval. Zavisne aktivnosti su aktivnosti čija se potrebna potražnja za radnicima računa na osnovu broja radnika raspoređenih na aktivnost od koje zavise i zadatog odnosa. Na primjer, ako je za utovar raspoređeno 4 radnika, a kontrola zavisi od utovara uz odnos od 50%, potrebno je najmanje 2 radnika za kontrolu.
 
-    - **U okviru**: Koristi kada aktivnost mora biti pokrivena unutar određenog broja intervala.
-    - **Do**: Koristi kada aktivnost mora biti pokrivena najkasnije do određenog intervala.
+    Ovaj dio koristi se za dodavanje vremenskih pravila nezavisnim ili zavisnim aktivnostima.
+
+    - **U okviru**: Koristi kada aktivnost tj. zahtjev za radnicima iz nekog intervala mora biti zadovoljen unutar određenog broja intervala.
+    - **Do**: Koristi kada aktivnost tj. zahtjev za radnicima iz nekog intervala mora biti zadovoljen najkasnije do određenog intervala.
     - **Zavisna aktivnost**: Koristi kada se potreban broj radnika računa iz druge aktivnosti, na primjer kontrola je 50% istovara.
     - Nemoj istu aktivnost istovremeno označiti kao "u okviru" i "do".
 
@@ -209,7 +212,7 @@ TRANSLATIONS = {
 
     Ovi parametri ograničavaju koliko slobode model ima pri izboru rasporeda.
 
-    - **Maks radnika po intervalu**: Najveći ukupan broj radnika koji smije istovremeno raditi.
+    - **Maksimalni broj radnika po intervalu**: Najveći ukupan broj radnika koji smije istovremeno raditi (u jednom intervalu).
     - **Maksimalan broj smjena sa punim radnim vremenom**: Najveći broj punih smjena koje model smije otvoriti.
     - **Maksimalan broj smjena sa nepunim radnim vremenom**: Najveći broj nepunih smjena koje model smije otvoriti.
     - **Granica odnosa smjena sa nepunim radnim vremenom**: Najveći dozvoljeni udio nepunih smjena među svim smjenama; 0.30 znači najviše 30%.
@@ -237,7 +240,7 @@ TRANSLATIONS = {
         "optimal_objective_value": "Optimal Objective Value",
         "solver_status_optimal": "Solver Status: Optimal",
         "part_1_cost": "Part 1 (worker cost)",
-        "part_2_penalty": "Part 2 (transition penalty)",
+        "part_2_penalty": "Number of switches from one activity to another",
         "part_2_weighted": "Part 2 weighted (P * part 2)",
         "total_active_shifts": "Total active shifts",
         "full_time": "Full-time",
@@ -300,15 +303,15 @@ TRANSLATIONS = {
         "m2_shift_start": "Početak M2 smjene (broj intervala):",
         "m1_set_label": "Skup smijena sa punim radnim vremenom",
         "m2_set_label": "Skup smijena sa nepunim radnim vremenom",
-        "m1_set_help": "Skup se automatski popunjava prema dužini pune smjene i broju raspoložih intervala. Npr. Ako je 9 raspoloživih intervala, dužina pune smjene 8 intervala, postoje dvije smjene. Prva počinje od 8, druga od 9 itd. Svaka se može obrisati.",
-        "m2_set_help": "Skup se automatski popunjava prema dužini nepune smjene i broju raspoloživih intervala. Počinju od 51, pa nadalje.",
+        "m1_set_help": "Skup se automatski popunjava prema dužini pune smjene i broju raspoloživih intervala. Na primjer, ako je dostupno 9 intervala, a puna smjena traje 8 intervala, postoje dvije smjene. Ako interval traje sat vremena i radni dan počinje u 8, prva počinje u 8, a druga u 9. Svaka se može obrisati, a sve su iste dužine.",
+        "m2_set_help": "Skup se automatski popunjava prema dužini nepune smjene i broju raspoloživih intervala. Smjene počinju od oznake 51 nadalje; broj 5 na početku služi da se razlikuju od smjena sa punim radnim vremenom. Sve su iste dužine.",
         "m_set_label": "Skup svih smijena ",
         "m_set_help": "Sadrži sve pune i nepune smjene, zbog pregleda",
-        "oj_intervals_label": "Intervali dostupni za odmor tokom smjene. ",
+        "oj_intervals_label": "Intervali dostupni za odmor",
         "intervals_for_shift": "Intervali za smjenu",
-        "oj_help_prefix": "Vremenski intervali dostupni za odmor tokom smjene",
+        "oj_help_prefix": "Intervali dostupni za odmor u smjeni",
         "min_len_label": "Minimalna dužina uzastopnih aktivnosti (cijeli broj):",
-        "min_len_help": "Broj uzastopnih intervala rada na istoj aktivnosti nakon kojeg se može preći na drugu aktivnost bez penala.",
+        "min_len_help": "Minimalna dužina sekvence aktivnosti koja se prikazuje u dodatnoj analizi rezultata. Ovaj parametar ne utiče na raspored; na raspored utiče koeficijent troška promjene aktivnosti ako je veći od 0.",
         "p_help_transition_penalty": "Množi se sa brojem prelazaka. Dobijena vrijednost se dodaje funkciji cilja.",
         "num_profiles_help": "Broj različitih profila radnika (npr. komisioner, kontrolor, viljuškarista).",
         "num_activities_help": "Broj različitih tipova aktivnosti koje radnici mogu obavljati.",
@@ -323,7 +326,7 @@ TRANSLATIONS = {
         "rest_duration_help": "Trajanje odmora u minutama (npr. 30 za 30 minuta, 60 za 1 sat).",
         "num_intervals_label": "Broj intervala u 24h:",
         "num_intervals_help": "Koliko intervala se radi u 24h, tj. koliko traje radno vrijeme u intervalima",
-        "oj_intervals_help": "Vremenski intervali dostupni za odmor tokom smjene. Radnici mogu koristiti pauzu u ovim intervalima tokom smjene. Važi samo za smjene sa punim radnim vremenom.",
+        "oj_intervals_help": "Za svaku smjenu sa punim radnim vremenom unesi redne brojeve intervala u kojima je dozvoljena pauza. Važi samo za smjene sa punim radnim vremenom.",
         "ind_within_help": "Aktivnosti čiji zahtjevi za radnicima se moraju ispuniti u okviru zadatog broja intervala.",
         "ind_until_help": "Aktivnosti čiji zahtjevi za radnicima se moraju ispuniti do zadatog intervala dana.",
         "dependent_within_help": "Aktivnosti čiji zahtjevi za radnicima zavise od realizacije drugih aktivnosti, a potrebno je realizovati ih u okviru datog broja intervala.",
@@ -436,22 +439,22 @@ TRANSLATIONS = {
     - **Trajanje jednog intervala**: Definiše trajanje planskog intervala u minutama.
     - **Trajanje pauze**: Definiše koliko minuta traje pauza.
     - **Broj intervala u 24h**: Definiše ukupni planski horizont.
-    - **M1_set**: Definiše dostupne početne intervale punih smjena.
-    - **M2_set**: Definiše dostupne početne intervale nepunih smjena.
+    - **Skup smjena sa punim radnim vremenom**: Automatski se popunjava prema dužini pune smjene i broju raspoloživih intervala. Smjene se mogu brisati, a sve su iste dužine.
+    - **Skup smjena sa nepunim radnim vremenom**: Automatski se popunjava prema dužini nepune smjene i broju raspoloživih intervala. Počinje od oznake 51, čiji početni broj 5 razlikuje nepune smjene od punih; sve su iste dužine.
     - **M_set**: Prikazuje sve smjene dobijene iz M1_set i M2_set.
-    - **Oj**: Definiše intervale u kojima M1 radnik može koristiti pauzu.
-    - **Minimalna dužina uzastopnih aktivnosti**: Određuje dužinu sekvence koju analizira rezultat.
+    - **Intervali dostupni za odmor**: Za svaku smjenu sa punim radnim vremenom navodi redne brojeve intervala u kojima je dozvoljena pauza.
+    - **Minimalna dužina uzastopnih aktivnosti**: Određuje minimalnu dužinu sekvenci u dodatnoj analizi rezultata; ne utiče na raspored.
 
     **Troškovi** - Definiše relativni trošak dodjele svakog profila punim i nepunim smjenama.
-    - **Koeficijent troška M1**: Definiše trošak jedne pune smjene za profil.
-    - **Koeficijent troška M2**: Definiše trošak jedne nepune smjene za profil.
-    - **Koeficijent troška prebrzog mijenjanja aktivnosti**: Definiše kaznu za promjenu aktivnosti.
+    - **Koeficijent troška M1**: Definiše relativni trošak pune smjene za profil.
+    - **Koeficijent troška M2**: Definiše relativni trošak nepune smjene za profil.
+    - **Koeficijent troška prebrzog mijenjanja aktivnosti**: Ako je veći od 0, model kažnjava promjene aktivnosti, pa koeficijent utiče na raspored.
 
     **Mapiranje uloga i aktivnosti** - Definiše koje profile mogu obavljati aktivnosti i koje su aktivnosti primarne.
     - **Profili za aktivnost**: Bira profile kojima je dozvoljeno obavljanje aktivnosti.
     - **Primarne aktivnosti po profilu**: Definiše aktivnosti koje su primarne za profil.
 
-    **Tipovi aktivnosti** - Definiše vremenska pravila i zavisnosti između aktivnosti.
+    **Tipovi aktivnosti** - Nezavisne aktivnosti imaju potražnju unesenu u početnu tabelu. Potražnja za zavisne aktivnosti računa se prema broju raspoređenih radnika na povezanoj aktivnosti i zadatom odnosu (npr. 50% kontrole u odnosu na 4 radnika za utovar znači najmanje 2 radnika za kontrolu). Ovdje se definišu i vremenska pravila aktivnosti.
     - **Aktivnosti i vrijednosti "u okviru"**: Zahtijeva da se aktivnost pokrije u zadanom broju intervala.
     - **Aktivnosti i vrijednosti "do"**: Zahtijeva da se aktivnost pokrije do zadanog intervala.
     - **Zavisne aktivnosti**: Definiše aktivnosti čija potražnja zavisi od druge aktivnosti.
@@ -491,8 +494,8 @@ TRANSLATIONS = {
         "optimal_objective_value": "Optimalna vrijednost funkcije",
         "solver_status_optimal": "Status rješavača: Optimalno",
         "part_1_cost": "Dio 1 (trošak radnika)",
-        "part_2_penalty": "Dio 2 (kazna prelazaka)",
-        "part_2_weighted": "Dio 2 ponderisan (P * dio 2)",
+        "part_2_penalty": "Broj prelazaka sa aktivnosti na aktivnost",
+        "part_2_weighted": "Dio 2 (trošak prelazaka)",
         "total_active_shifts": "Ukupan broj aktivnih smijena",
         "full_time": "Puno radno vrijeme",
         "part_time": "Nepuno radno vrijeme",

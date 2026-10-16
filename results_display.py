@@ -309,7 +309,6 @@ def display_results(results):
 
     st.markdown(
         f"**{get_text('part_1_cost', lang)}:** {results['value_part_1']:.2f}  |  "
-        f"**{get_text('part_2_penalty', lang)}:** {results['value_part_2']:.2f}  |  "
         f"**{get_text('part_2_weighted', lang)}:** {(results['P'] * results['value_part_2']):.2f}"
     )
 
@@ -342,11 +341,13 @@ def display_results(results):
         f"**{get_text('with_part_time', lang)}:** {part_time_workers}"
     )
 
-    st.markdown(f"**{get_text('total_idle_intervals', lang)}:** {results['broj_nula']}")
+    st.markdown(
+        f"**{get_text('total_idle_intervals', lang)}:** {results['broj_nula']}  |  "
+        f"**{get_text('part_2_penalty', lang)}:** {results['value_part_2']:.0f}"
+    )
 
     result_summary = [
         f"{get_text('part_1_cost', lang)}: {results['value_part_1']:.2f} | "
-        f"{get_text('part_2_penalty', lang)}: {results['value_part_2']:.2f} | "
         f"{get_text('part_2_weighted', lang)}: {(results['P'] * results['value_part_2']):.2f}",
         f"{get_text('total_active_shifts', lang)}: {total_shifts} | "
         f"{get_text('full_time', lang)}: {full_time_shifts} | "
@@ -354,7 +355,8 @@ def display_results(results):
         f"{get_text('total_workers', lang)}: {total_workers} | "
         f"{get_text('with_full_time', lang)}: {full_time_workers} | "
         f"{get_text('with_part_time', lang)}: {part_time_workers}",
-        f"{get_text('total_idle_intervals', lang)}: {results['broj_nula']}",
+        f"{get_text('total_idle_intervals', lang)}: {results['broj_nula']} | "
+        f"{get_text('part_2_penalty', lang)}: {results['value_part_2']:.0f}",
     ]
 
     # Employee count per shift
