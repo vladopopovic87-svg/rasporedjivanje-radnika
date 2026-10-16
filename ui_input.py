@@ -449,7 +449,7 @@ def collect_role_activity_mappings(profil_types, activities, profile_full_names,
                 options=[activity_full_names.get(a, a) for a in able.get(generic_profile_id, [])],
                 default=default_selection_full_names,
                 key=f"primary_able_{generic_profile_id}",
-                help=f"{get_text('select_which_activities', lang)} {profile_full_names.get(generic_profile_id, generic_profile_id)} {get_text('can_perform_primary', lang)}."
+                help=f"{get_text('select_primary_activities_for', lang)} {profile_full_names.get(generic_profile_id, generic_profile_id)}."
             )
             primary_able[generic_profile_id] = [
                 aid for full_name in selected_full_names

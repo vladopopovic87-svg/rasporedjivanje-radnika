@@ -108,6 +108,7 @@ TRANSLATIONS = {
         "primary_activities_for": "Primary activities for",
         "select_which_workers": "Select worker profiles that can perform the",
         "select_which_activities": "Select which activities",
+        "select_primary_activities_for": "Select primary activities for",
         "workers_are_able": "workers are able to perform",
         "can_perform_primary": "can perform as primary work",
         
@@ -306,8 +307,8 @@ TRANSLATIONS = {
         "oj_intervals_label": "Intervali dostupni za odmor tokom smjene. ",
         "intervals_for_shift": "Intervali za smjenu",
         "oj_help_prefix": "Vremenski intervali dostupni za odmor tokom smjene",
-        "min_len_label": "Minimalna dužina uzastopnih aktivnosti (min_len):",
-        "min_len_help": "Minimalna dužina uzastopnih aktivnosti.",
+        "min_len_label": "Minimalna dužina uzastopnih aktivnosti (cijeli broj):",
+        "min_len_help": "Broj uzastopnih intervala rada na istoj aktivnosti nakon kojeg se može preći na drugu aktivnost bez penala.",
         "p_help_transition_penalty": "Množi se sa brojem prelazaka. Dobijena vrijednost se dodaje funkciji cilja.",
         "num_profiles_help": "Broj različitih profila radnika (npr. komisioner, kontrolor, viljuškarista).",
         "num_activities_help": "Broj različitih tipova aktivnosti koje radnici mogu obavljati.",
@@ -372,6 +373,7 @@ TRANSLATIONS = {
         "primary_activities_for": "Primarne aktivnosti za",
         "select_which_workers": "Odaberi profile radnika koji mogu obavljati",
         "select_which_activities": "Odaberi koje aktivnosti",
+        "select_primary_activities_for": "Odaberi primarne aktivnosti za",
         "workers_are_able": "Radnici mogu obaviti",
         "can_perform_primary": "Mogu obaviti kao primarni rad",
         
