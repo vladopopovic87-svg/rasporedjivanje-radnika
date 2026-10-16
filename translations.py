@@ -416,8 +416,8 @@ TRANSLATIONS = {
         "max_workers_per_interval": "Maksimalni broj radnika po intervalu",
         "max_m1_shifts": "Maksimalni broj smijena sa punim radnim vremenom",
         "max_m2_shifts": "Maksimalni broj smijena sa nepunim radnim vremenom",
-        "non_primary_activities_ratio": "Odnos sporednih aktivnosti",
-        "m2_ratio_limit": "Granica M2 odnosa",
+        "non_primary_activities_ratio": "Maksimalni udio sporednih aktivnosti radnika",
+        "m2_ratio_limit": "Maksimalni udio smijena sa nepunim radnim vremenom",
         "max_number_of": "Maksimalan broj",
         "instructions": "Uputstvo",
         "instructions_content": """
