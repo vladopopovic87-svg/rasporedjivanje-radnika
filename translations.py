@@ -288,6 +288,7 @@ Kada je definisana potražnja, zadatak ostaje odrediti potreban broj radnika i n
 Matematički model je ILP model koji ima sljedeću formu:
 
 $$
+\kern-6em
 \begin{aligned}
 \min\quad
 &\sum_{j\in M}\sum_{t\in T} c_t y_{tj}
@@ -297,49 +298,50 @@ $$
 $$
 
 $$
+\kern-6em
 \begin{aligned}
 \sum_{j\in M}\sum_{k=i}^{u}x_{aijk}b_{kj} &= d_{ai},
-&&\forall i\in N,\ \forall a\in B\cap A_1,\quad
+\quad\forall i\in N,\ \forall a\in B\cap A_1,\quad
 u=\min(i+v_a,n) &&\text{(2)}\\
 \sum_{j\in M}\sum_{k=i}^{r_a}x_{aijk}b_{kj} &= d_{ai},
-&&\forall i\in N,\ \forall a\in B\cap A_2 &&\text{(3)}\\
+\quad\forall i\in N,\ \forall a\in B\cap A_2 &&\text{(3)}\\
 \sum_{j\in M}\sum_{k=i}^{u}x_{aijk}b_{kj}
 &\ge s_{aa'}\sum_{j\in M}\sum_{i\in N}x_{aijk},
-&&\forall k\in N,\ \forall a\in C\cap A_1,\quad
+\quad\forall k\in N,\ \forall a\in C\cap A_1,\quad
 u=\min(k+v_a,n) &&\text{(4)}\\
 \sum_{j\in M}\sum_{k=i}^{r_a}x_{aijk}b_{kj}
 &\ge s_{aa'}\sum_{j\in M}\sum_{i\in N}x_{aijk},
-&&\forall k\in N,\ \forall a\in C\cap A_2 &&\text{(5)}\\
+\quad\forall k\in N,\ \forall a\in C\cap A_2 &&\text{(5)}\\
 \sum_{i=1}^{k}x_{aijk}
 &=\sum_{t\in T_a}y_{tija},
-&&\forall k\in N,\ \forall j\in M,\ \forall a\in A &&\text{(6)}\\
+\quad\forall k\in N,\ \forall j\in M,\ \forall a\in A &&\text{(6)}\\
 \sum_{a\in H_t}y_{tija}
 &\le y_{tj},
-&&\forall i\in N,\ \forall j\in M,\ \forall t\in T &&\text{(7)}\\
+\quad\forall i\in N,\ \forall j\in M,\ \forall t\in T &&\text{(7)}\\
 \sum_{t\in T}\sum_{j\in M}\sum_{a\in A}y_{tija}
 &\le q,
-&&\forall i\in N &&\text{(8)}\\
+\quad\forall i\in N &&\text{(8)}\\
 \sum_{i\in O_j}\sum_{a\in H_t}y_{tija}b_{ij}
 &\le \left(f-\frac{p}{h}\right)y_{tj},
-&&\forall t\in T,\ \forall j\in M_1 &&\text{(9)}\\
+\quad\forall t\in T,\ \forall j\in M_1 &&\text{(9)}\\
 \sum_{j\in M_2}y_{tj}
 &\le w\sum_{j\in M}y_{tj},
-&&\forall t\in T &&\text{(10)}\\
+\quad\forall t\in T &&\text{(10)}\\
 \sum_{t\in T}y_{tj}
 &\le \text{bignumber}\,y_j,
-&&\forall j\in M &&\text{(11)}\\
+\quad\forall j\in M &&\text{(11)}\\
 \sum_{j\in M_1}y_j &\le s_1^{\max} &&&&\text{(12)}\\
 \sum_{j\in M_2}y_j &\le s_2^{\max} &&&&\text{(13)}\\
 \sum_{i\in N}\sum_{a\in E_t}y_{tija}b_{ij}
 &\le e\sum_{i\in N}\sum_{a\in H_t}y_{tija}b_{ij},
-&&\forall t\in T,\ \forall j\in M &&\text{(14)}\\
+\quad\forall t\in T,\ \forall j\in M &&\text{(14)}\\
 \sum_{a\in E_t}y_{tija}&=0,
-&&\forall t\in T,\ \forall i\in N,\ \forall j\in M &&\text{(15)}\\
+\quad\forall t\in T,\ \forall i\in N,\ \forall j\in M &&\text{(15)}\\
 \delta_{tija}&=y_{tija}-y_{t(i+1)ja},
-&&\forall t\in T,\ \forall j\in M,\ \forall a\in A,\ 
-\forall i\in N\cap\{1,\ldots,\max(N)-1\} &&\text{(16)}\\
+\quad\forall t\in T,\ \forall j\in M,\ \forall a\in A,\ 
+\forall i\in N\cap\max(N) &&\text{(16)}\\
 \text{integer:}\quad x_{aijk},\ y_{tija},\ y_{tj},\ y_j,\ \delta_{tija},
-&&\forall i\in N,\ \forall j\in M,\ \forall a\in A,\ \forall t\in T,\ \forall k\in N &&\text{(17)}
+\quad\forall i\in N,\ \forall j\in M,\ \forall a\in A,\ \forall t\in T,\ \forall k\in N &&\text{(17)}
 \end{aligned}
 $$
 
