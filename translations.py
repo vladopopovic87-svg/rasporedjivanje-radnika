@@ -340,7 +340,7 @@ u=\min(k+v_a,n) &&\text{(4)}\\
 \delta_{tija}&=y_{tija}-y_{t(i+1)ja},
 \quad\forall t\in T,\ \forall j\in M,\ \forall a\in A,\ 
 \forall i\in N\cap\max(N) &&\text{(16)}\\
-\text{integer:}\quad x_{aijk},\ y_{tija},\ y_{tj},\ y_j,\ \delta_{tija},
+&\text{integer:}\quad x_{aijk},\ y_{tija},\ y_{tj},\ y_j,\ \delta_{tija},
 \quad\forall i\in N,\ \forall j\in M,\ \forall a\in A,\ \forall t\in T,\ \forall k\in N &&\text{(17)}
 \end{aligned}
 $$
