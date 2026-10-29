@@ -276,7 +276,126 @@ TRANSLATIONS = {
         "schedule_page": "Raspored",
         "instructions_page": "Uputstvo",
         "about_page": "O aplikaciji",
-        "about_content": "Tekst ove stranice biće dodat naknadno.",
+        "about_content": r"""
+Aplikacija je nastala iz potrebe za rješavanjem problema raspoređivanja radnika u jednom realnom distributivnom skladištu. Zahvaljujući primijenjenom pristupu problemu, aplikacija se može koristiti za rješavanje sličnih problema i u drugim radnim okruženjima. Bazira se na matematičkom modelu predstavljenom u radu Popović i ostali (2021), objavljenom u časopisu *Sustainability*, koji prema podacima sa ResearchGate-a do sada ima 48 citata. Takođe, taj model je korišćen i u doktorskoj disertaciji Vlade Popovića pod nazivom *Optimizacija logističkih procesa u distribuciji proizvoda*.
+
+Primijenjeni pristup problemu raspoređivanja radnika podrazumijeva da se svi poslovi posmatraju kao aktivnosti koje tokom radnog dana zahtijevaju određeni broj radnika. Potreban broj radnika za obavljanje pojedine aktivnosti može biti različit u toku dana. Radni dan se u aplikaciji može podijeliti na duže ili kraće vremenske intervale i za svaki od njih definisati potreban broj radnika po aktivnostima.
+
+Kada je definisana potražnja, zadatak ostaje odrediti potreban broj radnika i njihov raspored tako da budu zadovoljene potrebe svih aktivnosti, uz istovremeno poštovanje definisanih ograničenja i minimiziranje troškova radne snage. Matematički model i definicije njegovih činilaca dati su u nastavku.
+
+## Matematički model
+
+Matematički model je ILP model koji ima sljedeću formu:
+
+$$
+\begin{aligned}
+\min\quad
+&\sum_{j\in M}\sum_{t\in T} c_t y_{tj}
++ P\sum_{t\in T}\sum_{j\in M}\sum_{a\in A}\sum_{i\in N}\delta_{tija}
+&&\text{(1)}
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+\sum_{j\in M}\sum_{k=i}^{u}x_{aijk}b_{kj} &= d_{ai},
+&&\forall i\in N,\ \forall a\in B\cap A_1,\quad
+u=\min(i+v_a,n) &&\text{(2)}\\
+\sum_{j\in M}\sum_{k=i}^{r_a}x_{aijk}b_{kj} &= d_{ai},
+&&\forall i\in N,\ \forall a\in B\cap A_2 &&\text{(3)}\\
+\sum_{j\in M}\sum_{k=i}^{u}x_{aijk}b_{kj}
+&\ge s_{aa'}\sum_{j\in M}\sum_{i\in N}x_{aijk},
+&&\forall k\in N,\ \forall a\in C\cap A_1,\quad
+u=\min(k+v_a,n) &&\text{(4)}\\
+\sum_{j\in M}\sum_{k=i}^{r_a}x_{aijk}b_{kj}
+&\ge s_{aa'}\sum_{j\in M}\sum_{i\in N}x_{aijk},
+&&\forall k\in N,\ \forall a\in C\cap A_2 &&\text{(5)}\\
+\sum_{i=1}^{k}x_{aijk}
+&=\sum_{t\in T_a}y_{tija},
+&&\forall k\in N,\ \forall j\in M,\ \forall a\in A &&\text{(6)}\\
+\sum_{a\in H_t}y_{tija}
+&\le y_{tj},
+&&\forall i\in N,\ \forall j\in M,\ \forall t\in T &&\text{(7)}\\
+\sum_{t\in T}\sum_{j\in M}\sum_{a\in A}y_{tija}
+&\le q,
+&&\forall i\in N &&\text{(8)}\\
+\sum_{i\in O_j}\sum_{a\in H_t}y_{tija}b_{ij}
+&\le \left(f-\frac{p}{h}\right)y_{tj},
+&&\forall t\in T,\ \forall j\in M_1 &&\text{(9)}\\
+\sum_{j\in M_2}y_{tj}
+&\le w\sum_{j\in M}y_{tj},
+&&\forall t\in T &&\text{(10)}\\
+\sum_{t\in T}y_{tj}
+&\le \text{bignumber}\,y_j,
+&&\forall j\in M &&\text{(11)}\\
+\sum_{j\in M_1}y_j &\le s_1^{\max} &&&&\text{(12)}\\
+\sum_{j\in M_2}y_j &\le s_2^{\max} &&&&\text{(13)}\\
+\sum_{i\in N}\sum_{a\in E_t}y_{tija}b_{ij}
+&\le e\sum_{i\in N}\sum_{a\in H_t}y_{tija}b_{ij},
+&&\forall t\in T,\ \forall j\in M &&\text{(14)}\\
+\sum_{a\in E_t}y_{tija}&=0,
+&&\forall t\in T,\ \forall i\in N,\ \forall j\in M &&\text{(15)}\\
+\delta_{tija}&=y_{tija}-y_{t(i+1)ja},
+&&\forall t\in T,\ \forall j\in M,\ \forall a\in A,\ 
+\forall i\in N\cap\{1,\ldots,\max(N)-1\} &&\text{(16)}\\
+\text{integer:}\quad x_{aijk},\ y_{tija},\ y_{tj},\ y_j,\ \delta_{tija},
+&&\forall i\in N,\ \forall j\in M,\ \forall a\in A,\ \forall t\in T,\ \forall k\in N &&\text{(17)}
+\end{aligned}
+$$
+
+Funkcija cilja (1) teži da minimizira troškove radne snage. Ograničenja (2, 3, 4, 5) osiguravaju da se zahtjevi za radnicima ispune u predviđenom vremenu. Ograničenje (6) reguliše da ukupan broj radnika koji obavlja neku aktivnost u nekom intervalu bude jednak predviđenom broju radnika tog profila u tom intervalu. Ograničenje (7) reguliše da ukupan broj radnika nekog profila u nekom intervalu angažovanih na svim aktivnostima ne može biti veći od ukupnog broja radnika tog profila u smjeni. Ograničenje (8) reguliše da ukupan broj radnika koji radi u skladištu ne može da bude veći od maksimalnog dozvoljenog broja radnika u bilo kom intervalu radnog dana.
+
+Ograničenje (9) osigurava da svaki radnik ima odmor predviđene dužine u definisanom vremenu. Ograničenje (10) sprječava prevelik broj radnika u smjenama sa skraćenim radnim vremenom i obezbjeđuje da udio radnika određenog profila raspoređenih u takve smjene ne prelazi zadati procenat ukupnog broja radnika tog profila u svim smjenama. Ograničenje (11) obezbjeđuje podatak o broju radnika u smjeni bez obzira na profil. Ograničenjima (12 i 13) definiše se željeni maksimalni broj smjena sa punim i skraćenim radnim vremenom. Ograničenje (14) reguliše vrijeme provedeno u obavljanju aktivnosti koje nisu primarne određenom profilu. Ograničenje (15) obezbjeđuje da radnici određenog profila ne mogu biti dodijeljeni aktivnostima za koje nisu osposobljeni. Ograničenje (16) registruje prelazak sa obavljanja aktivnosti u jednom intervalu na neobavljanje iste aktivnosti u narednom intervalu, odnosno prelazak na drugu aktivnost ili odmor. Ograničenje (17) definiše prirodu promjenljivih.
+
+## Tabela 4.1. Ulazi i izlazi matematičkog modela
+
+### Ulazi
+
+| Oznaka | Opis |
+|---|---|
+| `N` | Skup intervala radnog dana |
+| `M` | Skup svih smjena |
+| `M1` | Skup smjena sa punim radnim vremenom |
+| `M2` | Skup smjena sa skraćenim radnim vremenom |
+| `s1` | Maksimalni broj smjena sa punim radnim vremenom |
+| `s2` | Maksimalni broj smjena sa skraćenim radnim vremenom |
+| `n` | Redni broj posljednjeg intervala radnog dana |
+| `bkj` | Parametar sa vrijednošću 1 ako je interval `k∈N` dio smjene `j∈M`, a 0 u suprotnom |
+| `A` | Skup svih aktivnosti |
+| `B` | Skup nezavisnih aktivnosti |
+| `C` | Skup zavisnih aktivnosti |
+| `Ga` | Skup aktivnosti od kojih aktivnost `a∈C` zavisi |
+| `dai` | Potrebe za radnicima aktivnosti `a` u intervalu `i` |
+| `sa,a'` | Procenat zavisnosti aktivnosti `a∈C` od aktivnosti `a'∈Ga` |
+| `A1` | Skup aktivnosti sa vremenskim prozorom kao rokom za završetak |
+| `va` | Veličina vremenskog prozora za završetak aktivnosti `a∈A1`, u intervalima |
+| `A2` | Skup aktivnosti sa rokom predstavljenim rednim brojem intervala do kada se moraju obaviti |
+| `ra` | Interval do koga se mora zadovoljiti potreba za radnicima aktivnosti `a∈A2` |
+| `T` | Skup svih profila radnika |
+| `Ta` | Skup svih profila radnika kojima je dozvoljeno da obavljaju aktivnost `a` |
+| `Ht` | Skup svih aktivnosti koje radnik profila `t∈T` može da obavlja |
+| `Et` | Skup aktivnosti koje nisu primarne za radnika profila `t∈T` |
+| `ct` | Trošak radnika profila `t` |
+| `q` | Maksimalni dozvoljeni broj radnika koji može raditi u isto vrijeme |
+| `p` | Trajanje pauze, u vremenskim jedinicama |
+| `h` | Trajanje intervala, u vremenskim jedinicama |
+| `f` | Veličina vremenskog prozora, u intervalima |
+| `Oj` | Skup intervala dozvoljenih za pauzu u smjeni `j∈M1` |
+| `w` | Maksimalno dozvoljeni procenat radnika sa skraćenim radnim vremenom |
+| `e` | Maksimalno dozvoljeni udio vremena provedenog na neprimarnim aktivnostima |
+| `P` | Značaj smanjenja promjena aktivnosti |
+
+### Izlazi
+
+| Oznaka | Opis |
+|---|---|
+| `yj` | Ukupan broj radnika u smjeni `j∈M` |
+| `ytj` | Broj radnika profila `t∈T` dodijeljenih smjeni `j∈M` |
+| `ytija` | Broj radnika profila `t∈T` dodijeljenih aktivnosti `a∈A` u intervalu `i∈N` smjene `j∈M` |
+| `xaijk` | Broj radnika dodijeljenih intervalu `i∈N` smjene `j∈M` da ispuni potrebu aktivnosti `a∈A` iz intervala `k∈N` |
+| `δtija` | Nenegativna promjenljiva koja označava prekid obavljanja aktivnosti `a` od strane radnika profila `t` u smjeni `j`, pri prelasku iz intervala `i` u interval `i+1` |
+| `bignumber` | Veliki broj |
+""",
         
         # General Parameters
         "general_parameters": "Radnici i aktivnosti",
