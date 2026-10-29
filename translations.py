@@ -306,11 +306,11 @@ u=\min(i+v_a,n) &&\text{(2)}\\
 \sum_{j\in M}\sum_{k=i}^{r_a}x_{aijk}b_{kj} &= d_{ai},
 \quad\forall i\in N,\ \forall a\in B\cap A_2 &&\text{(3)}\\
 \sum_{j\in M}\sum_{k=i}^{u}x_{aijk}b_{kj}
-&\ge s_{aa'}\sum_{j\in M}\sum_{i\in N}x_{aijk},
+&\ge \displaystyle\sum_{a'\in G_a}s_{a'}\sum_{j\in M}\sum_{i\in N}x_{aijk},
 \quad\forall k\in N,\ \forall a\in C\cap A_1,\quad
 u=\min(k+v_a,n) &&\text{(4)}\\
 \sum_{j\in M}\sum_{k=i}^{r_a}x_{aijk}b_{kj}
-&\ge s_{aa'}\sum_{j\in M}\sum_{i\in N}x_{aijk},
+&\ge \displaystyle\sum_{a'\in G_a}s_{a'}\sum_{j\in M}\sum_{i\in N}x_{aijk},
 \quad\forall k\in N,\ \forall a\in C\cap A_2 &&\text{(5)}\\
 \sum_{i=1}^{k}x_{aijk}
 &=\sum_{t\in T_a}y_{tija},
@@ -366,9 +366,9 @@ Ograničenje (9) osigurava da svaki radnik ima odmor predviđene dužine u defin
 | `A` | Skup svih aktivnosti |
 | `B` | Skup nezavisnih aktivnosti |
 | `C` | Skup zavisnih aktivnosti |
-| `Ga` | Skup aktivnosti od kojih aktivnost `a∈C` zavisi |
+| `$G_a$` | Skup aktivnosti od kojih aktivnost `$a\in C$` zavisi |
 | `dai` | Potrebe za radnicima aktivnosti `a` u intervalu `i` |
-| `sa,a'` | Procenat zavisnosti aktivnosti `a∈C` od aktivnosti `a'∈Ga` |
+| `$s_{a'}$` | Procenat zavisnosti aktivnosti `$a\in C$` od aktivnosti `$a'\in G_a$` |
 | `A1` | Skup aktivnosti sa vremenskim prozorom kao rokom za završetak |
 | `va` | Veličina vremenskog prozora za završetak aktivnosti `a∈A1`, u intervalima |
 | `A2` | Skup aktivnosti sa rokom predstavljenim rednim brojem intervala do kada se moraju obaviti |
