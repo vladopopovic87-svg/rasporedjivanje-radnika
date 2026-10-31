@@ -288,7 +288,6 @@ Kada je definisana potražnja, zadatak ostaje odrediti potreban broj radnika i n
 Matematički model je ILP model koji ima sljedeću formu:
 
 $$
-\kern-6em
 \begin{aligned}
 \min\quad
 &\sum_{j\in M}\sum_{t\in T} c_t y_{tj}
@@ -298,7 +297,6 @@ $$
 $$
 
 $$
-\kern-6em
 \begin{aligned}
 \sum_{j\in M}\sum_{k=i}^{u}x_{aijk}b_{kj} &= d_{ai},
 \quad\forall i\in N,\ \forall a\in B\cap A_1,\quad
@@ -366,9 +364,9 @@ Ograničenje (9) osigurava da svaki radnik ima odmor predviđene dužine u defin
 | `A` | Skup svih aktivnosti |
 | `B` | Skup nezavisnih aktivnosti |
 | `C` | Skup zavisnih aktivnosti |
-| `$G_a$` | Skup aktivnosti od kojih aktivnost `$a\in C$` zavisi |
+| `Ga` | Skup aktivnosti od kojih aktivnost `a∈C` zavisi |
 | `dai` | Potrebe za radnicima aktivnosti `a` u intervalu `i` |
-| `$s_{a'}$` | Procenat zavisnosti aktivnosti `$a\in C$` od aktivnosti `$a'\in G_a$` |
+| `sa'` | Procenat zavisnosti aktivnosti `a∈C` od aktivnosti `a'∈Ga` |
 | `A1` | Skup aktivnosti sa vremenskim prozorom kao rokom za završetak |
 | `va` | Veličina vremenskog prozora za završetak aktivnosti `a∈A1`, u intervalima |
 | `A2` | Skup aktivnosti sa rokom predstavljenim rednim brojem intervala do kada se moraju obaviti |

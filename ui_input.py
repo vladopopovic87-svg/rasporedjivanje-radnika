@@ -18,6 +18,26 @@ def display_about():
     """Display the about page content."""
     lang = st.session_state.get("language", "sr")
     st.header(get_text("about_page", lang))
+    st.markdown(
+        """
+        <style>
+        [data-testid="stMarkdownContainer"] .katex-display {
+            overflow-x: auto;
+            overflow-y: hidden;
+            margin-left: 0;
+            margin-right: 0;
+            padding: 0.25rem 0;
+            text-align: left;
+        }
+
+        [data-testid="stMarkdownContainer"] .katex-display > .katex {
+            display: inline-block;
+            min-width: max-content;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
     st.markdown(get_text("about_content", lang))
 
 
