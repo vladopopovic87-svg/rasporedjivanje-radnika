@@ -222,7 +222,9 @@ TRANSLATIONS = {
 
     ### 7. Pokretanje i provjera rezultata
 
-    Klikni **Pokreni optimizaciju**. U tabeli rasporeda svaka kolona predstavlja jednu smjenu, profil i konkretnog radnika. Tabela aktivnosti po intervalu poredi **Zahtevano** i **Raspoređeno**. Ako se vrijednosti razlikuju, provjeri potražnju, dozvoljene profile, trajanje smjena i ograničenja.
+    Klikni **Pokreni optimizaciju**. U tabeli rasporeda svaka kolona predstavlja jednu smjenu, profil i konkretnog radnika.
+
+    Tabela **Zahtijevano vs. raspoređeno** prikazuje za svaku aktivnost i interval broj radnika koji je zahtijevan i broj radnika koji je raspoređen. Red **Ukupno** na kraju tabele sabira vrijednosti za cijeli dan. Ukupni zahtijevani i ukupni raspoređeni broj radnika treba da budu jednaki za svaku aktivnost.
 
     """,
         
@@ -252,7 +254,7 @@ TRANSLATIONS = {
         "employees_per_shift": "Employees per Shift and Profile (ytj)",
         "shift_allocation_timetable": "Shift Allocation Timetable",
         "export_schedule_excel": "Export schedule to Excel",
-        "total_activities_per_interval": "Total activities per interval (Demanded vs. Realized)",
+        "total_activities_per_interval": "Demanded vs. Allocated by activity and interval",
         "additional_results_analysis": "Additional Results Analysis",
         "show_activity_sequences": "Show Activity Sequences Analysis",
         "show_nonzero_pulp_variables": "Show all PuLP variables with non-zero values",
@@ -263,6 +265,7 @@ TRANSLATIONS = {
         "demanded": "Demanded",
         "allocated": "Allocated",
         "interval_hour": "Interval (Hour)",
+        "total": "Total",
         "edit_demand_per_interval": "Edit Demand per Interval",
         "no_demand_data_dummy": "No demand data available. Using dummy data.",
         "dummy_activity": "Dummy Activity",
@@ -273,7 +276,7 @@ TRANSLATIONS = {
         # App titles and headers
         "app_title": "Optimizacija raspoređivanja radnika",
         "model_parameters": "Parametri modela",
-        "schedule_page": "Raspored",
+        "schedule_page": "Aplikacija",
         "instructions_page": "Uputstvo",
         "about_page": "O aplikaciji",
         "about_content": r"""
@@ -596,7 +599,11 @@ Ograničenje (9) osigurava da svaki radnik ima odmor predviđene dužine u defin
 
     **Izlazna tabela - Tabela rasporeda smjena**: Prikazuje generisani raspored, a svaka kolona predstavlja smjenu, profil i konkretnog radnika.
 
-    **Izlazna tabela - Ukupne aktivnosti po intervalu**: Upoređuje traženi i raspoređeni broj radnika za svaku aktivnost i interval.
+    **Izlazna tabela - Zahtijevano vs. raspoređeno po aktivnosti i intervalu**: Za svaku aktivnost i svaki vremenski interval prikazuje dvije vrijednosti:
+    - **Zahtijevano**: broj radnika koji je potreban prema unesenoj potražnji, odnosno prema pravilima za zavisne aktivnosti.
+    - **Raspoređeno**: broj radnika koji je optimizacija dodijelila toj aktivnosti u tom intervalu.
+
+    Posljednji red **Ukupno** sabira vrijednosti za sve intervale tokom cijelog dana. Za svaku aktivnost ukupno **Zahtijevano** i ukupno **Raspoređeno** treba da budu jednaki. Ako nisu jednaki, provjeri unos potražnje, dozvoljene profile, dužine smjena i postavljena ograničenja.
     """,
         
         # Results
@@ -625,7 +632,7 @@ Ograničenje (9) osigurava da svaki radnik ima odmor predviđene dužine u defin
         "employees_per_shift": "Izabrane smjene i radnici",
         "shift_allocation_timetable": "Raspored rada",
         "export_schedule_excel": "Izvezi raspored u Excel",
-        "total_activities_per_interval": "Ukupne aktivnosti po intervalu (zahtjevano vs. raspoređeno)",
+        "total_activities_per_interval": "Zahtijevano vs. raspoređeno po aktivnosti i intervalu",
         "additional_results_analysis": "Dodatna analiza rezultata",
         "show_activity_sequences": "Prikaži analizu sekvenci aktivnosti",
         "show_nonzero_pulp_variables": "Prikaži sve PuLP promenljive sa nenula vrijednostima",
@@ -636,6 +643,7 @@ Ograničenje (9) osigurava da svaki radnik ima odmor predviđene dužine u defin
         "demanded": "Zahtevano",
         "allocated": "Raspoređeno",
         "interval_hour": "Interval (Sat)",
+        "total": "Ukupno",
         "edit_demand_per_interval": "Uredi potražnju po intervalu",
         "no_demand_data_dummy": "Nema podataka o potražnji. Koristi se zamjenski skup podataka.",
         "dummy_activity": "Zamjenska aktivnost",

@@ -194,6 +194,9 @@ def create_demand_comparison_table(activity_per_interval, N_set, activities,
     final_columns = [col for col in ordered_columns if col in df_activities.columns]
     df_activities = df_activities[final_columns]
 
+    totals = df_activities.sum(numeric_only=True)
+    df_activities.loc[get_text("total", lang)] = totals
+
     return df_activities
 
 
